@@ -1,0 +1,287 @@
+/* ═══════════════════════════════════════════════════════
+   SIMILAR PRODUCTS — adicionar no final do globals.css
+   ═══════════════════════════════════════════════════════ */
+
+.simSection {
+  width: 100%;
+  background: #f3f0fb;
+  padding: 48px 0 56px;
+}
+
+/* Reusa o max-width do site */
+.simSection > * {
+  max-width: 1280px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 32px;
+  padding-right: 32px;
+}
+
+/* ── Cabeçalho ── */
+.simHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  max-width: 1280px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 32px;
+  padding-right: 32px;
+}
+
+.simTitle {
+  font-family: var(--font-syne), Syne, sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: #1a1a2e;
+  letter-spacing: -0.3px;
+  margin: 0;
+}
+
+.simTitleAccent {
+  color: #5b21b6;
+}
+
+.simNavRow {
+  display: flex;
+  gap: 8px;
+}
+
+.simNavBtn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 2px solid #5b21b6;
+  background: transparent;
+  color: #5b21b6;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.18s, color 0.18s;
+  flex-shrink: 0;
+}
+
+.simNavBtn:hover:not(:disabled) {
+  background: #5b21b6;
+  color: #fff;
+}
+
+.simNavBtn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+/* ── Trilho scrollável ── */
+.simTrack {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;          /* Firefox */
+  padding-left: 32px;
+  padding-right: 32px;
+  /* limita visualmente ao max-width sem quebrar scroll lateral */
+  max-width: 1280px;
+  margin-left: auto;
+  margin-right: auto;
+  box-sizing: border-box;
+}
+
+.simTrack::-webkit-scrollbar {
+  display: none;                  /* Chrome/Safari */
+}
+
+/* ── Card ── */
+.simCard {
+  flex: 0 0 220px;
+  scroll-snap-align: start;
+  background: #ffffff;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(91, 33, 182, 0.07);
+  transition: box-shadow 0.2s, transform 0.2s;
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+}
+
+.simCard:hover {
+  box-shadow: 0 8px 28px rgba(91, 33, 182, 0.18);
+  transform: translateY(-4px);
+}
+
+/* ── Imagem ── */
+.simCardImg {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  background: #f7f5ff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+}
+
+.simCardImg img,
+.simCardImg > * {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transition: transform 0.3s ease;
+}
+
+.simCard:hover .simCardImg img,
+.simCard:hover .simCardImg > * {
+  transform: scale(1.05);
+}
+
+/* Badges */
+.simBadgeOff {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background: #ea580c;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 7px;
+  border-radius: 20px;
+  letter-spacing: 0.3px;
+  z-index: 1;
+}
+
+.simBadgeLaunch {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background: #5b21b6;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 7px;
+  border-radius: 20px;
+  letter-spacing: 0.3px;
+  z-index: 1;
+}
+
+.simBadgeBrand {
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+  background: rgba(26, 26, 46, 0.82);
+  color: #fff;
+  font-size: 9px;
+  font-weight: 600;
+  padding: 3px 7px;
+  border-radius: 20px;
+  letter-spacing: 0.2px;
+  z-index: 1;
+}
+
+/* ── Corpo do card ── */
+.simCardBody {
+  padding: 12px 14px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.simCardSub {
+  font-size: 10px;
+  font-weight: 600;
+  color: #5b21b6;
+  letter-spacing: 0.7px;
+  text-transform: uppercase;
+}
+
+.simCardName {
+  font-size: 13px;
+  font-weight: 600;
+  color: #1a1a2e;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.simCardPrices {
+  display: flex;
+  flex-direction: column;
+  margin-top: 6px;
+}
+
+.simCardFrom {
+  font-size: 10px;
+  color: #6b7280;
+}
+
+.simCardPrice {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1a1a2e;
+  letter-spacing: -0.5px;
+}
+
+.simCardNote {
+  font-size: 10px;
+  color: #9ca3af;
+}
+
+.simCardVars {
+  font-size: 10px;
+  color: #5b21b6;
+  font-weight: 500;
+  margin-top: 2px;
+}
+
+/* ── Rodapé do card ── */
+.simCardFooter {
+  padding: 0 14px 14px;
+}
+
+.simCardBtn {
+  display: block;
+  width: 100%;
+  padding: 9px 0;
+  background: #5b21b6;
+  color: #fff;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 600;
+  text-align: center;
+  transition: background 0.18s;
+}
+
+.simCard:hover .simCardBtn {
+  background: #4c1d95;
+}
+
+/* ── Responsivo ── */
+@media (max-width: 768px) {
+  .simHeader,
+  .simTrack {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .simTitle {
+    font-size: 18px;
+  }
+
+  .simCard {
+    flex: 0 0 180px;
+  }
+}
+
+@media (max-width: 480px) {
+  .simCard {
+    flex: 0 0 72vw;
+  }
+}

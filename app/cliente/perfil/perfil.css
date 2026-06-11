@@ -1,0 +1,184 @@
+/* PÁGINA /CLIENTE/PERFIL */
+
+.perfilBreadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-dm-sans), sans-serif;
+  font-size: 0.8125rem;
+  color: #9ca3af;
+  margin-bottom: 16px;
+}
+.perfilBreadcrumb a { color: var(--purple-700, #5b21b6); text-decoration: none; }
+.perfilBreadcrumb a:hover { text-decoration: underline; }
+
+.perfilTitle {
+  font-family: var(--font-syne), sans-serif;
+  font-size: 1.375rem;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin: 0 0 4px;
+}
+
+.perfilSubtitle {
+  font-family: var(--font-dm-sans), sans-serif;
+  font-size: 0.8125rem;
+  color: #6b7280;
+  margin: 0 0 20px;
+}
+
+.perfilSection {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 12px;
+}
+
+.perfilSectionTitle {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-family: var(--font-syne), sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #6b7280;
+  margin: 0 0 16px;
+}
+.perfilSectionTitle svg { color: var(--purple-700, #5b21b6); flex-shrink: 0; }
+
+.perfilGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.perfilField {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.perfilFieldFull { grid-column: 1 / -1; }
+
+.perfilField label {
+  font-family: var(--font-dm-sans), sans-serif;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: #374151;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.perfilOptional {
+  font-size: 0.6875rem;
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+  color: #9ca3af;
+}
+
+.perfilField input,
+.perfilField select {
+  height: 38px;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 7px;
+  padding: 0 10px;
+  font-family: var(--font-dm-sans), sans-serif;
+  font-size: 0.8125rem;
+  color: #1a1a2e;
+  background: #fff;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  width: 100%;
+}
+
+.perfilField input:focus,
+.perfilField select:focus {
+  border-color: var(--purple-700, #5b21b6);
+  box-shadow: 0 0 0 3px rgba(91,33,182,0.08);
+}
+
+.perfilDisabled {
+  background: #f9fafb !important;
+  color: #9ca3af !important;
+  cursor: not-allowed;
+}
+
+.perfilField small {
+  font-family: var(--font-dm-sans), sans-serif;
+  font-size: 0.6875rem;
+  color: #9ca3af;
+}
+
+.perfilCepWrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.perfilCepWrap input { width: 100%; }
+.perfilCepSpinner {
+  position: absolute;
+  right: 10px;
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(91,33,182,0.2);
+  border-top-color: var(--purple-700, #5b21b6);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+
+.perfilActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 4px;
+  padding-bottom: 40px;
+}
+
+.perfilBtnPrimary {
+  height: 40px;
+  padding: 0 22px;
+  background: var(--purple-700, #5b21b6);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-family: var(--font-dm-sans), sans-serif;
+  font-size: 0.875rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.perfilBtnPrimary:hover:not(:disabled) { background: #4c1d95; }
+.perfilBtnPrimary:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.perfilBtnSecondary {
+  height: 40px;
+  padding: 0 18px;
+  background: #fff;
+  color: #374151;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 8px;
+  font-family: var(--font-dm-sans), sans-serif;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  transition: border-color 0.15s;
+}
+.perfilBtnSecondary:hover { border-color: #d1d5db; }
+
+@media (max-width: 480px) {
+  .perfilGrid { grid-template-columns: 1fr; }
+  .perfilFieldFull { grid-column: 1; }
+  .perfilActions { flex-direction: column-reverse; }
+  .perfilBtnPrimary, .perfilBtnSecondary { width: 100%; justify-content: center; }
+}
