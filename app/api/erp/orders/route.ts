@@ -11,23 +11,11 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase-admin'
-
-// Confere a chave de API enviada pelo Grape One.
-function autorizado(request: NextRequest): boolean {
-  const esperada = process.env.ERP_API_KEY
-  if (!esperada) return false // sem chave configurada, bloqueia por segurança
-  const recebida = request.headers.get('x-api-key')
-  return recebida === esperada
-}
-
-// Arredonda para 2 casas decimais, evitando os "0.30000000004" do float.
-function round2(n: number): number {
-  return Math.round((n + Number.EPSILON) * 100) / 100
-}
+import { autorizadoErp, round2 } from '@/lib/erp-auth'
 
 export async function GET(request: NextRequest) {
   // 1) Segurança: precisa da chave certa
-  if (!autorizado(request)) {
+  if (!autorizadoErp(request)) {
     return NextResponse.json(
       { error: 'Não autorizado. Envie o cabeçalho x-api-key válido.' },
       { status: 401 }
