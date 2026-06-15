@@ -3,7 +3,9 @@
 // O Grape One chama:  GET /api/erp/orders   com o cabeçalho  x-api-key: <ERP_API_KEY>
 //
 // Filtros opcionais (query string):
-//   ?status=confirmado          -> só pedidos com esse status
+//   ?status=confirmado          -> só pedidos com esse status (andamento/entrega)
+//   ?pagamento=pago             -> só pedidos com esse status de pagamento
+//   ?pago=true | false          -> atalho: só pagos (true) ou só não-pagos (false)
 //   ?desde=2026-06-01           -> só pedidos criados a partir dessa data (ISO)
 //   ?limite=50                  -> máximo de pedidos retornados (padrão 100, teto 500)
 
@@ -18,6 +20,11 @@ function autorizado(request: NextRequest): boolean {
   return recebida === esperada
 }
 
+// Arredonda para 2 casas decimais, evitando os "0.30000000004" do float.
+function round2(n: number): number {
+  return Math.round((n + Number.EPSILON) * 100) / 100
+}
+
 export async function GET(request: NextRequest) {
   // 1) Segurança: precisa da chave certa
   if (!autorizado(request)) {
@@ -30,6 +37,8 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
     const status = searchParams.get('status')
+    const pagamento = searchParams.get('pagamento')
+    const pago = searchParams.get('pago') // 'true' | 'false'
     const desde = searchParams.get('desde')
     const limiteParam = parseInt(searchParams.get('limite') || '100', 10)
     const limite = Math.min(Math.max(Number.isNaN(limiteParam) ? 100 : limiteParam, 1), 500)
@@ -43,6 +52,9 @@ export async function GET(request: NextRequest) {
       .select(`
         id,
         status,
+        pagamento_status,
+        pago_em,
+        pagarme_order_id,
         total,
         observacao,
         forma_pagamento,
@@ -55,6 +67,9 @@ export async function GET(request: NextRequest) {
       .limit(limite)
 
     if (status) query = query.eq('status', status)
+    if (pagamento) query = query.eq('pagamento_status', pagamento)
+    if (pago === 'true') query = query.eq('pagamento_status', 'pago')
+    if (pago === 'false') query = query.neq('pagamento_status', 'pago')
     if (desde) query = query.gte('created_at', desde)
 
     const { data, error } = await query
@@ -95,18 +110,24 @@ export async function GET(request: NextRequest) {
         sku: i.sku,
         descricao: i.descricao,
         quantidade: i.quantidade,
-        preco_unitario: Number(i.preco_unitario),
-        subtotal: Number(i.preco_unitario) * i.quantidade,
+        preco_unitario: round2(Number(i.preco_unitario)),
+        subtotal: round2(Number(i.preco_unitario) * i.quantidade),
       }))
+
+      const pagamentoStatus = p.pagamento_status || 'nao_pago'
 
       return {
         id: p.id,
-        status: p.status,
-        total: Number(p.total),
+        status: p.status,              // andamento/entrega
+        pagamento_status: pagamentoStatus, // nao_pago | pago | estornado | falhou
+        pago: pagamentoStatus === 'pago', // atalho booleano
+        pago_em: p.pago_em || null,
+        total: round2(Number(p.total)),
         forma_pagamento: p.forma_pagamento,
         observacao: p.observacao,
         criado_em: p.created_at,
         atualizado_em: p.updated_at,
+        pagarme_order_id: p.pagarme_order_id || null,
         cliente: cliente
           ? {
               nome: cliente.nome,

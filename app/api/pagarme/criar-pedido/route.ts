@@ -3,6 +3,7 @@
 // SEGURO: secret key nunca vai para o frontend
 
 import { NextRequest, NextResponse } from 'next/server'
+import { createAdminClient } from '@/lib/supabase-admin'
 
 const PAGARME_API = 'https://api.pagar.me/core/v5'
 const SECRET_KEY = process.env.PAGARME_SECRET_KEY!
@@ -143,6 +144,19 @@ export async function POST(request: NextRequest) {
         { error: `Erro Pagar.me: ${errMsg}` },
         { status: 400 }
       )
+    }
+
+    // Vincula a cobrança do Pagar.me ao pedido no Supabase.
+    // Isso permite, depois, o webhook marcar o pedido como pago.
+    try {
+      const admin = createAdminClient()
+      await admin
+        .from('pedidos')
+        .update({ pagarme_order_id: data.id })
+        .eq('id', pedido_id)
+    } catch (e) {
+      console.error('Falha ao salvar pagarme_order_id no pedido:', e)
+      // Não interrompe o fluxo: o cliente ainda recebe o Pix/boleto
     }
 
     // Extrai os dados de pagamento da resposta
