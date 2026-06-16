@@ -390,7 +390,7 @@ Regra simples: quanto menor o número do grão, mais agressiva é a lixa; quanto
   {
     prefix:"1.TPOR",
     slug:"1-tpor",
-    name:"Trava Porta |Prático",
+    name:"Trava Porta Prático Adesivo Segura Fixa Porta e Janela",
     description:"Trava Porta |Prático · Branco",
     category:"Ferragens",
     subcategory:"Travas",
