@@ -18,6 +18,12 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  // Serve as imagens direto (sem o otimizador do Next, que roda o sharp em
+  // worker e estava crashando — "Jest worker exceeding retry limit"). Resolve
+  // o erro na pagina de produto. Para producao, depois da pra reativar e
+  // comprimir as imagens grandes.
+  images: { unoptimized: true },
+
   async headers() {
     return [
       {
