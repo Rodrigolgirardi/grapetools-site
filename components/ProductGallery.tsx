@@ -9,22 +9,24 @@ const EXTS = ["png", "jpg", "jpeg"];
 // Quantas fotos secundárias procurar por SKU (principal + até 5 extras).
 const MAX_EXTRAS = 5;
 
-// Resolve a URL real de uma foto, testando as extensões na ordem. null se não existir.
-function resolveUrl(base: string): Promise<string | null> {
+// Testa se uma imagem existe (no navegador).
+function checkUrl(url: string): Promise<boolean> {
   return new Promise((resolve) => {
-    let i = 0;
-    const tryNext = () => {
-      if (i >= EXTS.length) {
-        resolve(null);
-        return;
-      }
-      const url = `/products/${base}.${EXTS[i++]}`;
-      const img = new Image();
-      img.onload = () => resolve(url);
-      img.onerror = tryNext;
-      img.src = url;
-    };
-    tryNext();
+    const img = new Image();
+    img.onload = () => resolve(true);
+    img.onerror = () => resolve(false);
+    img.src = url;
+  });
+}
+
+// Resolve a URL real de uma foto. Testa cada "base" (nome do arquivo) nas 3
+// extensões, TUDO em paralelo, e pega a primeira que existir (na ordem dada).
+// Recebe várias bases pra aceitar o nome com HÍFEN e com PONTO.
+function resolveFromBases(bases: string[]): Promise<string | null> {
+  const urls = bases.flatMap((b) => EXTS.map((ext) => `/products/${b}.${ext}`));
+  return Promise.all(urls.map(checkUrl)).then((oks) => {
+    const i = oks.findIndex(Boolean);
+    return i >= 0 ? urls[i] : null;
   });
 }
 
@@ -34,8 +36,11 @@ type Props = {
 };
 
 export function ProductGallery({ product, variation }: Props) {
-  const mainBase = variation.sku.replace(/\./g, "-");
-  const prefixBase = product.prefix.replace(/\./g, "-");
+  // Aceita o nome do arquivo com hífen (CH-FEC-MAGNET) OU com ponto (CH.FEC.MAGNET)
+  const skuDash = variation.sku.replace(/\./g, "-");
+  const skuDot = variation.sku;
+  const prefixDash = product.prefix.replace(/\./g, "-");
+  const prefixDot = product.prefix;
 
   const [photos, setPhotos] = useState<string[]>([]);
   const [selected, setSelected] = useState(0);
@@ -50,16 +55,16 @@ export function ProductGallery({ product, variation }: Props) {
     setLoading(true);
 
     (async () => {
-      // Foto principal: tenta o SKU; se não houver, cai pra foto genérica do produto (prefixo)
-      let principal = await resolveUrl(mainBase);
-      if (!principal) principal = await resolveUrl(prefixBase);
+      // Foto principal: tenta o SKU (hífen e ponto); se não houver, foto genérica (prefixo)
+      let principal = await resolveFromBases([skuDash, skuDot]);
+      if (!principal) principal = await resolveFromBases([prefixDash, prefixDot]);
 
-      // Secundárias: 1-TPOR-BR-2, -3, ...
-      const extras: string[] = [];
-      for (let n = 2; n <= MAX_EXTRAS + 1; n++) {
-        const u = await resolveUrl(`${mainBase}-${n}`);
-        if (u) extras.push(u);
-      }
+      // Secundárias (-2, -3, ...): testa TODAS em paralelo, hífen e ponto
+      const extras = (await Promise.all(
+        Array.from({ length: MAX_EXTRAS }, (_, i) => i + 2).map((n) =>
+          resolveFromBases([`${skuDash}-${n}`, `${skuDot}-${n}`])
+        )
+      )).filter(Boolean) as string[];
 
       const todas = [principal, ...extras].filter(Boolean) as string[];
       if (!cancelled) {
@@ -71,7 +76,7 @@ export function ProductGallery({ product, variation }: Props) {
     return () => {
       cancelled = true;
     };
-  }, [mainBase, prefixBase]);
+  }, [skuDash, skuDot, prefixDash, prefixDot]);
 
   const temFotos = photos.length > 0;
 
@@ -121,7 +126,7 @@ export function ProductGallery({ product, variation }: Props) {
           <div className="productVisual" />
         ) : (
           // nenhuma foto encontrada → placeholder com iniciais
-          <ProductVisual product={product} fileBase={mainBase} />
+          <ProductVisual product={product} fileBase={skuDash} />
         )}
       </div>
 

@@ -26,28 +26,24 @@ export function ProductVisual({ product, sku, fileBase }: Props) {
 
   // SKU da variação selecionada OU primeira variação OU prefixo do produto
   const imageSku = sku ?? product.variations[0]?.sku ?? product.prefix;
-  const imageFile = fileBase ?? imageSku.replace(/\./g, "-");
-  const prefixFile = product.prefix.replace(/\./g, "-");
 
-  // Tenta:
-  // 1. PNG da variação → 2. JPG da variação → 3. JPEG da variação
-  // 4. PNG do prefixo → 5. JPG do prefixo (foto genérica do produto)
-  // 6. placeholder com iniciais
-  const sources = [
-    `/products/${imageFile}.png`,
-    `/products/${imageFile}.jpg`,
-    `/products/${imageFile}.jpeg`,
-    `/products/${prefixFile}.png`,
-    `/products/${prefixFile}.jpg`,
-    `/products/${prefixFile}.jpeg`,
-  ];
+  // "Bases" (nomes de arquivo) a tentar, em ordem de prioridade. Aceita o nome
+  // com HÍFEN (CH-FEC-MAGNET) e com PONTO (CH.FEC.MAGNET) — assim funciona
+  // mesmo se a foto for salva de qualquer das duas formas.
+  const bases = fileBase
+    ? [fileBase]
+    : [imageSku.replace(/\./g, "-"), imageSku];
+  bases.push(product.prefix.replace(/\./g, "-"), product.prefix); // foto genérica do produto
+
+  const exts = ["png", "jpg", "jpeg"];
+  const sources = bases.flatMap((b) => exts.map((ext) => `/products/${b}.${ext}`));
 
   const [srcIndex, setSrcIndex] = useState(0);
 
-  // Reseta o índice quando o SKU muda (troca de variação)
+  // Reseta o índice quando o SKU/arquivo muda (troca de variação)
   useEffect(() => {
     setSrcIndex(0);
-  }, [imageFile]);
+  }, [sources[0]]);
 
   return (
     <div className="productVisual" aria-label={`Imagem de ${product.name}`}>

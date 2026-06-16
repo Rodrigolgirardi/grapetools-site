@@ -7,6 +7,7 @@ import { createClient } from '@/lib/supabase-client'
 import { useAuth } from '@/hooks/useAuth'
 import { useCart } from '@/hooks/useCart'
 import { products } from '@/lib/data'
+import { productImageSrc, handleProductImageError } from '@/lib/product-image'
 import { formatCurrency, getTierForQuantity } from '@/lib/pricing'
 import { BackToSite } from '@/components/BackToSite'
 
@@ -312,17 +313,9 @@ export default function CheckoutPage() {
                       <div className="checkoutItemImg">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
-                          src={`/products/${variation.sku.replace(/\./g, '-')}.png`}
+                          src={productImageSrc(variation.sku)}
                           alt={product.name}
-                          onError={e => {
-                            const img = e.target as HTMLImageElement
-                            const base = variation.sku.replace(/\./g, '-')
-                            img.src = `/products/${base}.jpg`
-                            img.onerror = () => {
-                              img.src = `/products/${base}.jpeg`
-                              img.onerror = () => { img.style.display = 'none' }
-                            }
-                          }}
+                          onError={handleProductImageError(variation.sku)}
                         />
                       </div>
                       <div className="checkoutItemInfo">

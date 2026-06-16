@@ -3,6 +3,7 @@
 import { X, ShoppingCart, Minus, Plus, Trash2 } from "lucide-react";
 import { formatCurrency, getTierForQuantity } from "@/lib/pricing";
 import { products } from "@/lib/data";
+import { productImageSrc, handleProductImageError } from "@/lib/product-image";
 
 type CartLine = {
   sku: string;
@@ -64,13 +65,9 @@ export function CartDrawer({ open, onClose, cart, onUpdate }: Props) {
                 <div className="cartDrawerItemImg">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
-                    src={`/products/${variation.sku.replace(/\./g, "-")}.png`}
+                    src={productImageSrc(variation.sku)}
                     alt={product.name}
-                    onError={(e) => {
-                      const img = e.target as HTMLImageElement;
-                      img.src = `/products/${variation.sku.replace(/\./g, "-")}.jpg`;
-                      img.onerror = () => { img.style.display = "none"; };
-                    }}
+                    onError={handleProductImageError(variation.sku)}
                   />
                 </div>
                 <div className="cartDrawerItemInfo">

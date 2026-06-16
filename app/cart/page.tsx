@@ -5,6 +5,7 @@ import { useState, useMemo } from 'react'
 import { products } from '@/lib/data'
 import { formatCurrency, getTierForQuantity } from '@/lib/pricing'
 import { useCart } from '@/hooks/useCart'
+import { productImageSrc, handleProductImageError } from '@/lib/product-image'
 import { BackToSite } from '@/components/BackToSite'
 import { Minus, Plus, Trash2, ShoppingCart, Shield, FileText, Truck, MessageCircle } from 'lucide-react'
 
@@ -186,13 +187,9 @@ export default function CartPage() {
                       <a href={`/${product.slug}`} className="cartItemImg">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
-                          src={`/products/${variation.sku.replace(/\./g, '-')}.png`}
+                          src={productImageSrc(variation.sku)}
                           alt={product.name}
-                          onError={e => {
-                            const img = e.target as HTMLImageElement
-                            img.src = `/products/${variation.sku.replace(/\./g, '-')}.jpg`
-                            img.onerror = () => { img.style.display = 'none' }
-                          }}
+                          onError={handleProductImageError(variation.sku)}
                         />
                       </a>
 
@@ -279,19 +276,14 @@ export default function CartPage() {
                 <div className="cartSugestoesGrid">
                   {sugestoes.map(p => {
                     const lowestPrice = Math.min(...p.variations.flatMap(v => v.tiers.map(t => t.price)))
-                    const imageFile = p.variations[0].sku.replace(/\./g, '-')
                     return (
                       <a key={p.prefix} href={`/${p.slug}`} className="cartSugestaoCard">
                         <div className="cartSugestaoImg">
                           {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img
-                            src={`/products/${imageFile}.png`}
+                            src={productImageSrc(p.variations[0].sku)}
                             alt={p.name}
-                            onError={e => {
-                              const img = e.target as HTMLImageElement
-                              img.src = `/products/${imageFile}.jpg`
-                              img.onerror = () => { img.style.display = 'none' }
-                            }}
+                            onError={handleProductImageError(p.variations[0].sku)}
                           />
                         </div>
                         <div className="cartSugestaoInfo">
