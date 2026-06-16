@@ -1,6 +1,9 @@
 ﻿import { Boxes, ClipboardList, Megaphone, Users } from "lucide-react";
+import { redirect } from "next/navigation";
 import { Logo } from "@/components/Logo";
 import { adminModules, products } from "@/lib/data";
+import { createClient } from "@/lib/supabase-server";
+import { isAdminEmail } from "@/lib/admin";
 
 const stats = [
   { label: "Produtos ativos", value: products.length.toString(), icon: Boxes },
@@ -9,7 +12,14 @@ const stats = [
   { label: "Campanhas", value: "7", icon: Megaphone }
 ];
 
-export default function AdminPage() {
+export default async function AdminPage() {
+  // Defesa em profundidade: além do middleware, confere admin aqui também.
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!isAdminEmail(user?.email)) {
+    redirect("/");
+  }
+
   return (
     <main className="adminLayout">
       <aside className="adminSidebar">
@@ -47,8 +57,8 @@ export default function AdminPage() {
             <span>Base pronta para Supabase/PostgreSQL</span>
           </div>
           {products.map((product) => (
-            <div className="tableRow" key={product.sku}>
-              <span>{product.sku}</span>
+            <div className="tableRow" key={product.prefix}>
+              <span>{product.prefix}</span>
               <strong>{product.name}</strong>
               <span>{product.category}</span>
               <span>{product.stock.toLocaleString("pt-BR")} un.</span>

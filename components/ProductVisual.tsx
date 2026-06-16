@@ -16,14 +16,17 @@ const categoryIcon: Record<string, string> = {
 type Props = {
   product: Product;
   sku?: string;
+  // Quando informado, usa este nome de arquivo exato (sem extensão), ex:
+  // "1-TPOR-BR-2". Tem prioridade sobre o SKU. Usado pela galeria de fotos.
+  fileBase?: string;
 };
 
-export function ProductVisual({ product, sku }: Props) {
+export function ProductVisual({ product, sku, fileBase }: Props) {
   const initials = categoryIcon[product.category] ?? product.category.slice(0, 2).toUpperCase();
 
   // SKU da variação selecionada OU primeira variação OU prefixo do produto
   const imageSku = sku ?? product.variations[0]?.sku ?? product.prefix;
-  const imageFile = imageSku.replace(/\./g, "-");
+  const imageFile = fileBase ?? imageSku.replace(/\./g, "-");
   const prefixFile = product.prefix.replace(/\./g, "-");
 
   // Tenta:

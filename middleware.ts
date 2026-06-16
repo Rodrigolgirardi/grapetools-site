@@ -1,9 +1,10 @@
 // middleware.ts  ← coloca na RAIZ do projeto (mesmo nível de app/)
-import { createServerClient } from '@supabase/ssr'
+import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
+import { isAdminEmail } from '@/lib/admin'
 
 // Rotas que exigem login
-const ROTAS_PROTEGIDAS = ['/cliente', '/carrinho/checkout', '/pedidos']
+const ROTAS_PROTEGIDAS = ['/cliente', '/checkout', '/pedidos']
 
 export async function middleware(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request })
@@ -16,7 +17,7 @@ export async function middleware(request: NextRequest) {
         getAll() {
           return request.cookies.getAll()
         },
-        setAll(cookiesToSet) {
+        setAll(cookiesToSet: { name: string; value: string; options?: CookieOptions }[]) {
           cookiesToSet.forEach(({ name, value }) =>
             request.cookies.set(name, value)
           )
@@ -46,6 +47,22 @@ export async function middleware(request: NextRequest) {
     redirectUrl.pathname = '/login'
     redirectUrl.searchParams.set('redirect', pathname)
     return NextResponse.redirect(redirectUrl)
+  }
+
+  // Rota /admin: exige login E ser administrador (lista ADMIN_EMAILS)
+  if (pathname.startsWith('/admin')) {
+    if (!user) {
+      const redirectUrl = request.nextUrl.clone()
+      redirectUrl.pathname = '/login'
+      redirectUrl.searchParams.set('redirect', pathname)
+      return NextResponse.redirect(redirectUrl)
+    }
+    if (!isAdminEmail(user.email)) {
+      // Logado mas não é admin → manda pra home
+      const redirectUrl = request.nextUrl.clone()
+      redirectUrl.pathname = '/'
+      return NextResponse.redirect(redirectUrl)
+    }
   }
 
   // Se já logado e tentar acessar /login, redireciona para home

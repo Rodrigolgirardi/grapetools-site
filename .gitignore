@@ -69,6 +69,10 @@ web_modules/
 # Output of 'npm pack'
 *.tgz
 
+# Pacotes/arquivos compactados (não versionar)
+*.tar.gz
+*.zip
+
 # Yarn Integrity file
 .yarn-integrity
 

@@ -6,7 +6,7 @@ import { ChevronDown, ChevronUp, CreditCard, Smartphone } from "lucide-react";
 import { FloatingWhatsApp } from "@/components/FloatingWhatsApp";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
-import { ProductVisual } from "@/components/ProductVisual";
+import { ProductGallery } from "@/components/ProductGallery";
 import { SimilarProducts } from "@/components/SimilarProducts";
 import { products } from "@/lib/data";
 import { useCart } from "@/hooks/useCart";
@@ -160,29 +160,8 @@ export default function ProductPage({ params }: Props) {
         />
 
         <section className="detailHero">
-          {/* COL 1 — GALERIA */}
-          <div className="detailGallery">
-            <div className="detailThumbs">
-              {product.variations.map((v, i) => (
-                <button
-                  key={v.sku}
-                  className={`detailThumb ${selectedIdx === i ? "active" : ""}`}
-                  onClick={() => setSelectedIdx(i)}
-                  aria-label={v.label}
-                >
-                  <ProductVisual product={product} sku={v.sku} />
-                </button>
-              ))}
-              {product.variations.length === 1 && (
-                <div className="detailThumb active">
-                  <ProductVisual product={product} sku={product.variations[0].sku} />
-                </div>
-              )}
-            </div>
-            <div className="detailMainPhoto">
-              <ProductVisual product={product} sku={variation.sku} />
-            </div>
-          </div>
+          {/* COL 1 — GALERIA (fotos da variação selecionada) */}
+          <ProductGallery product={product} variation={variation} />
 
           {/* COL 2 — INFO */}
           <div>

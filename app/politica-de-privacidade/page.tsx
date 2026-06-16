@@ -18,7 +18,7 @@ export default function PoliticaPage() {
 
           <p className="lgpdDate">Última atualização: 08 de junho de 2026</p>
           <h1>Política de Privacidade</h1>
-          <p>A <strong>THE GRAPE LTDA</strong>, inscrita no CNPJ sob nº 60.055.028/0001-58, com sede na Rua Professor Guilherme Belfort Sabino, 348, doravante denominada "Grape Tools", respeita sua privacidade e está comprometida com a proteção dos dados pessoais de seus clientes, visitantes e usuários, em conformidade com a Lei nº 13.709/2018 (Lei Geral de Proteção de Dados Pessoais – LGPD).</p>
+          <p>A <strong>THE GRAPE LTDA</strong>, inscrita no CNPJ sob nº 60.055.028/0001-58, com sede na Rua Professor Guilherme Belfort Sabino, 348, doravante denominada &quot;Grape Tools&quot;, respeita sua privacidade e está comprometida com a proteção dos dados pessoais de seus clientes, visitantes e usuários, em conformidade com a Lei nº 13.709/2018 (Lei Geral de Proteção de Dados Pessoais – LGPD).</p>
           <p>Esta Política de Privacidade descreve como coletamos, utilizamos, armazenamos, compartilhamos e protegemos seus dados pessoais ao utilizar nosso site, realizar compras ou interagir com nossos serviços.</p>
 
           <h2>1. Identificação do Controlador</h2>

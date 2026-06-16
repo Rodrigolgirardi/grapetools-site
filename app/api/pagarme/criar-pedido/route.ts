@@ -4,6 +4,7 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase-admin'
+import { createClient } from '@/lib/supabase-server'
 
 const PAGARME_API = 'https://api.pagar.me/core/v5'
 const SECRET_KEY = process.env.PAGARME_SECRET_KEY!
@@ -54,8 +55,27 @@ function cleanPhone(phone: string): string {
 
 export async function POST(request: NextRequest) {
   try {
+    // 0) Segurança: precisa estar logado
+    const supabaseUser = await createClient()
+    const { data: { user } } = await supabaseUser.auth.getUser()
+    if (!user) {
+      return NextResponse.json({ error: 'Não autorizado. Faça login.' }, { status: 401 })
+    }
+
     const body: CriarPedidoPayload = await request.json()
     const { pedido_id, total, forma_pagamento, itens, cliente, endereco } = body
+
+    // 0b) Confere que o pedido existe E pertence a quem está logado
+    //     (impede criar cobranças para pedidos de outras pessoas)
+    const admin = createAdminClient()
+    const { data: pedidoRow } = await admin
+      .from('pedidos')
+      .select('user_id')
+      .eq('id', pedido_id)
+      .single()
+    if (!pedidoRow || pedidoRow.user_id !== user.id) {
+      return NextResponse.json({ error: 'Pedido inválido.' }, { status: 403 })
+    }
 
     // Só processa Pix e Boleto por agora
     if (forma_pagamento === 'transferencia') {
@@ -149,7 +169,6 @@ export async function POST(request: NextRequest) {
     // Vincula a cobrança do Pagar.me ao pedido no Supabase.
     // Isso permite, depois, o webhook marcar o pedido como pago.
     try {
-      const admin = createAdminClient()
       await admin
         .from('pedidos')
         .update({ pagarme_order_id: data.id })

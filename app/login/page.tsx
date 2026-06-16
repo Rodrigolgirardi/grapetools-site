@@ -33,8 +33,8 @@ export default function LoginPage() {
         if (error) throw error;
         setSuccess("Conta criada! Verifique seu email para confirmar.");
       }
-    } catch (err: any) {
-      const msg = err.message;
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
       if (msg === "Invalid login credentials") setError("Email ou senha incorretos.");
       else if (msg === "User already registered") setError("Este email já está cadastrado.");
       else if (msg.includes("rate limit")) setError("Muitas tentativas. Aguarde alguns minutos.");
@@ -50,7 +50,7 @@ export default function LoginPage() {
     const supabase = createClient();
     await supabase.auth.signInWithOAuth({
       provider: "google",
-      options: { redirectTo: `${window.location.origin}/` },
+      options: { redirectTo: `${window.location.origin}/auth/callback?next=/` },
     });
   }
 

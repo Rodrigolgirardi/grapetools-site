@@ -84,7 +84,7 @@ export default function CheckoutPage() {
         if (data.nome) setNomeContato(data.nome.split(' ')[0] || data.nome)
         if (data.telefone) setTelefoneContato(data.telefone)
       } else {
-        const name = user.user_metadata?.full_name || user.user_metadata?.nome || ''
+        const name = user!.user_metadata?.full_name || user!.user_metadata?.nome || ''
         setNomeContato(name.split(' ')[0] || name)
       }
     }
