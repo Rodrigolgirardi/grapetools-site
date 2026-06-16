@@ -1,18 +1,13 @@
 import type { Metadata } from "next";
-import { Syne, DM_Sans } from "next/font/google";
+import { Fustat } from "next/font/google";
 import "./globals.css";
 
-const syne = Syne({
+// Fonte única do site (igual abacatepay.com). As variáveis --font-syne e
+// --font-dm-sans usadas no CSS apontam para esta fonte (alias no globals.css).
+const fustat = Fustat({
   subsets: ["latin"],
-  weight: ["400", "600", "700", "800"],
-  variable: "--font-syne",
-  display: "swap",
-});
-
-const dmSans = DM_Sans({
-  subsets: ["latin"],
-  weight: ["300", "400", "500"],
-  variable: "--font-dm-sans",
+  weight: ["300", "400", "500", "600", "700", "800"],
+  variable: "--font-fustat",
   display: "swap",
 });
 
@@ -33,7 +28,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="pt-BR" className={`${syne.variable} ${dmSans.variable}`}>
+    <html lang="pt-BR" className={fustat.variable}>
       <body>{children}</body>
     </html>
   );

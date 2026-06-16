@@ -18,6 +18,11 @@
   --shadow-lg:  0 12px 40px rgba(76,29,149,0.15);
   --r:          8px;
   --r-sm:       6px;
+  /* Fonte única do site = Fustat. As variáveis antigas (--font-syne /
+     --font-dm-sans) usadas em todo o CSS agora apontam para a Fustat,
+     então o site inteiro usa uma fonte só sem reescrever cada regra. */
+  --font-syne:    var(--font-fustat);
+  --font-dm-sans: var(--font-fustat);
 }
 
 * { box-sizing: border-box; }
