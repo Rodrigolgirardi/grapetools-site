@@ -314,7 +314,15 @@ export default function CheckoutPage() {
                         <img
                           src={`/products/${variation.sku.replace(/\./g, '-')}.png`}
                           alt={product.name}
-                          onError={e => { (e.target as HTMLImageElement).style.display = 'none' }}
+                          onError={e => {
+                            const img = e.target as HTMLImageElement
+                            const base = variation.sku.replace(/\./g, '-')
+                            img.src = `/products/${base}.jpg`
+                            img.onerror = () => {
+                              img.src = `/products/${base}.jpeg`
+                              img.onerror = () => { img.style.display = 'none' }
+                            }
+                          }}
                         />
                       </div>
                       <div className="checkoutItemInfo">
