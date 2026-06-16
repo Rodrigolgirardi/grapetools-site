@@ -58,6 +58,8 @@ export function ProductVisual({ product, sku, fileBase }: Props) {
           alt={product.name}
           className="productImage"
           onError={() => setSrcIndex((i) => i + 1)}
+          onContextMenu={(e) => e.preventDefault()}
+          draggable={false}
         />
       ) : (
         <div className="productPlaceholder">

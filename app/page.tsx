@@ -369,6 +369,9 @@ export default function HomePage() {
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("Todas");
   const [supplier, setSupplier] = useState("Todos");
+  const [grapeOnly, setGrapeOnly] = useState(false);
+  const [grapeLogoSrc, setGrapeLogoSrc] = useState("/grape-tools-logo.png");
+  const [grapeLogoErro, setGrapeLogoErro] = useState(false);
   const [sort, setSort] = useState<SortOption>("best");
   const [sideOpen, setSideOpen] = useState(false);
   const [cartDrawerOpen, setCartDrawerOpen] = useState(false);
@@ -388,6 +391,7 @@ export default function HomePage() {
           ...p.keywords, ...p.variations.map((v) => v.sku)].join(" ").toLowerCase();
         return (
           (!q || text.includes(q)) &&
+          (!grapeOnly || p.prefix.startsWith("CH.")) &&
           (category === "Todas" || p.category === category) &&
           (supplier === "Todos" || p.supplier === supplier) &&
           (!perfilAtivo || perfilAtivo.categorias.length === 0 ||
@@ -403,7 +407,7 @@ export default function HomePage() {
         if (sort === "sold") return b.sold - a.sold;
         return Number(b.isPromotion) - Number(a.isPromotion) || b.sold - a.sold;
       });
-  }, [category, query, sort, supplier]);
+  }, [category, query, sort, supplier, grapeOnly, perfilAtivo]);
 
   const cartLines = products.flatMap((p) =>
     p.variations
@@ -423,6 +427,7 @@ export default function HomePage() {
   }
 
   const activeFilters = [
+    grapeOnly && { label: "Grape Tools", clear: () => setGrapeOnly(false) },
     category !== "Todas" && { label: category, clear: () => setCategory("Todas") },
     supplier !== "Todos" && { label: supplier, clear: () => setSupplier("Todos") },
   ].filter(Boolean) as { label: string; clear: () => void }[];
@@ -461,6 +466,28 @@ export default function HomePage() {
             )}
           </button>
 
+          <button
+            className={`categoryPill grapePill ${grapeOnly ? "active" : ""}`}
+            onClick={() => { setGrapeOnly(true); setCategory("Todas"); }}
+            title="Ver só os produtos da marca Grape Tools"
+          >
+            {grapeLogoErro ? (
+              "Grape Tools"
+            ) : (
+              /* eslint-disable-next-line @next/next/no-img-element */
+              <img
+                src={grapeLogoSrc}
+                alt="Grape Tools"
+                className="grapePillImg"
+                onError={() => {
+                  // tenta .png, depois .jpg, depois mostra o texto
+                  if (grapeLogoSrc.endsWith(".png")) setGrapeLogoSrc("/grape-tools-logo.jpg");
+                  else setGrapeLogoErro(true);
+                }}
+              />
+            )}
+          </button>
+
           {[
             { label: "Top Ofertas", value: "ofertas", icon: <BadgePercent size={15}/> },
             { label: "Ferragens", value: "Ferragens", icon: <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.93 4.93l2.12 2.12M16.95 16.95l2.12 2.12M4.93 19.07l2.12-2.12M16.95 7.05l2.12-2.12"/></svg> },
@@ -472,8 +499,8 @@ export default function HomePage() {
           ].map(({ label, value, icon }) => (
             <button
               key={value}
-              className={`categoryPill ${category === value ? "active" : ""}`}
-              onClick={() => setCategory(value === "ofertas" ? "Todas" : value)}
+              className={`categoryPill ${category === value && !grapeOnly ? "active" : ""}`}
+              onClick={() => { setGrapeOnly(false); setCategory(value === "ofertas" ? "Todas" : value); }}
             >
               <span className="categoryPillIcon">{icon}</span>
               {label}

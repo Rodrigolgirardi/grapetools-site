@@ -35,13 +35,16 @@ export type Product = {
   material?: string;
   usoIndicado?: string;
   compativelCom?: string;
+  // Descrição longa personalizada (opcional). Se preenchida, aparece na página
+  // do produto no lugar do texto automático. Pode ter quebras de linha.
+  descricaoLonga?: string;
 };
 
 export const products: Product[] = [
   {
     prefix:"CH.CONEC.DUP",
     slug:"ch-conec-dup",
-    name:"Conector Duplo Curto",
+    name:"Conector Duplo Curto | Grape Tools",
     description:"Conector Duplo Curto · Emendas · Grape Tools",
     category:"Elétrica",
     subcategory:"Conectores",
@@ -56,7 +59,7 @@ export const products: Product[] = [
   {
     prefix:"CH.CONEC.LONG",
     slug:"ch-conec-long",
-    name:"Conector Duplo Longo",
+    name:"Conector Duplo Longo | Grape Tools",
     description:"Conector Duplo Longo · Emendas · Grape Tools",
     category:"Elétrica",
     subcategory:"Conectores",
@@ -72,7 +75,7 @@ export const products: Product[] = [
   {
     prefix:"CH.DISC.125.BR",
     slug:"ch-disc-125-br",
-    name:"Disco de Lixa",
+    name:"Disco de Lixa Pluma Branco | 125mm | Grape Tools",
     description:"Disco de Lixa · Pluma · Branco · Grape Tools · Grão 40",
     category:"Abrasivos",
     subcategory:"Discos de Lixa",
@@ -94,11 +97,27 @@ export const products: Product[] = [
       {sku:"CH.DISC.125.BR.320",label:"Branco · Grão 320",tiers:[{minQty:10,label:"10",price:1.04}, {minQty:50,label:"50",price:0.94}, {minQty:100,label:"100",price:0.85}, {minQty:500,label:"500",price:0.75}],weight:"8.00g",ncm:"68053090"}
     ],
     stock:999,sold:0,isPromotion:false,isLaunch:false,
+    descricaoLonga:`Resumo rápido dos grãos de lixa para disco pluma:
+
+Grão 40 → Desbaste pesado. Remove material rapidamente, tinta grossa, ferrugem e imperfeições grandes.
+Grão 60 → Desbaste médio. Nivelamento inicial de superfícies e remoção de marcas profundas.
+Grão 80 → Preparação antes do acabamento. Remove riscos deixados pelos grãos mais grossos.
+Grão 100 → Acabamento inicial. Começa a deixar a superfície mais uniforme.
+Grão 120 → Acabamento intermediário. Muito usado antes da pintura ou aplicação de verniz.
+Grão 150 → Refinamento da superfície. Remove riscos leves e melhora o acabamento.
+Grão 180 → Pré-acabamento fino. Ideal para preparação de pintura de qualidade.
+Grão 240 → Acabamento fino. Deixa a superfície lisa e pronta para pintura fina.
+Grão 320 → Acabamento muito fino. Lixamento entre demãos de tinta, verniz ou seladora.
+Grão 400 → Polimento inicial. Remove pequenas imperfeições e marcas superficiais.
+Grão 600 → Acabamento extrafino. Muito usado em pintura automotiva e lixamento úmido.
+Grão 1000 → Polimento fino. Preparação para lustro e acabamento de alto brilho.
+
+Regra simples: quanto menor o número do grão, mais agressiva é a lixa; quanto maior o número, mais fino e suave é o acabamento.`,
   },
   {
     prefix:"CH.DISC.LIX.125",
     slug:"ch-disc-lix-125",
-    name:"Disco de Lixa Com Furos Grape Tools",
+    name:"Disco de Lixa Com Furos Grape Tools | Grape Tools",
     description:"Disco de Lixa Com Furos Grape Tools · 125mm · Grão 150",
     category:"Abrasivos",
     subcategory:"Discos com Furos",
@@ -122,7 +141,7 @@ export const products: Product[] = [
   {
     prefix:"CH.TRAV.PIS",
     slug:"ch-trav-pis",
-    name:"Trava Plástica com Pistão",
+    name:"Trava Plástica com Pistão | Grape Tools",
     description:"Trava Plástica com Pistão · Grape Tools · Branco",
     category:"Ferragens",
     subcategory:"Travas",
@@ -138,7 +157,7 @@ export const products: Product[] = [
   {
     prefix:"CH.LA",
     slug:"ch-la",
-    name:"Lâmina de Estilete",
+    name:"Lâmina de Estilete | Grape Tools",
     description:"Lâmina de Estilete · 18mm · Grape Tools · 0,5mm Espessura (10un)",
     category:"Ferramentas",
     subcategory:"Lâminas",
@@ -154,7 +173,7 @@ export const products: Product[] = [
   {
     prefix:"CH.SUP.QUAD.5",
     slug:"ch-sup-quad-5",
-    name:"Suporte para Esponja",
+    name:"Suporte para Esponja | Grape Tools",
     description:"Suporte para Esponja · 5 x 5 · Grape Tools · Aço Escovado",
     category:"Ferramentas",
     subcategory:"Suportes",
@@ -169,7 +188,7 @@ export const products: Product[] = [
   {
     prefix:"CH.MAC.MAC",
     slug:"ch-mac-mac",
-    name:"Fio Macho para Macho",
+    name:"Fio Macho para Macho | Grape Tools",
     description:"Fio Macho para Macho · Grape Tools · 20cm",
     category:"Elétrica",
     subcategory:"Cabos e Fios",
@@ -184,7 +203,7 @@ export const products: Product[] = [
   {
     prefix:"CH.ROLET",
     slug:"ch-rolet",
-    name:"Fecho Rolete",
+    name:"Fecho Rolete | Grape Tools",
     description:"Fecho Rolete · Grape Tools · Dourado",
     category:"Ferragens",
     subcategory:"Fechos",
@@ -200,7 +219,7 @@ export const products: Product[] = [
   {
     prefix:"CH.MASC",
     slug:"ch-masc",
-    name:"Mascara 3d para Olhos",
+    name:"Mascara 3d para Olhos | Grape Tools",
     description:"Mascara 3d para Olhos · Grape Tools · Preto",
     category:"Utilidades",
     subcategory:"Organização",
@@ -215,7 +234,7 @@ export const products: Product[] = [
   {
     prefix:"CH.MAC.FEM",
     slug:"ch-mac-fem",
-    name:"Fio Macho para Fêmea",
+    name:"Fio Macho para Fêmea | Grape Tools",
     description:"Fio Macho para Fêmea · Grape Tools · 20cm",
     category:"Elétrica",
     subcategory:"Cabos e Fios",
@@ -230,7 +249,7 @@ export const products: Product[] = [
   {
     prefix:"CH.FEM.FEM",
     slug:"ch-fem-fem",
-    name:"Fio Fêmea para fêmea",
+    name:"Fio Fêmea para fêmea | Grape Tools",
     description:"Fio Fêmea para fêmea · Grape Tools · 20cm",
     category:"Elétrica",
     subcategory:"Cabos e Fios",
@@ -245,7 +264,7 @@ export const products: Product[] = [
   {
     prefix:"CH.SUP.INX.VASS",
     slug:"ch-sup-inx-vass",
-    name:"Suporte de Vassoura",
+    name:"Suporte de Vassoura Aço Inox 48,5cm | Grape Tools",
     description:"Suporte de Vassoura · Inox · Grape Tools · 4 Clipes + 5 Ganchos",
     category:"Ferramentas",
     subcategory:"Suportes",
@@ -260,7 +279,7 @@ export const products: Product[] = [
   {
     prefix:"CH.TRAV.PR",
     slug:"ch-trav-pr",
-    name:"Trava Porta",
+    name:"Trava Porta | Grape Tools",
     description:"Trava Porta · Longo · Grape Tools · Prateado",
     category:"Ferragens",
     subcategory:"Travas",
@@ -275,7 +294,7 @@ export const products: Product[] = [
   {
     prefix:"CH.TPOR",
     slug:"ch-tpor",
-    name:"Trava Porta Magnético",
+    name:"Trava Porta Magnético | Grape Tools",
     description:"Trava Porta Magnético · Grape Tools |Slim",
     category:"Ferragens",
     subcategory:"Travas",
@@ -290,7 +309,7 @@ export const products: Product[] = [
   {
     prefix:"CH.TRAV.BOL",
     slug:"ch-trav-bol",
-    name:"Trava Porta Magnético Bola",
+    name:"Trava Porta Magnético Bola | Grape Tools",
     description:"Trava Porta Magnético Bola · Grape Tools · Preto",
     category:"Ferragens",
     subcategory:"Travas",
@@ -305,7 +324,7 @@ export const products: Product[] = [
   {
     prefix:"CH.FEC",
     slug:"ch-fec",
-    name:"Fecho Magnético Invisível",
+    name:"Fecho Magnético Invisível | Grape Tools",
     description:"Fecho Magnético Invisível · Grape Tools · Prata",
     category:"Ferragens",
     subcategory:"Fechos",
@@ -320,7 +339,7 @@ export const products: Product[] = [
   {
     prefix:"CH.LIMIT",
     slug:"ch-limit",
-    name:"Limitador de Janela",
+    name:"Limitador de Janela | Grape Tools",
     description:"Limitador de Janela · Grape Tools Trava Amarelo",
     category:"Ferragens",
     subcategory:"Travas",
@@ -335,7 +354,7 @@ export const products: Product[] = [
   {
     prefix:"1.AÇUC",
     slug:"1-acuc",
-    name:"Açucareiro",
+    name:"Açucareiro em Acrilico de Mesa com botão Dosador",
     description:"Açucareiro · Prático · Azul",
     category:"Utilidades",
     subcategory:"Organização",
@@ -523,7 +542,7 @@ export const products: Product[] = [
   {
     prefix:"3.PIS.BR",
     slug:"3-pis-br",
-    name:"Pistão Fit",
+    name:"Pistão a Gás com Amortecedor | Abre a porta para Cima",
     description:"Pistão Fit · 40N · Branco",
     category:"Ferragens",
     subcategory:"Pistões",
@@ -544,7 +563,7 @@ export const products: Product[] = [
   {
     prefix:"3.PIS.CZ",
     slug:"3-pis-cz",
-    name:"Pistão Fit",
+    name:"Pistão a Gás com Amortecedor | Abre a porta para Cima",
     description:"Pistão Fit · 40N · Cinza",
     category:"Ferragens",
     subcategory:"Pistões",
@@ -1104,7 +1123,7 @@ export const products: Product[] = [
   {
     prefix:"10.PIS.BR",
     slug:"10-pis-br",
-    name:"Pistão Fit",
+    name:"Pistão a Gás com Amortecedor | Abre a porta para Cima",
     description:"Pistão Fit · 40N · Branco",
     category:"Ferragens",
     subcategory:"Pistões",
@@ -1124,7 +1143,7 @@ export const products: Product[] = [
   {
     prefix:"10.PIS.CZ",
     slug:"10-pis-cz",
-    name:"Pistão Fit",
+    name:"Pistão a Gás com Amortecedor | Abre a porta para Cima",
     description:"Pistão Fit · 40N · Cinza",
     category:"Ferragens",
     subcategory:"Pistões",
@@ -2064,7 +2083,7 @@ export const products: Product[] = [
   {
     prefix:"CH.TRAV",
     slug:"ch-trav",
-    name:"Trava Porta Inox",
+    name:"Trava Porta Inox | Grape Tools",
     description:"Trava Porta Inox · Grape Tools · Pato",
     category:"Ferragens",
     subcategory:"Travas",

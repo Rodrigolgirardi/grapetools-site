@@ -210,18 +210,6 @@ export default function ProductPage({ params }: Props) {
                 </dl>
               )}
             </div>
-
-            <div className="productDescBlock">
-              <h3 className="productDescTitle">Descrição do produto</h3>
-              <p className="productDetailDesc">
-                {product.name} — {product.category} · {product.subcategory}.
-                Fornecido por <strong>{product.supplier}</strong>, marca <strong>{product.brand}</strong>.
-                {product.variations.length > 1 && (
-                  <> Disponível em {product.variations.length} variações: {product.variations.map(v => v.label).join(", ")}.</>
-                )}
-                {" "}Compre com desconto progressivo: quanto maior a quantidade, menor o preço por unidade.
-              </p>
-            </div>
           </div>
 
           {/* COL 3 — CTA */}
@@ -281,6 +269,27 @@ export default function ProductPage({ params }: Props) {
 
             <FreteCalc subtotal={variation.tiers[variation.tiers.length - 1].price * qty} />
           </aside>
+        </section>
+
+        {/* DESCRIÇÃO — largura total, abaixo do bloco principal */}
+        <section className="detailDescSection">
+          <div className="productDescBlock">
+            <h3 className="productDescTitle">Descrição do produto</h3>
+            {product.descricaoLonga ? (
+              <p className="productDetailDesc" style={{ whiteSpace: "pre-line" }}>
+                {product.descricaoLonga}
+              </p>
+            ) : (
+              <p className="productDetailDesc">
+                {product.name} — {product.category} · {product.subcategory}.
+                Fornecido por <strong>{product.supplier}</strong>, marca <strong>{product.brand}</strong>.
+                {product.variations.length > 1 && (
+                  <> Disponível em {product.variations.length} variações: {product.variations.map(v => v.label).join(", ")}.</>
+                )}
+                {" "}Compre com desconto progressivo: quanto maior a quantidade, menor o preço por unidade.
+              </p>
+            )}
+          </div>
         </section>
       </main>
 

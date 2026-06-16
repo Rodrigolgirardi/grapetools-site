@@ -2120,9 +2120,9 @@ h1, h2, h3, h4 { font-family: var(--font-syne), sans-serif; margin: 0; }
   width: 100%;
   max-width: 100%;
   margin: 0;
-  border-bottom: 1px solid #d8c9f5;
+  border-bottom: 1px solid #e5e7eb;
   padding: 0 16px;
-  background: #ede8fa;
+  background: #ffffff;
   position: sticky;
   top: 104px;
   z-index: 90;
@@ -3750,18 +3750,47 @@ h1, h2, h3, h4 { font-family: var(--font-syne), sans-serif; margin: 0; }
   border-radius: var(--r);
 }
 
-.productDescTitle {
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.07em;
-  text-transform: uppercase;
-  color: var(--muted);
-  margin-bottom: 8px;
+/* Descrição em largura total (abaixo do bloco principal do produto) */
+.detailDescSection {
+  margin: 0 0 32px;
+}
+.detailDescSection .productDescBlock {
+  margin-top: 0;
 }
 
-.productDetailDesc {
-  color: var(--ink-80);
-  font-size: 13.5px;
+/* Aba da marca própria "Grape Tools" na barra de categorias */
+.grapePill {
+  background: #fff;
+  border: 1.5px solid var(--purple-400);
+  font-weight: 700;
+  color: var(--purple-700);
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+.grapePill:hover { border-color: var(--purple-700); }
+.grapePill.active {
+  border-color: var(--purple-700);
+  box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.35);
+}
+.grapePillImg {
+  height: 48px;
+  width: auto;
+  display: block;
+}
+
+.productDescTitle {
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: normal;
+  text-transform: none;
+  line-height: 1.35;
+  color: var(--ink);
+  margin-bottom: 12px;
+}
+
+.productDescBlock .productDetailDesc {
+  color: var(--ink);
+  font-size: 14.5px;
   line-height: 1.7;
   margin: 0;
 }
@@ -4412,6 +4441,162 @@ h1, h2, h3, h4 { font-family: var(--font-syne), sans-serif; margin: 0; }
   height: 90px !important;
   font-size: 18px !important;
 }
+
+/* ════════════════════════════
+   LIGHTBOX — zoom da foto do produto
+════════════════════════════ */
+.detailZoomTrigger {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: zoom-in;
+}
+
+.detailZoomHint {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  color: var(--purple-700);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  pointer-events: none;
+}
+
+/* Dificulta salvar/arrastar as fotos de produto (anti-cópia casual) */
+.productImage,
+.lightboxImg,
+.lightboxThumb img {
+  -webkit-user-drag: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.lightboxOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(17, 17, 17, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  animation: lightboxFade 0.15s ease;
+}
+
+@keyframes lightboxFade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.lightboxStage {
+  max-width: min(90vw, 900px);
+  max-height: 85vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.lightboxImg {
+  max-width: min(90vw, 900px);
+  max-height: 85vh;
+  object-fit: contain;
+  background: #fff;
+  border-radius: 8px;
+  cursor: zoom-in;
+  transition: transform 0.15s ease;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.lightboxImg.zoomed {
+  transform: scale(2.4);
+  cursor: zoom-out;
+}
+
+.lightboxClose {
+  position: absolute;
+  top: 16px;
+  right: 20px;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  font-size: 18px;
+  cursor: pointer;
+  z-index: 2;
+}
+.lightboxClose:hover { background: rgba(255, 255, 255, 0.3); }
+
+.lightboxNav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 48px;
+  height: 48px;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  font-size: 30px;
+  line-height: 1;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  z-index: 2;
+}
+.lightboxNav:hover { background: rgba(255, 255, 255, 0.3); }
+.lightboxPrev { left: 20px; }
+.lightboxNext { right: 20px; }
+
+.lightboxThumbs {
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+  padding: 8px;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 10px;
+  max-width: 90vw;
+  overflow-x: auto;
+}
+
+.lightboxThumb {
+  width: 54px;
+  height: 54px;
+  flex-shrink: 0;
+  border: 2px solid transparent;
+  border-radius: 6px;
+  overflow: hidden;
+  background: #fff;
+  cursor: pointer;
+  padding: 0;
+}
+.lightboxThumb.active { border-color: #fff; }
+.lightboxThumb img { width: 100%; height: 100%; object-fit: contain; }
+
+@media (max-width: 480px) {
+  .lightboxNav { width: 40px; height: 40px; font-size: 24px; }
+  .lightboxPrev { left: 8px; }
+  .lightboxNext { right: 8px; }
+  .lightboxImg.zoomed { transform: scale(2); }
+}
+
 /* ════════════════════════════
    LOGIN PAGE
 ════════════════════════════ */
