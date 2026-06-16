@@ -14,6 +14,12 @@ import { useCart } from "@/hooks/useCart";
 
 type SortOption = "best" | "high" | "low" | "sold";
 
+// Tira acentos e deixa minúsculo, pra busca funcionar com ou sem acento
+// (ex: "rodizio" encontra "rodízio").
+function semAcento(s: string): string {
+  return s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+}
+
 const CATEGORY_COUNTS = Object.fromEntries(
   categories.map((c) => [c, products.filter((p) => p.category === c).length])
 );
@@ -384,11 +390,11 @@ export default function HomePage() {
   const { cart, addToCart: addToCartHook, updateQuantity } = useCart();
 
   const filteredProducts = useMemo(() => {
-    const q = query.trim().toLowerCase();
+    const q = semAcento(query.trim());
     return products
       .filter((p) => {
-        const text = [p.name, p.brand, p.supplier, p.description, p.prefix,
-          ...p.keywords, ...p.variations.map((v) => v.sku)].join(" ").toLowerCase();
+        const text = semAcento([p.name, p.brand, p.supplier, p.description, p.prefix,
+          ...p.keywords, ...p.variations.map((v) => v.sku)].join(" "));
         return (
           (!q || text.includes(q)) &&
           (!grapeOnly || p.prefix.startsWith("CH.")) &&

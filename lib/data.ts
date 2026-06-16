@@ -279,7 +279,7 @@ Regra simples: quanto menor o número do grão, mais agressiva é a lixa; quanto
   {
     prefix:"CH.TRAV.PR",
     slug:"ch-trav-pr",
-    name:"Trava Porta | Grape Tools",
+    name:"Trava Porta Longo Reforçado até 80kg | Grape Tools",
     description:"Trava Porta · Longo · Grape Tools · Prateado",
     category:"Ferragens",
     subcategory:"Travas",
@@ -457,38 +457,6 @@ Regra simples: quanto menor o número do grão, mais agressiva é a lixa; quanto
       {sku:"2.CAD.50",label:"50mm",tiers:[{minQty:10,label:"10",price:79.44}, {minQty:50,label:"50",price:71.5}, {minQty:100,label:"100",price:65.14}, {minQty:500,label:"500",price:57.2}],weight:"A consultar",ncm:"83011000"},
       {sku:"2.CAD.60",label:"60mm",tiers:[{minQty:10,label:"10",price:2.8}, {minQty:50,label:"50",price:2.52}, {minQty:100,label:"100",price:2.3}, {minQty:500,label:"500",price:2.02}],weight:"A consultar",ncm:"83011000"},
       {sku:"2.CAD.70",label:"70mm",tiers:[{minQty:10,label:"10",price:2.8}, {minQty:50,label:"50",price:2.52}, {minQty:100,label:"100",price:2.3}, {minQty:500,label:"500",price:2.02}],weight:"A consultar",ncm:"83011000"}
-    ],
-    stock:999,sold:0,isPromotion:false,isLaunch:false,
-  },
-  {
-    prefix:"3.ROD.COMT",
-    slug:"3-rod-comt",
-    name:"Rodízio",
-    description:"Rodízio · Com trava · 35mm",
-    category:"Ferragens",
-    subcategory:"Rodízios",
-    brand:"Renna",
-    supplier:"Renna",
-    keywords:["rodízio","com trava","35mm","50mm"],
-    variations:[
-      {sku:"3.ROD.COMT.35",label:"Com trava · 35mm",tiers:[{minQty:10,label:"10",price:7.21}, {minQty:50,label:"50",price:6.49}, {minQty:100,label:"100",price:5.91}, {minQty:500,label:"500",price:5.19}],weight:"A consultar",ncm:"83022000"},
-      {sku:"3.ROD.COMT.50",label:"Com trava · 50mm",tiers:[{minQty:10,label:"10",price:8.75}, {minQty:50,label:"50",price:7.88}, {minQty:100,label:"100",price:7.17}, {minQty:500,label:"500",price:6.3}],weight:"A consultar",ncm:"83022000"}
-    ],
-    stock:999,sold:0,isPromotion:false,isLaunch:false,
-  },
-  {
-    prefix:"3.ROD.SEMT",
-    slug:"3-rod-semt",
-    name:"Rodízio",
-    description:"Rodízio · Sem trava · 35mm",
-    category:"Ferragens",
-    subcategory:"Rodízios",
-    brand:"Renna",
-    supplier:"Renna",
-    keywords:["rodízio","sem trava","35mm","50mm"],
-    variations:[
-      {sku:"3.ROD.SEMT.35",label:"Sem trava · 35mm",tiers:[{minQty:10,label:"10",price:5.81}, {minQty:50,label:"50",price:5.23}, {minQty:100,label:"100",price:4.76}, {minQty:500,label:"500",price:4.18}],weight:"A consultar",ncm:"83022000"},
-      {sku:"3.ROD.SEMT.50",label:"Sem trava · 50mm",tiers:[{minQty:10,label:"10",price:6.9}, {minQty:50,label:"50",price:6.21}, {minQty:100,label:"100",price:5.66}, {minQty:500,label:"500",price:4.97}],weight:"A consultar",ncm:"83022000"}
     ],
     stock:999,sold:0,isPromotion:false,isLaunch:false,
   },
@@ -1062,29 +1030,15 @@ Regra simples: quanto menor o número do grão, mais agressiva é a lixa; quanto
   {
     prefix:"9.BOLS.TER",
     slug:"9-bols-ter",
-    name:"Bolsa Térmica",
-    description:"Bolsa Térmica · Grande · 650ml",
+    name:"Bolsa Compressa Térmica Gelo Termogel Reutilizável",
+    description:"Bolsa Térmica · Grande 650ml e Pequena 350ml",
     category:"Utilidades",
     subcategory:"Organização",
     brand:"Termogel",
     supplier:"Termogel",
-    keywords:["bolsa térmica","grande","650ml"],
+    keywords:["bolsa térmica","compressa","gelo","termogel","reutilizável","grande","650ml","pequena","350ml"],
     variations:[
-      {sku:"9.BOLS.TER.GRA",label:"Grande · 650ml",tiers:[{minQty:10,label:"10",price:26.39}, {minQty:50,label:"50",price:23.75}, {minQty:100,label:"100",price:21.64}, {minQty:500,label:"500",price:19.0}],weight:"A consultar",ncm:"39123119"}
-    ],
-    stock:999,sold:0,isPromotion:false,isLaunch:false,
-  },
-  {
-    prefix:"9.BOLS.TERM",
-    slug:"9-bols-term",
-    name:"Bolsa Térmica",
-    description:"Bolsa Térmica · Pequena · 350ml",
-    category:"Utilidades",
-    subcategory:"Organização",
-    brand:"Termogel",
-    supplier:"Termogel",
-    keywords:["bolsa térmica","pequena","350ml"],
-    variations:[
+      {sku:"9.BOLS.TER.GRA",label:"Grande · 650ml",tiers:[{minQty:10,label:"10",price:26.39}, {minQty:50,label:"50",price:23.75}, {minQty:100,label:"100",price:21.64}, {minQty:500,label:"500",price:19.0}],weight:"A consultar",ncm:"39123119"},
       {sku:"9.BOLS.TERM.PEQ",label:"Pequena · 350ml",tiers:[{minQty:10,label:"10",price:14.36}, {minQty:50,label:"50",price:12.92}, {minQty:100,label:"100",price:11.78}, {minQty:500,label:"500",price:10.34}],weight:"A consultar",ncm:"39123119"}
     ],
     stock:999,sold:0,isPromotion:false,isLaunch:false,
@@ -1172,21 +1126,6 @@ Regra simples: quanto menor o número do grão, mais agressiva é a lixa; quanto
     keywords:["rodízio","sq65 hga preto","com capa"],
     variations:[
       {sku:"11.ROD.PIN.SQ65",label:"SQ65 HGA Preto · Com Capa",tiers:[{minQty:10,label:"10",price:21.22}, {minQty:50,label:"50",price:19.1}, {minQty:100,label:"100",price:17.4}, {minQty:500,label:"500",price:15.28}],weight:"A consultar",ncm:"94039900"}
-    ],
-    stock:999,sold:0,isPromotion:false,isLaunch:false,
-  },
-  {
-    prefix:"11.ROD.SEMT",
-    slug:"11-rod-semt",
-    name:"Rodizio",
-    description:"Rodizio · 50mm · Sem Trava",
-    category:"Ferragens",
-    subcategory:"Rodízios",
-    brand:"Squadroni",
-    supplier:"Squadroni",
-    keywords:["rodizio","50mm","sem trava"],
-    variations:[
-      {sku:"11.ROD.SEMT.50",label:"50mm · Sem Trava",tiers:[{minQty:10,label:"10",price:7.22}, {minQty:50,label:"50",price:6.5}, {minQty:100,label:"100",price:5.92}, {minQty:500,label:"500",price:5.2}],weight:"A consultar",ncm:"83022000"}
     ],
     stock:999,sold:0,isPromotion:false,isLaunch:false,
   },
@@ -1810,38 +1749,6 @@ Regra simples: quanto menor o número do grão, mais agressiva é a lixa; quanto
     stock:999,sold:0,isPromotion:false,isLaunch:false,
   },
   {
-    prefix:"24.ROD.COMT",
-    slug:"24-rod-comt",
-    name:"Rodízio",
-    description:"Rodízio · Com Trava · 50mm",
-    category:"Ferragens",
-    subcategory:"Rodízios",
-    brand:"FGVTN",
-    supplier:"FGVTN",
-    keywords:["rodízio","com trava","50mm","35mm"],
-    variations:[
-      {sku:"24.ROD.COMT.50",label:"Com Trava · 50mm",tiers:[{minQty:10,label:"10",price:9.27}, {minQty:50,label:"50",price:8.34}, {minQty:100,label:"100",price:7.6}, {minQty:500,label:"500",price:6.67}],weight:"A consultar",ncm:"83022000"},
-      {sku:"24.ROD.COMT.35",label:"Com Trava · 35mm",tiers:[{minQty:10,label:"10",price:8.23}, {minQty:50,label:"50",price:7.41}, {minQty:100,label:"100",price:6.75}, {minQty:500,label:"500",price:5.93}],weight:"A consultar",ncm:"83022000"}
-    ],
-    stock:999,sold:0,isPromotion:false,isLaunch:false,
-  },
-  {
-    prefix:"24.ROD.SEMT",
-    slug:"24-rod-semt",
-    name:"Rodízio",
-    description:"Rodízio · Sem Trava · 50mm",
-    category:"Ferragens",
-    subcategory:"Rodízios",
-    brand:"FGVTN",
-    supplier:"FGVTN",
-    keywords:["rodízio","sem trava","50mm","35mm"],
-    variations:[
-      {sku:"24.ROD.SEMT.50",label:"Sem Trava · 50mm",tiers:[{minQty:10,label:"10",price:8.99}, {minQty:50,label:"50",price:8.09}, {minQty:100,label:"100",price:7.37}, {minQty:500,label:"500",price:6.47}],weight:"A consultar",ncm:"83022000"},
-      {sku:"24.ROD.SEMT.35",label:"Sem Trava · 35mm",tiers:[{minQty:10,label:"10",price:6.3}, {minQty:50,label:"50",price:5.67}, {minQty:100,label:"100",price:5.17}, {minQty:500,label:"500",price:4.54}],weight:"A consultar",ncm:"83022000"}
-    ],
-    stock:999,sold:0,isPromotion:false,isLaunch:false,
-  },
-  {
     prefix:"24.DOB.AMORT",
     slug:"24-dob-amort",
     name:"Dobradiça Curva",
@@ -1988,34 +1895,20 @@ Regra simples: quanto menor o número do grão, mais agressiva é a lixa; quanto
     stock:999,sold:0,isPromotion:false,isLaunch:false,
   },
   {
-    prefix:"29.ROD.SEMT",
-    slug:"29-rod-semt",
-    name:"Rodízio MN",
-    description:"Rodízio MN · Sem Freio · 35mm",
+    prefix:"29.ROD",
+    slug:"29-rod",
+    name:"Rodízio em Silicone PU Incolor Roda Com Trava / Sem Trava",
+    description:"Rodízio em silicone PU incolor · Com Trava e Sem Trava · 35mm e 50mm",
     category:"Ferragens",
     subcategory:"Rodízios",
     brand:"Metalnox",
     supplier:"Metalnox",
-    keywords:["rodízio mn","sem freio","35mm","50mm"],
+    keywords:["rodízio","silicone","pu","incolor","roda","com trava","sem trava","35mm","50mm"],
     variations:[
-      {sku:"29.ROD.SEMT.35",label:"Sem Freio · 35mm",tiers:[{minQty:10,label:"10",price:5.43}, {minQty:50,label:"50",price:4.89}, {minQty:100,label:"100",price:4.45}, {minQty:500,label:"500",price:3.91}],weight:"A consultar",ncm:"83022000"},
-      {sku:"29.ROD.SEMT.50",label:"Sem Freio · 50mm",tiers:[{minQty:10,label:"10",price:5.82}, {minQty:50,label:"50",price:5.24}, {minQty:100,label:"100",price:4.77}, {minQty:500,label:"500",price:4.19}],weight:"A consultar",ncm:"83022000"}
-    ],
-    stock:999,sold:0,isPromotion:false,isLaunch:false,
-  },
-  {
-    prefix:"29.ROD.COMT",
-    slug:"29-rod-comt",
-    name:"Rodízio MN",
-    description:"Rodízio MN · Com Freio · 35mm",
-    category:"Ferragens",
-    subcategory:"Rodízios",
-    brand:"Metalnox",
-    supplier:"Metalnox",
-    keywords:["rodízio mn","com freio","35mm","50mm"],
-    variations:[
-      {sku:"29.ROD.COMT.35",label:"Com Freio · 35mm",tiers:[{minQty:10,label:"10",price:6.72}, {minQty:50,label:"50",price:6.05}, {minQty:100,label:"100",price:5.51}, {minQty:500,label:"500",price:4.84}],weight:"A consultar",ncm:"83022000"},
-      {sku:"29.ROD.COMT.50",label:"Com Freio · 50mm",tiers:[{minQty:10,label:"10",price:7.5}, {minQty:50,label:"50",price:6.75}, {minQty:100,label:"100",price:6.15}, {minQty:500,label:"500",price:5.4}],weight:"A consultar",ncm:"83022000"}
+      {sku:"29.ROD.COMT.35",label:"Com Trava · 35mm",tiers:[{minQty:10,label:"10",price:6.72}, {minQty:50,label:"50",price:6.05}, {minQty:100,label:"100",price:5.51}, {minQty:500,label:"500",price:4.84}],weight:"A consultar",ncm:"83022000"},
+      {sku:"29.ROD.COMT.50",label:"Com Trava · 50mm",tiers:[{minQty:10,label:"10",price:7.5}, {minQty:50,label:"50",price:6.75}, {minQty:100,label:"100",price:6.15}, {minQty:500,label:"500",price:5.4}],weight:"A consultar",ncm:"83022000"},
+      {sku:"29.ROD.SEMT.35",label:"Sem Trava · 35mm",tiers:[{minQty:10,label:"10",price:5.43}, {minQty:50,label:"50",price:4.89}, {minQty:100,label:"100",price:4.45}, {minQty:500,label:"500",price:3.91}],weight:"A consultar",ncm:"83022000"},
+      {sku:"29.ROD.SEMT.50",label:"Sem Trava · 50mm",tiers:[{minQty:10,label:"10",price:5.82}, {minQty:50,label:"50",price:5.24}, {minQty:100,label:"100",price:4.77}, {minQty:500,label:"500",price:4.19}],weight:"A consultar",ncm:"83022000"}
     ],
     stock:999,sold:0,isPromotion:false,isLaunch:false,
   },
@@ -2092,38 +1985,6 @@ Regra simples: quanto menor o número do grão, mais agressiva é a lixa; quanto
     keywords:["trava porta inox","grape tools","pato"],
     variations:[
       {sku:"CH.TRAV.PATO",label:"Pato",tiers:[{minQty:10,label:"10",price:14.17}, {minQty:50,label:"50",price:12.75}, {minQty:100,label:"100",price:11.62}, {minQty:500,label:"500",price:10.2}],weight:"120g",ncm:"83024200"}
-    ],
-    stock:999,sold:0,isPromotion:false,isLaunch:false,
-  },
-  {
-    prefix:"10.ROD.COMT",
-    slug:"10-rod-comt",
-    name:"Rodízio",
-    description:"Rodízio · Com trava · 35mm",
-    category:"Ferragens",
-    subcategory:"Rodízios",
-    brand:"HD",
-    supplier:"HD",
-    keywords:["rodízio","com trava","35mm","50mm"],
-    variations:[
-      {sku:"10.ROD.COMT.35",label:"Com trava · 35mm",tiers:[{minQty:10,label:"10",price:8.88}, {minQty:50,label:"50",price:7.99}, {minQty:100,label:"100",price:7.28}, {minQty:500,label:"500",price:6.39}],weight:"A consultar",ncm:"83022000"},
-      {sku:"10.ROD.COMT.50",label:"Com trava · 50mm",tiers:[{minQty:10,label:"10",price:9.83}, {minQty:50,label:"50",price:8.85}, {minQty:100,label:"100",price:8.06}, {minQty:500,label:"500",price:7.08}],weight:"A consultar",ncm:"83022000"}
-    ],
-    stock:999,sold:0,isPromotion:false,isLaunch:false,
-  },
-  {
-    prefix:"10.ROD.SEMT",
-    slug:"10-rod-semt",
-    name:"Rodízio",
-    description:"Rodízio · Sem trava · 35mm",
-    category:"Ferragens",
-    subcategory:"Rodízios",
-    brand:"HD",
-    supplier:"HD",
-    keywords:["rodízio","sem trava","35mm","50mm"],
-    variations:[
-      {sku:"10.ROD.SEMT.35",label:"Sem trava · 35mm",tiers:[{minQty:10,label:"10",price:6.86}, {minQty:50,label:"50",price:6.17}, {minQty:100,label:"100",price:5.63}, {minQty:500,label:"500",price:4.94}],weight:"A consultar",ncm:"83022000"},
-      {sku:"10.ROD.SEMT.50",label:"Sem trava · 50mm",tiers:[{minQty:10,label:"10",price:7.98}, {minQty:50,label:"50",price:7.18}, {minQty:100,label:"100",price:6.54}, {minQty:500,label:"500",price:5.75}],weight:"A consultar",ncm:"83022000"}
     ],
     stock:999,sold:0,isPromotion:false,isLaunch:false,
   },
