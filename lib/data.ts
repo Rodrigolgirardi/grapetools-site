@@ -440,7 +440,7 @@ Regra simples: quanto menor o número do grão, mais agressiva é a lixa; quanto
   {
     prefix:"2.CAD",
     slug:"2-cad",
-    name:"Cadeado |Dourado",
+    name:"Cadeado Linha Standard Dourado | Papaiz",
     description:"Cadeado |Dourado · 20mm",
     category:"Ferragens",
     subcategory:"Cadeados",
@@ -480,7 +480,7 @@ Regra simples: quanto menor o número do grão, mais agressiva é a lixa; quanto
   {
     prefix:"3.MET",
     slug:"3-met",
-    name:"Metro Sueco de Madeira",
+    name:"Metro Sueco Articulado de Madeira | 2 Metros",
     description:"Metro Sueco de Madeira",
     category:"Ferramentas",
     subcategory:"Medição",
