@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { ProductVisual } from "./ProductVisual";
 import { Lightbox } from "./Lightbox";
+import { productImageBases } from "@/lib/product-image";
 import type { Product, Variation } from "@/lib/data";
 
 const EXTS = ["png", "jpg", "jpeg"];
@@ -21,9 +22,9 @@ function checkUrl(url: string): Promise<boolean> {
 
 // Resolve a URL real de uma foto. Testa cada "base" (nome do arquivo) nas 3
 // extensões, TUDO em paralelo, e pega a primeira que existir (na ordem dada).
-// Recebe várias bases pra aceitar o nome com HÍFEN e com PONTO.
+// Recebe várias bases pra aceitar nome com HÍFEN/PONTO e com/sem acento.
 function resolveFromBases(bases: string[]): Promise<string | null> {
-  const urls = bases.flatMap((b) => EXTS.map((ext) => `/products/${b}.${ext}`));
+  const urls = [...new Set(bases.flatMap((b) => EXTS.map((ext) => `/products/${b}.${ext}`)))];
   return Promise.all(urls.map(checkUrl)).then((oks) => {
     const i = oks.findIndex(Boolean);
     return i >= 0 ? urls[i] : null;
@@ -36,11 +37,8 @@ type Props = {
 };
 
 export function ProductGallery({ product, variation }: Props) {
-  // Aceita o nome do arquivo com hífen (CH-FEC-MAGNET) OU com ponto (CH.FEC.MAGNET)
+  // Nome-base com hífen, usado no placeholder quando não há foto.
   const skuDash = variation.sku.replace(/\./g, "-");
-  const skuDot = variation.sku;
-  const prefixDash = product.prefix.replace(/\./g, "-");
-  const prefixDot = product.prefix;
 
   const [photos, setPhotos] = useState<string[]>([]);
   const [selected, setSelected] = useState(0);
@@ -55,14 +53,18 @@ export function ProductGallery({ product, variation }: Props) {
     setLoading(true);
 
     (async () => {
-      // Foto principal: tenta o SKU (hífen e ponto); se não houver, foto genérica (prefixo)
-      let principal = await resolveFromBases([skuDash, skuDot]);
-      if (!principal) principal = await resolveFromBases([prefixDash, prefixDot]);
+      // Bases do SKU (hífen, ponto, com e sem acento) e do prefixo
+      const skuBases = productImageBases(variation.sku);
+      const prefixBases = productImageBases(product.prefix);
 
-      // Secundárias (-2, -3, ...): testa TODAS em paralelo, hífen e ponto
+      // Foto principal: tenta o SKU; se não houver, foto genérica (prefixo)
+      let principal = await resolveFromBases(skuBases);
+      if (!principal) principal = await resolveFromBases(prefixBases);
+
+      // Secundárias (-2, -3, ...): testa TODAS em paralelo
       const extras = (await Promise.all(
         Array.from({ length: MAX_EXTRAS }, (_, i) => i + 2).map((n) =>
-          resolveFromBases([`${skuDash}-${n}`, `${skuDot}-${n}`])
+          resolveFromBases(skuBases.map((b) => `${b}-${n}`))
         )
       )).filter(Boolean) as string[];
 
@@ -76,7 +78,7 @@ export function ProductGallery({ product, variation }: Props) {
     return () => {
       cancelled = true;
     };
-  }, [skuDash, skuDot, prefixDash, prefixDot]);
+  }, [variation.sku, product.prefix]);
 
   const temFotos = photos.length > 0;
 

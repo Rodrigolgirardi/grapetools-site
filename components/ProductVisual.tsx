@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { semAcento } from "@/lib/product-image";
 import type { Product } from "@/lib/data";
 
 const categoryIcon: Record<string, string> = {
@@ -28,13 +29,14 @@ export function ProductVisual({ product, sku, fileBase }: Props) {
   const imageSku = sku ?? product.variations[0]?.sku ?? product.prefix;
 
   // "Bases" (nomes de arquivo) a tentar, em ordem de prioridade. Aceita o nome
-  // com HÍFEN (CH-FEC-MAGNET) e com PONTO (CH.FEC.MAGNET) — assim funciona
-  // mesmo se a foto for salva de qualquer das duas formas.
-  const bases = fileBase
+  // com HÍFEN (CH-FEC-MAGNET) ou PONTO (CH.FEC.MAGNET), e com ou sem acento/
+  // cedilha (AÇOESC/ACOESC). Funciona se a foto for salva de qualquer forma.
+  const baseList = fileBase
     ? [fileBase]
     : [imageSku.replace(/\./g, "-"), imageSku];
-  bases.push(product.prefix.replace(/\./g, "-"), product.prefix); // foto genérica do produto
+  baseList.push(product.prefix.replace(/\./g, "-"), product.prefix); // foto genérica do produto
 
+  const bases = [...new Set(baseList.flatMap((b) => [b, semAcento(b)]))];
   const exts = ["png", "jpg", "jpeg"];
   const sources = bases.flatMap((b) => exts.map((ext) => `/products/${b}.${ext}`));
 

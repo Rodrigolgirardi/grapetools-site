@@ -1,15 +1,26 @@
 // lib/product-image.ts
-// Resolve a foto de um produto aceitando o nome do arquivo com HÍFEN
-// (CH-FEC-MAGNET) ou com PONTO (CH.FEC.MAGNET), em png/jpg/jpeg.
+// Resolve a foto de um produto aceitando o nome do arquivo:
+//  - com HÍFEN (CH-FEC-MAGNET) ou com PONTO (CH.FEC.MAGNET)
+//  - com acento/cedilha (AÇOESC) ou sem (ACOESC)
+//  - em png/jpg/jpeg
 
 const EXTS = ["png", "jpg", "jpeg"];
 
-// Lista de URLs candidatas, em ordem de prioridade.
-export function productImageCandidates(sku: string): string[] {
+// Remove acentos e cedilha, preservando maiúsculas/minúsculas (ex: AÇOESC -> ACOESC).
+export function semAcento(s: string): string {
+  return s.normalize("NFD").replace(/[̀-ͯ]/g, "");
+}
+
+// Nomes-base a tentar (sem extensão), já sem duplicatas.
+export function productImageBases(sku: string): string[] {
   const dash = sku.replace(/\./g, "-");
   const dot = sku;
-  const bases = dash === dot ? [dash] : [dash, dot];
-  return bases.flatMap((b) => EXTS.map((ext) => `/products/${b}.${ext}`));
+  return [...new Set([dash, dot, semAcento(dash), semAcento(dot)])];
+}
+
+// Lista de URLs candidatas, em ordem de prioridade.
+export function productImageCandidates(sku: string): string[] {
+  return productImageBases(sku).flatMap((b) => EXTS.map((ext) => `/products/${b}.${ext}`));
 }
 
 // Primeira candidata (o src inicial da <img>).
