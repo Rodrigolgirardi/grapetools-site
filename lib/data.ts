@@ -117,7 +117,7 @@ Regra simples: quanto menor o número do grão, mais agressiva é a lixa; quanto
   {
     prefix:"CH.DISC.LIX.125",
     slug:"ch-disc-lix-125",
-    name:"Disco de Lixa Com Furos Grape Tools | Grape Tools",
+    name:"Disco de Lixa Com Furos | Grape Tools",
     description:"Disco de Lixa Com Furos Grape Tools · 125mm · Grão 150",
     category:"Abrasivos",
     subcategory:"Discos com Furos",
