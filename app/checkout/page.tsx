@@ -27,12 +27,23 @@ function formatCEP(v: string) {
 
 const ESTADOS = ['AC','AL','AP','AM','BA','CE','DF','ES','GO','MA','MT','MS','MG','PA','PB','PR','PE','PI','RJ','RN','RS','RO','RR','SC','SP','SE','TO']
 
+// Endereço da loja para retirada (ajuste se necessário)
+const LOJA = {
+  rua: 'Rua Professor Guilherme Belfort Sabino',
+  numero: '348',
+  bairro: 'Campininha',
+  cidade: 'São Paulo',
+  estado: 'SP',
+  cep: '04678-002',
+}
+
 export default function CheckoutPage() {
   const { user, loading } = useAuth()
   const { cart, clearCart } = useCart()
   const router = useRouter()
 
   const [step, setStep] = useState<'resumo' | 'entrega' | 'pagamento' | 'confirmado'>('resumo')
+  const [entregaTipo, setEntregaTipo] = useState<'entrega' | 'retirada'>('entrega')
   const [endereco, setEndereco] = useState<Endereco>({})
   const [cepLoading, setCepLoading] = useState(false)
   const [formaPagamento, setFormaPagamento] = useState<'pix' | 'boleto' | 'transferencia'>('pix')
@@ -115,6 +126,10 @@ export default function CheckoutPage() {
     setSubmitting(true)
     const supabase = createClient()
 
+    // Endereço usado para o frete/Pagar.me: da loja (retirada) ou do cliente (entrega)
+    const enderecoEnvio = entregaTipo === 'retirada' ? LOJA : endereco
+    const entregaLabel = entregaTipo === 'retirada' ? 'Retirar na loja' : 'Entrega no endereço'
+
     // 1. Cria pedido no Supabase
     const { data: pedido, error: pedidoError } = await supabase
       .from('pedidos')
@@ -123,7 +138,7 @@ export default function CheckoutPage() {
         status: 'pendente',
         total: subtotal,
         forma_pagamento: formaPagamento,
-        observacao: obs || null,
+        observacao: `Entrega: ${entregaLabel}${obs ? ' | Obs: ' + obs : ''}`,
       })
       .select('id')
       .single()
@@ -144,13 +159,15 @@ export default function CheckoutPage() {
     }))
     await supabase.from('pedido_itens').insert(itens)
 
-    // 3. Salva endereço no perfil
-    await supabase.from('profiles').upsert({
-      id: user.id,
-      email: user.email,
-      endereco,
-      updated_at: new Date().toISOString(),
-    })
+    // 3. Salva endereço no perfil (só quando é entrega — não sobrescreve com vazio na retirada)
+    if (entregaTipo === 'entrega') {
+      await supabase.from('profiles').upsert({
+        id: user.id,
+        email: user.email,
+        endereco,
+        updated_at: new Date().toISOString(),
+      })
+    }
 
     // 4. Chama Pagar.me (se Pix ou Boleto)
     if (formaPagamento !== 'transferencia') {
@@ -176,7 +193,7 @@ export default function CheckoutPage() {
             documento,
             telefone: telefoneContato,
           },
-          endereco,
+          endereco: enderecoEnvio,
         }),
       })
 
@@ -342,8 +359,35 @@ export default function CheckoutPage() {
             {/* ─── STEP 2: ENTREGA ─── */}
             {step === 'entrega' && (
               <div className="checkoutSection">
-                <h2 className="checkoutSectionTitle">Endereço de entrega</h2>
+                <h2 className="checkoutSectionTitle">Entrega</h2>
 
+                {/* Tipo de entrega */}
+                <div className="checkoutPayOptions">
+                  <button
+                    className={`checkoutPayOption ${entregaTipo === 'entrega' ? 'active' : ''}`}
+                    onClick={() => setEntregaTipo('entrega')}
+                  >
+                    <span className="checkoutPayIcon">📦</span>
+                    <div>
+                      <strong>Receber em casa</strong>
+                      <span>Entrega no seu endereço</span>
+                    </div>
+                    <span className="checkoutPayCheck">{entregaTipo === 'entrega' ? '●' : '○'}</span>
+                  </button>
+                  <button
+                    className={`checkoutPayOption ${entregaTipo === 'retirada' ? 'active' : ''}`}
+                    onClick={() => setEntregaTipo('retirada')}
+                  >
+                    <span className="checkoutPayIcon">🏪</span>
+                    <div>
+                      <strong>Retirar na loja</strong>
+                      <span>Frete grátis · retire no balcão</span>
+                    </div>
+                    <span className="checkoutPayCheck">{entregaTipo === 'retirada' ? '●' : '○'}</span>
+                  </button>
+                </div>
+
+                {/* Contato (sempre) + endereço (só na entrega) */}
                 <div className="checkoutGrid">
                   <div className="checkoutField">
                     <label>Nome para contato</label>
@@ -353,47 +397,60 @@ export default function CheckoutPage() {
                     <label>Telefone / WhatsApp</label>
                     <input type="tel" value={telefoneContato} onChange={e => setTelefoneContato(e.target.value)} placeholder="(11) 99999-9999" />
                   </div>
-                  <div className="checkoutField">
-                    <label>CEP</label>
-                    <div className="checkoutCepWrap">
-                      <input
-                        type="text"
-                        value={endereco.cep || ''}
-                        onChange={e => setEndereco(v => ({ ...v, cep: formatCEP(e.target.value) }))}
-                        onBlur={e => buscarCEP(e.target.value)}
-                        placeholder="00000-000"
-                      />
-                      {cepLoading && <span className="checkoutCepSpinner" />}
-                    </div>
-                  </div>
-                  <div className="checkoutField">
-                    <label>Número</label>
-                    <input type="text" value={endereco.numero || ''} onChange={e => setEndereco(v => ({ ...v, numero: e.target.value }))} placeholder="123" />
-                  </div>
-                  <div className="checkoutField checkoutFieldFull">
-                    <label>Rua / Avenida</label>
-                    <input type="text" value={endereco.rua || ''} onChange={e => setEndereco(v => ({ ...v, rua: e.target.value }))} placeholder="Nome da rua" />
-                  </div>
-                  <div className="checkoutField">
-                    <label>Complemento <span className="checkoutOptional">opcional</span></label>
-                    <input type="text" value={endereco.complemento || ''} onChange={e => setEndereco(v => ({ ...v, complemento: e.target.value }))} placeholder="Apto, sala…" />
-                  </div>
-                  <div className="checkoutField">
-                    <label>Bairro</label>
-                    <input type="text" value={endereco.bairro || ''} onChange={e => setEndereco(v => ({ ...v, bairro: e.target.value }))} placeholder="Bairro" />
-                  </div>
-                  <div className="checkoutField">
-                    <label>Cidade</label>
-                    <input type="text" value={endereco.cidade || ''} onChange={e => setEndereco(v => ({ ...v, cidade: e.target.value }))} placeholder="Cidade" />
-                  </div>
-                  <div className="checkoutField">
-                    <label>Estado</label>
-                    <select value={endereco.estado || ''} onChange={e => setEndereco(v => ({ ...v, estado: e.target.value }))}>
-                      <option value="">Selecione</option>
-                      {ESTADOS.map(uf => <option key={uf} value={uf}>{uf}</option>)}
-                    </select>
-                  </div>
+
+                  {entregaTipo === 'entrega' && (
+                    <>
+                      <div className="checkoutField">
+                        <label>CEP</label>
+                        <div className="checkoutCepWrap">
+                          <input
+                            type="text"
+                            value={endereco.cep || ''}
+                            onChange={e => setEndereco(v => ({ ...v, cep: formatCEP(e.target.value) }))}
+                            onBlur={e => buscarCEP(e.target.value)}
+                            placeholder="00000-000"
+                          />
+                          {cepLoading && <span className="checkoutCepSpinner" />}
+                        </div>
+                      </div>
+                      <div className="checkoutField">
+                        <label>Número</label>
+                        <input type="text" value={endereco.numero || ''} onChange={e => setEndereco(v => ({ ...v, numero: e.target.value }))} placeholder="123" />
+                      </div>
+                      <div className="checkoutField checkoutFieldFull">
+                        <label>Rua / Avenida</label>
+                        <input type="text" value={endereco.rua || ''} onChange={e => setEndereco(v => ({ ...v, rua: e.target.value }))} placeholder="Nome da rua" />
+                      </div>
+                      <div className="checkoutField">
+                        <label>Complemento <span className="checkoutOptional">opcional</span></label>
+                        <input type="text" value={endereco.complemento || ''} onChange={e => setEndereco(v => ({ ...v, complemento: e.target.value }))} placeholder="Apto, sala…" />
+                      </div>
+                      <div className="checkoutField">
+                        <label>Bairro</label>
+                        <input type="text" value={endereco.bairro || ''} onChange={e => setEndereco(v => ({ ...v, bairro: e.target.value }))} placeholder="Bairro" />
+                      </div>
+                      <div className="checkoutField">
+                        <label>Cidade</label>
+                        <input type="text" value={endereco.cidade || ''} onChange={e => setEndereco(v => ({ ...v, cidade: e.target.value }))} placeholder="Cidade" />
+                      </div>
+                      <div className="checkoutField">
+                        <label>Estado</label>
+                        <select value={endereco.estado || ''} onChange={e => setEndereco(v => ({ ...v, estado: e.target.value }))}>
+                          <option value="">Selecione</option>
+                          {ESTADOS.map(uf => <option key={uf} value={uf}>{uf}</option>)}
+                        </select>
+                      </div>
+                    </>
+                  )}
                 </div>
+
+                {entregaTipo === 'retirada' && (
+                  <div className="checkoutPixInfo">
+                    <p><strong>🏪 Retirada na loja — frete grátis</strong></p>
+                    <p>{LOJA.rua}, {LOJA.numero} — {LOJA.bairro}, {LOJA.cidade}/{LOJA.estado} · CEP {LOJA.cep}</p>
+                    <p>Avisaremos por WhatsApp quando seu pedido estiver pronto para retirada.</p>
+                  </div>
+                )}
 
                 <div className="checkoutFieldFull">
                   <label className="checkoutLabel">Observações <span className="checkoutOptional">opcional</span></label>
@@ -411,7 +468,7 @@ export default function CheckoutPage() {
                   <button
                     className="checkoutBtnPrimary"
                     onClick={() => setStep('pagamento')}
-                    disabled={!enderecoCompleto()}
+                    disabled={entregaTipo === 'entrega' ? !enderecoCompleto() : !(nomeContato && telefoneContato)}
                   >
                     Continuar para pagamento →
                   </button>
@@ -484,7 +541,9 @@ export default function CheckoutPage() {
               </div>
               <div className="checkoutSidebarFrete">
                 <span>Frete</span>
-                <span className="checkoutSidebarFreteVal">A combinar</span>
+                <span className="checkoutSidebarFreteVal">
+                  {entregaTipo === 'retirada' ? 'Grátis · Retirar na loja' : 'A combinar'}
+                </span>
               </div>
             </div>
           </aside>
