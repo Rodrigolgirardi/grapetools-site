@@ -406,33 +406,19 @@ Regra simples: quanto menor o número do grão, mais agressiva é a lixa; quanto
     stock:999,sold:0,isPromotion:false,isLaunch:false,
   },
   {
-    prefix:"1.ROD.PIN.30",
-    slug:"1-rod-pin-30",
-    name:"Rodízio Com Bucha",
-    description:"Rodízio Com Bucha · 30mm · Preto",
+    prefix:"1.ROD.PIN",
+    slug:"1-rod-pin",
+    name:"Rodízio Multiuso com Bucha | Suporta até 25kg",
+    description:"Rodízio multiuso com bucha · suporta até 25kg · 30mm e 38mm · preto e branco",
     category:"Ferragens",
     subcategory:"Rodízios",
     brand:"Cobrirel",
     supplier:"Cobrirel",
-    keywords:["rodízio com bucha","30mm","preto","branco"],
+    keywords:["rodízio","multiuso","com bucha","25kg","30mm","38mm","preto","branco"],
     variations:[
       {sku:"1.ROD.PIN.30.PT",label:"30mm · Preto",tiers:[{minQty:10,label:"10",price:6.72}, {minQty:50,label:"50",price:6.05}, {minQty:100,label:"100",price:5.51}, {minQty:500,label:"500",price:4.84}],weight:"A consultar",ncm:"83022000"},
-      {sku:"1.ROD.PIN.30.BR",label:"30mm · Branco",tiers:[{minQty:10,label:"10",price:6.72}, {minQty:50,label:"50",price:6.05}, {minQty:100,label:"100",price:5.51}, {minQty:500,label:"500",price:4.84}],weight:"A consultar",ncm:"83022000"}
-    ],
-    stock:999,sold:0,isPromotion:false,isLaunch:false,
-  },
-  {
-    prefix:"1.ROD.PIN.38",
-    slug:"1-rod-pin-38",
-    name:"Rodízio Com Bucha",
-    description:"Rodízio Com Bucha · 38mm · Preto",
-    category:"Ferragens",
-    subcategory:"Rodízios",
-    brand:"Cobrirel",
-    supplier:"Cobrirel",
-    keywords:["rodízio com bucha","38mm","preto","branco"],
-    variations:[
       {sku:"1.ROD.PIN.38.PT",label:"38mm · Preto",tiers:[{minQty:10,label:"10",price:8.29}, {minQty:50,label:"50",price:7.46}, {minQty:100,label:"100",price:6.8}, {minQty:500,label:"500",price:5.97}],weight:"A consultar",ncm:"83022000"},
+      {sku:"1.ROD.PIN.30.BR",label:"30mm · Branco",tiers:[{minQty:10,label:"10",price:6.72}, {minQty:50,label:"50",price:6.05}, {minQty:100,label:"100",price:5.51}, {minQty:500,label:"500",price:4.84}],weight:"A consultar",ncm:"83022000"},
       {sku:"1.ROD.PIN.38.BR",label:"38mm · Branco",tiers:[{minQty:10,label:"10",price:8.29}, {minQty:50,label:"50",price:7.46}, {minQty:100,label:"100",price:6.8}, {minQty:500,label:"500",price:5.97}],weight:"A consultar",ncm:"83022000"}
     ],
     stock:999,sold:0,isPromotion:false,isLaunch:false,
@@ -1015,7 +1001,7 @@ Regra simples: quanto menor o número do grão, mais agressiva é a lixa; quanto
   {
     prefix:"11.ROD.PIN",
     slug:"11-rod-pin",
-    name:"Rodízio",
+    name:"Rodizio Anti-Risco SQ65 em Silicone para Cadeira de Escritório | Encaixe Universal",
     description:"Rodízio · SQ65 HGA Preto · Com Capa",
     category:"Ferragens",
     subcategory:"Rodízios",
@@ -1030,7 +1016,7 @@ Regra simples: quanto menor o número do grão, mais agressiva é a lixa; quanto
   {
     prefix:"11.ROD.SEM.PIN",
     slug:"11-rod-sem-pin",
-    name:"Rodizio",
+    name:"Rodízio Sem Pino Encaixe Universal para cadeira de Escritório | SQ90",
     description:"Rodizio · SQ90 · Sem Pino",
     category:"Ferragens",
     subcategory:"Rodízios",
