@@ -550,22 +550,6 @@ Regra simples: quanto menor o número do grão, mais agressiva é a lixa; quanto
     stock:999,sold:0,isPromotion:false,isLaunch:false,
   },
   {
-    prefix:"3.FEC.BATENT",
-    slug:"3-fec-batent",
-    name:"Fechadura com Batente",
-    description:"Fechadura com Batente · 22mm",
-    category:"Ferragens",
-    subcategory:"Fechaduras",
-    brand:"Renna",
-    supplier:"Renna",
-    keywords:["fechadura com batente","22mm","31mm"],
-    variations:[
-      {sku:"3.FEC.BATENT.22MM",label:"22mm",tiers:[{minQty:10,label:"10",price:7.19}, {minQty:50,label:"50",price:6.47}, {minQty:100,label:"100",price:5.9}, {minQty:500,label:"500",price:5.18}],weight:"A consultar",ncm:"83013000"},
-      {sku:"3.FEC.BATENT.31MM",label:"31mm",tiers:[{minQty:10,label:"10",price:7.82}, {minQty:50,label:"50",price:7.04}, {minQty:100,label:"100",price:6.41}, {minQty:500,label:"500",price:5.63}],weight:"A consultar",ncm:"83013000"}
-    ],
-    stock:999,sold:0,isPromotion:false,isLaunch:false,
-  },
-  {
     prefix:"3.PUX.CONCH",
     slug:"3-pux-conch",
     name:"Puxador Concha Paris para Móveis | 96mm | Aço Escovado",
@@ -583,7 +567,7 @@ Regra simples: quanto menor o número do grão, mais agressiva é a lixa; quanto
   {
     prefix:"3.CORR.LARG",
     slug:"3-corr-larg",
-    name:"Corrediça Telescópica",
+    name:"Corrediça Telescópica Reforçada | H45 (45kg)",
     description:"Corrediça Telescópica · 45mm · 25cm",
     category:"Ferragens",
     subcategory:"Corrediças",
@@ -1000,21 +984,6 @@ Regra simples: quanto menor o número do grão, mais agressiva é a lixa; quanto
     variations:[
       {sku:"10.DOB.AMORT.CUR",label:"35mm",tiers:[{minQty:10,label:"10",price:3.7}, {minQty:50,label:"50",price:3.33}, {minQty:100,label:"100",price:3.03}, {minQty:500,label:"500",price:2.66}],weight:"A consultar",ncm:"83021000"},
       {sku:"10.DOB.AMORT.RET",label:"Dobradiça Com Amortecedor Reta · 35mm",tiers:[{minQty:10,label:"10",price:4.56}, {minQty:50,label:"50",price:4.1}, {minQty:100,label:"100",price:3.74}, {minQty:500,label:"500",price:3.28}],weight:"A consultar",ncm:"83021000"}
-    ],
-    stock:999,sold:0,isPromotion:false,isLaunch:false,
-  },
-  {
-    prefix:"10.FEC.BATENT",
-    slug:"10-fec-batent",
-    name:"Fechadura com Batente",
-    description:"Fechadura com Batente · 22mm",
-    category:"Ferragens",
-    subcategory:"Fechaduras",
-    brand:"HD",
-    supplier:"HD",
-    keywords:["fechadura com batente","22mm"],
-    variations:[
-      {sku:"10.FEC.BATENT.22MM",label:"22mm",tiers:[{minQty:10,label:"10",price:9.24}, {minQty:50,label:"50",price:8.32}, {minQty:100,label:"100",price:7.58}, {minQty:500,label:"500",price:6.65}],weight:"A consultar",ncm:"83013000"}
     ],
     stock:999,sold:0,isPromotion:false,isLaunch:false,
   },
@@ -1657,21 +1626,6 @@ Regra simples: quanto menor o número do grão, mais agressiva é a lixa; quanto
     stock:999,sold:0,isPromotion:false,isLaunch:false,
   },
   {
-    prefix:"22.FEC.BATENT",
-    slug:"22-fec-batent",
-    name:"Fechadura com Batente",
-    description:"Fechadura com Batente · 22mm",
-    category:"Ferragens",
-    subcategory:"Fechaduras",
-    brand:"Sim",
-    supplier:"Sim",
-    keywords:["fechadura com batente","22mm"],
-    variations:[
-      {sku:"22.FEC.BATENT.22MM",label:"22mm",tiers:[{minQty:10,label:"10",price:8.37}, {minQty:50,label:"50",price:7.53}, {minQty:100,label:"100",price:6.86}, {minQty:500,label:"500",price:6.03}],weight:"A consultar",ncm:"83013000"}
-    ],
-    stock:999,sold:0,isPromotion:false,isLaunch:false,
-  },
-  {
     prefix:"23.SUP.INV",
     slug:"23-sup-inv",
     name:"Suporte Invisível",
@@ -1859,61 +1813,34 @@ Regra simples: quanto menor o número do grão, mais agressiva é a lixa; quanto
   {
     prefix:"29.FEC.BATENT",
     slug:"29-fec-batent",
-    name:"Fechadura 17 x 22mm",
-    description:"Fechadura 17 x 22mm · Com Batente",
+    name:"Fechadura Com batente + 2 Chaves | Para Gavetas",
+    description:"Fechadura com batente para gavetas · acompanha 2 chaves · 17 x 22mm e 17 x 31mm",
     category:"Ferragens",
     subcategory:"Fechaduras",
     brand:"Metalnox",
     supplier:"Metalnox",
-    keywords:["fechadura 17 x 22mm","com batente","fechadura 17 x 31mm"],
+    keywords:["fechadura","com batente","2 chaves","gavetas","17 x 22mm","17 x 31mm"],
     variations:[
-      {sku:"29.FEC.BATENT.22MM",label:"Com Batente",tiers:[{minQty:10,label:"10",price:6.47}, {minQty:50,label:"50",price:5.82}, {minQty:100,label:"100",price:5.31}, {minQty:500,label:"500",price:4.66}],weight:"A consultar",ncm:"83013000"},
-      {sku:"29.FEC.BATENT.31MM",label:"Fechadura 17 x 31mm · Com Batente",tiers:[{minQty:10,label:"10",price:7.76}, {minQty:50,label:"50",price:6.98}, {minQty:100,label:"100",price:6.36}, {minQty:500,label:"500",price:5.59}],weight:"A consultar",ncm:"83013000"}
+      {sku:"29.FEC.BATENT.22MM",label:"17 x 22mm",tiers:[{minQty:10,label:"10",price:6.47}, {minQty:50,label:"50",price:5.82}, {minQty:100,label:"100",price:5.31}, {minQty:500,label:"500",price:4.66}],weight:"A consultar",ncm:"83013000"},
+      {sku:"29.FEC.BATENT.31MM",label:"17 x 31mm",tiers:[{minQty:10,label:"10",price:7.76}, {minQty:50,label:"50",price:6.98}, {minQty:100,label:"100",price:6.36}, {minQty:500,label:"500",price:5.59}],weight:"A consultar",ncm:"83013000"}
     ],
     stock:999,sold:0,isPromotion:false,isLaunch:false,
   },
   {
-    prefix:"29.PF.3.5",
-    slug:"29-pf-3-5",
-    name:"Parafuso MiniChipboard",
-    description:"Parafuso MiniChipboard · 3,5 x 14mm",
+    prefix:"29.PF",
+    slug:"29-pf",
+    name:"Parafuso Chipboard Bicromatizado Cabeça Chata Phillips",
+    description:"Parafuso chipboard bicromatizado · cabeça chata Phillips · vários tamanhos",
     category:"Fixação",
     subcategory:"Parafusos",
     brand:"Metalnox",
     supplier:"Metalnox",
-    keywords:["parafuso minichipboard","3,5 x 14mm"],
+    keywords:["parafuso","chipboard","bicromatizado","cabeça chata","phillips","3,5 x 14mm","4,5 x 50mm","5,0 x 35mm","5,0 x 40mm"],
     variations:[
-      {sku:"29.PF.3.5.14",label:"3,5 x 14mm",tiers:[{minQty:10,label:"10",price:2.58}, {minQty:50,label:"50",price:2.32}, {minQty:100,label:"100",price:2.12}, {minQty:500,label:"500",price:1.86}],weight:"A consultar",ncm:"73181200"}
-    ],
-    stock:999,sold:0,isPromotion:false,isLaunch:false,
-  },
-  {
-    prefix:"29.PF.4.5",
-    slug:"29-pf-4-5",
-    name:"Parafuso Chipboard",
-    description:"Parafuso Chipboard · 4,5 x 50mm",
-    category:"Fixação",
-    subcategory:"Parafusos",
-    brand:"Metalnox",
-    supplier:"Metalnox",
-    keywords:["parafuso chipboard","4,5 x 50mm"],
-    variations:[
-      {sku:"29.PF.4.5.50",label:"4,5 x 50mm",tiers:[{minQty:10,label:"10",price:11.17}, {minQty:50,label:"50",price:10.05}, {minQty:100,label:"100",price:9.16}, {minQty:500,label:"500",price:8.04}],weight:"A consultar",ncm:"73181200"}
-    ],
-    stock:999,sold:0,isPromotion:false,isLaunch:false,
-  },
-  {
-    prefix:"29.PF.5.0",
-    slug:"29-pf-5-0",
-    name:"Parafuso Chipboard",
-    description:"Parafuso Chipboard · 5.0 x 35mm",
-    category:"Fixação",
-    subcategory:"Parafusos",
-    brand:"Metalnox",
-    supplier:"Metalnox",
-    keywords:["parafuso chipboard","5.0 x 35mm"],
-    variations:[
-      {sku:"29.PF.5.0.35",label:"5.0 x 35mm",tiers:[{minQty:10,label:"10",price:10.36}, {minQty:50,label:"50",price:9.32}, {minQty:100,label:"100",price:8.5}, {minQty:500,label:"500",price:7.46}],weight:"A consultar",ncm:"73181200"}
+      {sku:"29.PF.3.5.14",label:"3,5 x 14mm",tiers:[{minQty:10,label:"10",price:2.58}, {minQty:50,label:"50",price:2.32}, {minQty:100,label:"100",price:2.12}, {minQty:500,label:"500",price:1.86}],weight:"A consultar",ncm:"73181200"},
+      {sku:"29.PF.4.5.50",label:"4,5 x 50mm",tiers:[{minQty:10,label:"10",price:11.17}, {minQty:50,label:"50",price:10.05}, {minQty:100,label:"100",price:9.16}, {minQty:500,label:"500",price:8.04}],weight:"A consultar",ncm:"73181200"},
+      {sku:"29.PF.5.0.35",label:"5,0 x 35mm",tiers:[{minQty:10,label:"10",price:10.36}, {minQty:50,label:"50",price:9.32}, {minQty:100,label:"100",price:8.5}, {minQty:500,label:"500",price:7.46}],weight:"A consultar",ncm:"73181200"},
+      {sku:"29.PF.5.0.40",label:"5,0 x 40mm",tiers:[{minQty:10,label:"10",price:11.0}, {minQty:50,label:"50",price:9.9}, {minQty:100,label:"100",price:9.02}, {minQty:500,label:"500",price:7.92}],weight:"A consultar",ncm:"73181200"}
     ],
     stock:999,sold:0,isPromotion:false,isLaunch:false,
   },
