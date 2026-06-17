@@ -30,7 +30,7 @@ interface EnderecoPayload {
 interface CriarPedidoPayload {
   pedido_id: string       // ID do pedido no Supabase
   total: number           // em reais
-  forma_pagamento: 'pix' | 'boleto' | 'transferencia'
+  forma_pagamento: 'pix' | 'boleto' | 'transferencia' | 'cartao'
   itens: ItemPedido[]
   cliente: {
     nome: string
@@ -39,6 +39,8 @@ interface CriarPedidoPayload {
     telefone?: string
   }
   endereco: EnderecoPayload
+  card_token?: string     // token do cartão (gerado no navegador, nunca o cartão cru)
+  parcelas?: number       // número de parcelas (cartão de crédito)
 }
 
 function toAmountCents(reais: number): number {
@@ -64,7 +66,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body: CriarPedidoPayload = await request.json()
-    const { pedido_id, total, forma_pagamento, itens, cliente, endereco } = body
+    const { pedido_id, total, forma_pagamento, itens, cliente, endereco, card_token, parcelas } = body
 
     // 0b) Confere que o pedido existe E pertence a quem está logado
     //     (impede criar cobranças para pedidos de outras pessoas)
@@ -83,6 +85,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'CPF ou CNPJ inválido.' }, { status: 400 })
     }
 
+    // 0d) Cartão precisa do token (gerado no navegador)
+    if (forma_pagamento === 'cartao' && !card_token) {
+      return NextResponse.json({ error: 'Dados do cartão ausentes.' }, { status: 400 })
+    }
+
     // Só processa Pix e Boleto por agora
     if (forma_pagamento === 'transferencia') {
       return NextResponse.json({
@@ -93,6 +100,55 @@ export async function POST(request: NextRequest) {
 
     const docClean = cleanDoc(cliente.documento || '')
     const docType = docClean.length === 11 ? 'cpf' : 'cnpj'
+
+    // Monta o pagamento conforme a forma escolhida
+    let pagamento: Record<string, unknown>
+    if (forma_pagamento === 'pix') {
+      pagamento = {
+        payment_method: 'pix',
+        pix: { expires_in: 3600 }, // 1 hora
+        amount: toAmountCents(total),
+      }
+    } else if (forma_pagamento === 'cartao') {
+      pagamento = {
+        payment_method: 'credit_card',
+        credit_card: {
+          installments: parcelas && parcelas > 0 ? parcelas : 1,
+          statement_descriptor: 'GRAPETOOLS',
+          card_token,
+        },
+        amount: toAmountCents(total),
+      }
+    } else {
+      pagamento = {
+        payment_method: 'boleto',
+        boleto: {
+          instructions: 'Pagar até o vencimento. Após o vencimento, o pedido será cancelado.',
+          due_at: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(), // 3 dias
+        },
+        amount: toAmountCents(total),
+      }
+    }
+
+    // Itens; se o total cobrado for maior que a soma (juros do parcelamento no
+    // cartão), adiciona um item de "Juros" para o Pagar.me bater o valor.
+    const itemsBody: Array<{ code: string; description: string; amount: number; quantity: number }> =
+      itens.map(item => ({
+        code: item.sku,
+        description: item.descricao.slice(0, 100),
+        amount: toAmountCents(item.preco_unitario),
+        quantity: item.quantidade,
+      }))
+    const somaItens = itemsBody.reduce((s, it) => s + it.amount * it.quantity, 0)
+    const totalCents = toAmountCents(total)
+    if (totalCents > somaItens) {
+      itemsBody.push({
+        code: 'JUROS',
+        description: 'Juros do parcelamento',
+        amount: totalCents - somaItens,
+        quantity: 1,
+      })
+    }
 
     // Monta o body para a API do Pagar.me
     const pagarmeBody: Record<string, unknown> = {
@@ -111,30 +167,8 @@ export async function POST(request: NextRequest) {
           }
         } : undefined,
       },
-      items: itens.map(item => ({
-        code: item.sku,
-        description: item.descricao.slice(0, 100),
-        amount: toAmountCents(item.preco_unitario),
-        quantity: item.quantidade,
-      })),
-      payments: [
-        forma_pagamento === 'pix'
-          ? {
-              payment_method: 'pix',
-              pix: {
-                expires_in: 3600, // 1 hora
-              },
-              amount: toAmountCents(total),
-            }
-          : {
-              payment_method: 'boleto',
-              boleto: {
-                instructions: 'Pagar até o vencimento. Após o vencimento, o pedido será cancelado.',
-                due_at: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(), // 3 dias
-              },
-              amount: toAmountCents(total),
-            },
-      ],
+      items: itemsBody,
+      payments: [pagamento],
       shipping: {
         amount: 0,
         description: 'A combinar',
@@ -196,6 +230,33 @@ export async function POST(request: NextRequest) {
     const lastTransaction = charge?.last_transaction
     console.log('charge:', JSON.stringify(charge, null, 2))
     console.log('lastTransaction:', JSON.stringify(lastTransaction, null, 2))
+
+    if (forma_pagamento === 'cartao') {
+      // Cartão é aprovado/recusado na hora
+      if (data.status === 'paid') {
+        // Marca como pago já (o webhook é só reforço)
+        try {
+          await admin
+            .from('pedidos')
+            .update({ pagamento_status: 'pago', pago_em: new Date().toISOString(), status: 'confirmado' })
+            .eq('id', pedido_id)
+        } catch (e) {
+          console.error('Falha ao marcar cartão como pago:', e)
+        }
+        return NextResponse.json({
+          tipo: 'cartao',
+          pagarme_order_id: data.id,
+          status: 'paid',
+          parcelas: parcelas && parcelas > 0 ? parcelas : 1,
+        })
+      }
+      // Recusado
+      const motivo =
+        lastTransaction?.acquirer_message ||
+        lastTransaction?.gateway_response?.errors?.[0]?.message ||
+        'Pagamento não aprovado pela operadora do cartão'
+      return NextResponse.json({ error: `Cartão recusado: ${motivo}` }, { status: 400 })
+    }
 
     if (forma_pagamento === 'pix') {
       return NextResponse.json({

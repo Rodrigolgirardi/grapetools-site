@@ -26,6 +26,15 @@ function formatCEP(v: string) {
   return v.replace(/\D/g, '').replace(/^(\d{5})(\d)/, '$1-$2').slice(0, 9)
 }
 
+function maskCartaoNumero(v: string) {
+  return v.replace(/\D/g, '').slice(0, 19).replace(/(\d{4})(?=\d)/g, '$1 ').trim()
+}
+
+function maskValidade(v: string) {
+  const d = v.replace(/\D/g, '').slice(0, 4)
+  return d.length >= 3 ? `${d.slice(0, 2)}/${d.slice(2)}` : d
+}
+
 const ESTADOS = ['AC','AL','AP','AM','BA','CE','DF','ES','GO','MA','MT','MS','MG','PA','PB','PR','PE','PI','RJ','RN','RS','RO','RR','SC','SP','SE','TO']
 
 // Endereço da loja para retirada (ajuste se necessário)
@@ -47,13 +56,16 @@ export default function CheckoutPage() {
   const [entregaTipo, setEntregaTipo] = useState<'entrega' | 'retirada'>('entrega')
   const [endereco, setEndereco] = useState<Endereco>({})
   const [cepLoading, setCepLoading] = useState(false)
-  const [formaPagamento, setFormaPagamento] = useState<'pix' | 'boleto' | 'transferencia'>('pix')
+  const [formaPagamento, setFormaPagamento] = useState<'pix' | 'cartao' | 'boleto'>('pix')
+  const [cartao, setCartao] = useState({ numero: '', nome: '', validade: '', cvv: '' })
+  const [parcelas, setParcelas] = useState(1)
   const [obs, setObs] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [pedidoId, setPedidoId] = useState<string | null>(null)
   const [nomeContato, setNomeContato] = useState('')
   const [telefoneContato, setTelefoneContato] = useState('')
   const [documento, setDocumento] = useState('')
+  const [mostrarErros, setMostrarErros] = useState(false)
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => { setMounted(true) }, [])
@@ -65,6 +77,8 @@ export default function CheckoutPage() {
     boleto_barcode?: string
     due_at?: string
     mensagem?: string
+    status?: string
+    parcelas?: number
   } | null>(null)
 
   // Linhas do carrinho
@@ -124,6 +138,31 @@ export default function CheckoutPage() {
     return endereco.rua && endereco.numero && endereco.cidade && endereco.estado && endereco.cep
   }
 
+  function entregaValida() {
+    if (!nomeContato.trim()) return false
+    if (!telefoneContato.trim()) return false
+    if (!documentoValido(documento)) return false
+    if (entregaTipo === 'entrega' && !enderecoCompleto()) return false
+    return true
+  }
+
+  function cartaoValido() {
+    const num = cartao.numero.replace(/\D/g, '')
+    const val = cartao.validade.replace(/\D/g, '')
+    const cvv = cartao.cvv.replace(/\D/g, '')
+    return num.length >= 13 && cartao.nome.trim().length >= 2 && val.length === 4 && cvv.length >= 3
+  }
+
+  // Tenta avançar para o pagamento; se faltar algo, destaca os campos em vermelho
+  function avancarPagamento() {
+    if (entregaValida()) {
+      setMostrarErros(false)
+      setStep('pagamento')
+    } else {
+      setMostrarErros(true)
+    }
+  }
+
   async function finalizarPedido() {
     if (!user) return
     setSubmitting(true)
@@ -172,43 +211,77 @@ export default function CheckoutPage() {
       updated_at: new Date().toISOString(),
     })
 
-    // 4. Chama Pagar.me (se Pix ou Boleto)
-    if (formaPagamento !== 'transferencia') {
-      const pagarmeRes = await fetch('/api/pagarme/criar-pedido', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          pedido_id: pedido.id,
-          total: subtotal,
-          forma_pagamento: formaPagamento,
-          itens: itens.map(i => ({
-            sku: i.sku,
-            descricao: i.descricao,
-            quantidade: i.quantidade,
-            preco_unitario: lines.find(l => l.variation.sku === i.sku)?.tier.price || 0,
-          })),
-          cliente: {
-            nome: nomeContato || user.user_metadata?.full_name || user.email || 'Cliente',
-            email: user.email || '',
-            documento,
-            telefone: telefoneContato,
-          },
-          endereco: enderecoEnvio,
-        }),
-      })
-
-      const pagarmeData = await pagarmeRes.json()
-
-      if (pagarmeData.error) {
-        alert(pagarmeData.error)
+    // 4. Cartão: tokeniza no navegador (o cartão cru nunca passa pelo nosso servidor)
+    let cardToken: string | undefined
+    if (formaPagamento === 'cartao') {
+      const pubKey = process.env.NEXT_PUBLIC_PAGARME_PUBLIC_KEY
+      const [mm, aa] = cartao.validade.split('/')
+      try {
+        const tkRes = await fetch(`https://api.pagar.me/core/v5/tokens?appId=${pubKey}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            type: 'card',
+            card: {
+              number: cartao.numero.replace(/\D/g, ''),
+              holder_name: cartao.nome,
+              exp_month: Number(mm),
+              exp_year: Number(aa),
+              cvv: cartao.cvv,
+            },
+          }),
+        })
+        const tkData = await tkRes.json()
+        if (!tkRes.ok || !tkData.id) throw new Error('token')
+        cardToken = tkData.id
+      } catch {
+        alert('Não foi possível validar o cartão. Confira número, validade e CVV.')
         setSubmitting(false)
         return
       }
-
-      setPagamentoResult(pagarmeData)
-    } else {
-      setPagamentoResult({ tipo: 'transferencia', mensagem: 'Aguarde os dados de transferência por WhatsApp.' })
     }
+
+    // Valor cobrado: 3x sem juros; acima disso, repassa os juros (2% por parcela)
+    const valorCobrar =
+      formaPagamento === 'cartao' && parcelas > 3
+        ? Math.round(subtotal * (1 + 0.02 * parcelas) * 100) / 100
+        : subtotal
+
+    // 5. Chama o Pagar.me
+    const pagarmeRes = await fetch('/api/pagarme/criar-pedido', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        pedido_id: pedido.id,
+        total: valorCobrar,
+        forma_pagamento: formaPagamento,
+        itens: itens.map(i => ({
+          sku: i.sku,
+          descricao: i.descricao,
+          quantidade: i.quantidade,
+          preco_unitario: lines.find(l => l.variation.sku === i.sku)?.tier.price || 0,
+        })),
+        cliente: {
+          nome: nomeContato || user.user_metadata?.full_name || user.email || 'Cliente',
+          email: user.email || '',
+          documento,
+          telefone: telefoneContato,
+        },
+        endereco: enderecoEnvio,
+        card_token: cardToken,
+        parcelas,
+      }),
+    })
+
+    const pagarmeData = await pagarmeRes.json()
+
+    if (pagarmeData.error) {
+      alert(pagarmeData.error)
+      setSubmitting(false)
+      return
+    }
+
+    setPagamentoResult(pagarmeData)
 
     // 5. Limpa carrinho e vai para confirmado
     clearCart()
@@ -286,9 +359,14 @@ export default function CheckoutPage() {
               </div>
             )}
 
-            {/* TRANSFERÊNCIA */}
-            {pagamentoResult?.tipo === 'transferencia' && (
-              <p style={{color: '#6b7280', fontSize: '0.9375rem'}}>Entraremos em contato em breve com os dados para transferência.</p>
+            {/* CARTÃO */}
+            {pagamentoResult?.tipo === 'cartao' && (
+              <div className="checkoutPix">
+                <p className="checkoutPixTitle">💳 Pagamento aprovado!</p>
+                <p className="checkoutPixDesc">
+                  Seu cartão foi aprovado{pagamentoResult.parcelas && pagamentoResult.parcelas > 1 ? ` em ${pagamentoResult.parcelas}x` : ''}. Já estamos preparando seu pedido.
+                </p>
+              </div>
             )}
 
             <div className="checkoutConfirmadoAcoes" style={{marginTop: 24}}>
@@ -391,17 +469,18 @@ export default function CheckoutPage() {
                 <div className="checkoutGrid">
                   <div className="checkoutField">
                     <label>Nome para contato</label>
-                    <input type="text" value={nomeContato} onChange={e => setNomeContato(e.target.value)} placeholder="Seu nome" />
+                    <input type="text" className={mostrarErros && !nomeContato.trim() ? 'campoErro' : undefined} value={nomeContato} onChange={e => setNomeContato(e.target.value)} placeholder="Seu nome" />
                   </div>
                   <div className="checkoutField">
                     <label>Telefone / WhatsApp</label>
-                    <input type="tel" value={telefoneContato} onChange={e => setTelefoneContato(e.target.value)} placeholder="(11) 99999-9999" />
+                    <input type="tel" className={mostrarErros && !telefoneContato.trim() ? 'campoErro' : undefined} value={telefoneContato} onChange={e => setTelefoneContato(e.target.value)} placeholder="(11) 99999-9999" />
                   </div>
                   <div className="checkoutField">
                     <label>CPF ou CNPJ</label>
                     <input
                       type="text"
                       inputMode="numeric"
+                      className={mostrarErros && !documentoValido(documento) ? 'campoErro' : undefined}
                       value={documento}
                       onChange={e => setDocumento(e.target.value)}
                       placeholder="Obrigatório para o pagamento"
@@ -420,6 +499,7 @@ export default function CheckoutPage() {
                         <div className="checkoutCepWrap">
                           <input
                             type="text"
+                            className={mostrarErros && !endereco.cep ? 'campoErro' : undefined}
                             value={endereco.cep || ''}
                             onChange={e => setEndereco(v => ({ ...v, cep: formatCEP(e.target.value) }))}
                             onBlur={e => buscarCEP(e.target.value)}
@@ -430,11 +510,11 @@ export default function CheckoutPage() {
                       </div>
                       <div className="checkoutField">
                         <label>Número</label>
-                        <input type="text" value={endereco.numero || ''} onChange={e => setEndereco(v => ({ ...v, numero: e.target.value }))} placeholder="123" />
+                        <input type="text" className={mostrarErros && !endereco.numero ? 'campoErro' : undefined} value={endereco.numero || ''} onChange={e => setEndereco(v => ({ ...v, numero: e.target.value }))} placeholder="123" />
                       </div>
                       <div className="checkoutField checkoutFieldFull">
                         <label>Rua / Avenida</label>
-                        <input type="text" value={endereco.rua || ''} onChange={e => setEndereco(v => ({ ...v, rua: e.target.value }))} placeholder="Nome da rua" />
+                        <input type="text" className={mostrarErros && !endereco.rua ? 'campoErro' : undefined} value={endereco.rua || ''} onChange={e => setEndereco(v => ({ ...v, rua: e.target.value }))} placeholder="Nome da rua" />
                       </div>
                       <div className="checkoutField">
                         <label>Complemento <span className="checkoutOptional">opcional</span></label>
@@ -446,11 +526,11 @@ export default function CheckoutPage() {
                       </div>
                       <div className="checkoutField">
                         <label>Cidade</label>
-                        <input type="text" value={endereco.cidade || ''} onChange={e => setEndereco(v => ({ ...v, cidade: e.target.value }))} placeholder="Cidade" />
+                        <input type="text" className={mostrarErros && !endereco.cidade ? 'campoErro' : undefined} value={endereco.cidade || ''} onChange={e => setEndereco(v => ({ ...v, cidade: e.target.value }))} placeholder="Cidade" />
                       </div>
                       <div className="checkoutField">
                         <label>Estado</label>
-                        <select value={endereco.estado || ''} onChange={e => setEndereco(v => ({ ...v, estado: e.target.value }))}>
+                        <select className={mostrarErros && !endereco.estado ? 'campoErro' : undefined} value={endereco.estado || ''} onChange={e => setEndereco(v => ({ ...v, estado: e.target.value }))}>
                           <option value="">Selecione</option>
                           {ESTADOS.map(uf => <option key={uf} value={uf}>{uf}</option>)}
                         </select>
@@ -478,15 +558,17 @@ export default function CheckoutPage() {
                   />
                 </div>
 
+                {mostrarErros && !entregaValida() && (
+                  <p style={{ color: '#dc2626', fontSize: '13px', margin: '12px 0 0' }}>
+                    Preencha os campos destacados em vermelho para continuar.
+                  </p>
+                )}
+
                 <div className="checkoutBtnRow">
                   <button className="checkoutBtnSecondary" onClick={() => setStep('resumo')}>← Voltar</button>
                   <button
                     className="checkoutBtnPrimary"
-                    onClick={() => setStep('pagamento')}
-                    disabled={
-                      !documentoValido(documento) ||
-                      (entregaTipo === 'entrega' ? !enderecoCompleto() : !(nomeContato && telefoneContato))
-                    }
+                    onClick={avancarPagamento}
                   >
                     Continuar para pagamento →
                   </button>
@@ -501,9 +583,9 @@ export default function CheckoutPage() {
 
                 <div className="checkoutPayOptions">
                   {([
-                    { id: 'pix', label: 'Pix', desc: 'Aprovação imediata · Chave CNPJ', icon: '⚡' },
+                    { id: 'pix', label: 'Pix', desc: 'Aprovação imediata', icon: '⚡' },
+                    { id: 'cartao', label: 'Cartão de crédito', desc: 'Em até 12x', icon: '💳' },
                     { id: 'boleto', label: 'Boleto bancário', desc: 'Prazo de 1–3 dias úteis', icon: '📄' },
-                    { id: 'transferencia', label: 'Transferência / TED', desc: 'Dados enviados por WhatsApp', icon: '🏦' },
                   ] as const).map(opt => (
                     <button
                       key={opt.id}
@@ -526,14 +608,73 @@ export default function CheckoutPage() {
                   </div>
                 )}
 
+                {formaPagamento === 'cartao' && (
+                  <div className="checkoutGrid" style={{ marginTop: 16 }}>
+                    <div className="checkoutField checkoutFieldFull">
+                      <label>Número do cartão</label>
+                      <input
+                        type="text"
+                        inputMode="numeric"
+                        value={cartao.numero}
+                        onChange={e => setCartao(c => ({ ...c, numero: maskCartaoNumero(e.target.value) }))}
+                        placeholder="0000 0000 0000 0000"
+                      />
+                    </div>
+                    <div className="checkoutField checkoutFieldFull">
+                      <label>Nome impresso no cartão</label>
+                      <input
+                        type="text"
+                        value={cartao.nome}
+                        onChange={e => setCartao(c => ({ ...c, nome: e.target.value.toUpperCase() }))}
+                        placeholder="Como está no cartão"
+                      />
+                    </div>
+                    <div className="checkoutField">
+                      <label>Validade (MM/AA)</label>
+                      <input
+                        type="text"
+                        inputMode="numeric"
+                        value={cartao.validade}
+                        onChange={e => setCartao(c => ({ ...c, validade: maskValidade(e.target.value) }))}
+                        placeholder="MM/AA"
+                      />
+                    </div>
+                    <div className="checkoutField">
+                      <label>CVV</label>
+                      <input
+                        type="text"
+                        inputMode="numeric"
+                        value={cartao.cvv}
+                        onChange={e => setCartao(c => ({ ...c, cvv: e.target.value.replace(/\D/g, '').slice(0, 4) }))}
+                        placeholder="123"
+                      />
+                    </div>
+                    <div className="checkoutField checkoutFieldFull">
+                      <label>Parcelas</label>
+                      <select value={parcelas} onChange={e => setParcelas(Number(e.target.value))}>
+                        {Array.from({ length: 12 }, (_, i) => i + 1).map(n => {
+                          const comJuros = n > 3
+                          const totalParc = comJuros ? subtotal * (1 + 0.02 * n) : subtotal
+                          return (
+                            <option key={n} value={n}>
+                              {n}x de {formatCurrency(totalParc / n)}
+                              {comJuros ? ` (total ${formatCurrency(totalParc)})` : ' sem juros'}
+                            </option>
+                          )
+                        })}
+                      </select>
+                    </div>
+                  </div>
+                )}
+
                 <div className="checkoutBtnRow">
                   <button className="checkoutBtnSecondary" onClick={() => setStep('entrega')}>← Voltar</button>
                   <button
                     className="checkoutBtnPrimary checkoutBtnFinalizar"
                     onClick={finalizarPedido}
-                    disabled={submitting}
+                    disabled={submitting || (formaPagamento === 'cartao' && !cartaoValido())}
                   >
-                    {submitting ? 'Enviando pedido…' : `Finalizar pedido · ${formatCurrency(subtotal)}`}
+                    {submitting ? 'Processando…' : `Finalizar pedido · ${formatCurrency(subtotal)}`}
                   </button>
                 </div>
               </div>
