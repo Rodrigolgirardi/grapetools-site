@@ -655,8 +655,8 @@ Regra simples: quanto menor o número do grão, mais agressiva é a lixa; quanto
   {
     prefix:"4.M14",
     slug:"4-m14",
-    name:"Disco de Lixa",
-    description:"Disco de Lixa · M14 · 125mm",
+    name:"Base Velcro com Pino Rosca M14 | 125mm",
+    description:"Base Velcro com Pino Rosca M14 · 125mm",
     category:"Abrasivos",
     subcategory:"Discos de Lixa",
     brand:"Starfer",
@@ -694,21 +694,6 @@ Regra simples: quanto menor o número do grão, mais agressiva é a lixa; quanto
     keywords:["disco para polimento de vidro","5\""],
     variations:[
       {sku:"4.DISC.POL.5",label:"5\"",tiers:[{minQty:10,label:"10",price:32.16}, {minQty:50,label:"50",price:28.94}, {minQty:100,label:"100",price:26.37}, {minQty:500,label:"500",price:23.16}],weight:"A consultar",ncm:""}
-    ],
-    stock:999,sold:0,isPromotion:false,isLaunch:false,
-  },
-  {
-    prefix:"4.FEC.ROLET",
-    slug:"4-fec-rolet",
-    name:"Fecho Rolete",
-    description:"Fecho Rolete · Zincado",
-    category:"Ferragens",
-    subcategory:"Fechos",
-    brand:"Starfer",
-    supplier:"Starfer",
-    keywords:["fecho rolete","zincado"],
-    variations:[
-      {sku:"4.FEC.ROLET.PR",label:"Zincado",tiers:[{minQty:10,label:"10",price:3.06}, {minQty:50,label:"50",price:2.75}, {minQty:100,label:"100",price:2.51}, {minQty:500,label:"500",price:2.2}],weight:"A consultar",ncm:""}
     ],
     stock:999,sold:0,isPromotion:false,isLaunch:false,
   },
@@ -928,7 +913,7 @@ Regra simples: quanto menor o número do grão, mais agressiva é a lixa; quanto
   {
     prefix:"8.PORT.PAP",
     slug:"8-port-pap",
-    name:"Porta Papel Higiênico",
+    name:"Porta Papel Higiênico em Acrílico | Tampa de Bambu",
     description:"Porta Papel Higiênico · Tampa de Bambu",
     category:"Utilidades",
     subcategory:"Banheiro",
@@ -1190,76 +1175,20 @@ Regra simples: quanto menor o número do grão, mais agressiva é a lixa; quanto
     stock:999,sold:0,isPromotion:false,isLaunch:false,
   },
   {
-    prefix:"14.SDS.6",
-    slug:"14-sds-6",
-    name:"Broca SDS",
-    description:"Broca SDS · 6x160 mm",
+    prefix:"14.SDS",
+    slug:"14-sds",
+    name:"Broca SDS para Concreto Encaixe Rápido 160mm",
+    description:"Broca SDS para concreto · encaixe rápido · 160mm · diâmetros 6, 8, 10, 12 e 14mm",
     category:"Fixação",
     subcategory:"Brocas",
     brand:"Fertak",
     supplier:"Fertak",
-    keywords:["broca sds","6x160 mm"],
+    keywords:["broca sds","concreto","encaixe rápido","160mm","6x160","8x160","10x160","12x160","14x160"],
     variations:[
-      {sku:"14.SDS.6.160",label:"6x160 mm",tiers:[{minQty:10,label:"10",price:7.85}, {minQty:50,label:"50",price:7.06}, {minQty:100,label:"100",price:6.44}, {minQty:500,label:"500",price:5.65}],weight:"A consultar",ncm:"82075011"}
-    ],
-    stock:999,sold:0,isPromotion:false,isLaunch:false,
-  },
-  {
-    prefix:"14.SDS.8",
-    slug:"14-sds-8",
-    name:"Broca SDS",
-    description:"Broca SDS · 8x160 mm",
-    category:"Fixação",
-    subcategory:"Brocas",
-    brand:"Fertak",
-    supplier:"Fertak",
-    keywords:["broca sds","8x160 mm"],
-    variations:[
-      {sku:"14.SDS.8.160",label:"8x160 mm",tiers:[{minQty:10,label:"10",price:8.9}, {minQty:50,label:"50",price:8.01}, {minQty:100,label:"100",price:7.3}, {minQty:500,label:"500",price:6.41}],weight:"A consultar",ncm:"82075011"}
-    ],
-    stock:999,sold:0,isPromotion:false,isLaunch:false,
-  },
-  {
-    prefix:"14.SDS.10",
-    slug:"14-sds-10",
-    name:"Broca SDS",
-    description:"Broca SDS · 10x160 mm",
-    category:"Fixação",
-    subcategory:"Brocas",
-    brand:"Fertak",
-    supplier:"Fertak",
-    keywords:["broca sds","10x160 mm"],
-    variations:[
-      {sku:"14.SDS.10.160",label:"10x160 mm",tiers:[{minQty:10,label:"10",price:7.88}, {minQty:50,label:"50",price:7.09}, {minQty:100,label:"100",price:6.46}, {minQty:500,label:"500",price:5.67}],weight:"A consultar",ncm:"82075011"}
-    ],
-    stock:999,sold:0,isPromotion:false,isLaunch:false,
-  },
-  {
-    prefix:"14.SDS.12",
-    slug:"14-sds-12",
-    name:"Broca SDS",
-    description:"Broca SDS · 12x160 mm",
-    category:"Fixação",
-    subcategory:"Brocas",
-    brand:"Fertak",
-    supplier:"Fertak",
-    keywords:["broca sds","12x160 mm"],
-    variations:[
-      {sku:"14.SDS.12.160",label:"12x160 mm",tiers:[{minQty:10,label:"10",price:9.8}, {minQty:50,label:"50",price:8.82}, {minQty:100,label:"100",price:8.04}, {minQty:500,label:"500",price:7.06}],weight:"A consultar",ncm:"82075011"}
-    ],
-    stock:999,sold:0,isPromotion:false,isLaunch:false,
-  },
-  {
-    prefix:"14.SDS.14",
-    slug:"14-sds-14",
-    name:"Broca SDS",
-    description:"Broca SDS · 14x160 mm",
-    category:"Fixação",
-    subcategory:"Brocas",
-    brand:"Fertak",
-    supplier:"Fertak",
-    keywords:["broca sds","14x160 mm"],
-    variations:[
+      {sku:"14.SDS.6.160",label:"6x160 mm",tiers:[{minQty:10,label:"10",price:7.85}, {minQty:50,label:"50",price:7.06}, {minQty:100,label:"100",price:6.44}, {minQty:500,label:"500",price:5.65}],weight:"A consultar",ncm:"82075011"},
+      {sku:"14.SDS.8.160",label:"8x160 mm",tiers:[{minQty:10,label:"10",price:8.9}, {minQty:50,label:"50",price:8.01}, {minQty:100,label:"100",price:7.3}, {minQty:500,label:"500",price:6.41}],weight:"A consultar",ncm:"82075011"},
+      {sku:"14.SDS.10.160",label:"10x160 mm",tiers:[{minQty:10,label:"10",price:7.88}, {minQty:50,label:"50",price:7.09}, {minQty:100,label:"100",price:6.46}, {minQty:500,label:"500",price:5.67}],weight:"A consultar",ncm:"82075011"},
+      {sku:"14.SDS.12.160",label:"12x160 mm",tiers:[{minQty:10,label:"10",price:9.8}, {minQty:50,label:"50",price:8.82}, {minQty:100,label:"100",price:8.04}, {minQty:500,label:"500",price:7.06}],weight:"A consultar",ncm:"82075011"},
       {sku:"14.SDS.14.160",label:"14x160 mm",tiers:[{minQty:10,label:"10",price:11.97}, {minQty:50,label:"50",price:10.77}, {minQty:100,label:"100",price:9.82}, {minQty:500,label:"500",price:8.62}],weight:"A consultar",ncm:"82075011"}
     ],
     stock:999,sold:0,isPromotion:false,isLaunch:false,
