@@ -52,6 +52,7 @@ export default function CheckoutPage() {
   const [pedidoId, setPedidoId] = useState<string | null>(null)
   const [nomeContato, setNomeContato] = useState('')
   const [telefoneContato, setTelefoneContato] = useState('')
+  const [documento, setDocumento] = useState('')
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => { setMounted(true) }, [])
@@ -95,6 +96,7 @@ export default function CheckoutPage() {
         if (data.endereco) setEndereco(data.endereco)
         if (data.nome) setNomeContato(data.nome.split(' ')[0] || data.nome)
         if (data.telefone) setTelefoneContato(data.telefone)
+        if (data.cnpj) setDocumento(data.cnpj)
       } else {
         const name = user!.user_metadata?.full_name || user!.user_metadata?.nome || ''
         setNomeContato(name.split(' ')[0] || name)
@@ -119,6 +121,11 @@ export default function CheckoutPage() {
 
   function enderecoCompleto() {
     return endereco.rua && endereco.numero && endereco.cidade && endereco.estado && endereco.cep
+  }
+
+  function documentoValido() {
+    const d = documento.replace(/\D/g, '')
+    return d.length === 11 || d.length === 14 // CPF (11) ou CNPJ (14)
   }
 
   async function finalizarPedido() {
@@ -159,21 +166,18 @@ export default function CheckoutPage() {
     }))
     await supabase.from('pedido_itens').insert(itens)
 
-    // 3. Salva endereço no perfil (só quando é entrega — não sobrescreve com vazio na retirada)
-    if (entregaTipo === 'entrega') {
-      await supabase.from('profiles').upsert({
-        id: user.id,
-        email: user.email,
-        endereco,
-        updated_at: new Date().toISOString(),
-      })
-    }
+    // 3. Salva dados no perfil (documento/telefone sempre; endereço só na entrega)
+    await supabase.from('profiles').upsert({
+      id: user.id,
+      email: user.email,
+      cnpj: documento || null,
+      telefone: telefoneContato || null,
+      ...(entregaTipo === 'entrega' ? { endereco } : {}),
+      updated_at: new Date().toISOString(),
+    })
 
     // 4. Chama Pagar.me (se Pix ou Boleto)
     if (formaPagamento !== 'transferencia') {
-      const profile = await supabase.from('profiles').select('cnpj').eq('id', user.id).single()
-      const documento = profile.data?.cnpj || ''
-
       const pagarmeRes = await fetch('/api/pagarme/criar-pedido', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -397,6 +401,16 @@ export default function CheckoutPage() {
                     <label>Telefone / WhatsApp</label>
                     <input type="tel" value={telefoneContato} onChange={e => setTelefoneContato(e.target.value)} placeholder="(11) 99999-9999" />
                   </div>
+                  <div className="checkoutField">
+                    <label>CPF ou CNPJ</label>
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      value={documento}
+                      onChange={e => setDocumento(e.target.value)}
+                      placeholder="Obrigatório para o pagamento"
+                    />
+                  </div>
 
                   {entregaTipo === 'entrega' && (
                     <>
@@ -468,7 +482,10 @@ export default function CheckoutPage() {
                   <button
                     className="checkoutBtnPrimary"
                     onClick={() => setStep('pagamento')}
-                    disabled={entregaTipo === 'entrega' ? !enderecoCompleto() : !(nomeContato && telefoneContato)}
+                    disabled={
+                      !documentoValido() ||
+                      (entregaTipo === 'entrega' ? !enderecoCompleto() : !(nomeContato && telefoneContato))
+                    }
                   >
                     Continuar para pagamento →
                   </button>

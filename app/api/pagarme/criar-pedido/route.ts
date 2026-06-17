@@ -159,7 +159,13 @@ export async function POST(request: NextRequest) {
       console.error('Pagar.me error status:', response.status)
       console.error('Pagar.me error body:', JSON.stringify(data, null, 2))
       console.error('Pagar.me request body sent:', JSON.stringify(pagarmeBody, null, 2))
-      const errMsg = data?.message || data?.errors?.[0]?.message || JSON.stringify(data)
+      // Pagar.me v5 manda os erros detalhados em data.errors (objeto por campo)
+      const detalhes = data?.errors && typeof data.errors === 'object'
+        ? Object.entries(data.errors)
+            .map(([campo, msgs]) => `${campo}: ${Array.isArray(msgs) ? msgs.join(', ') : msgs}`)
+            .join(' | ')
+        : ''
+      const errMsg = detalhes || data?.message || JSON.stringify(data)
       return NextResponse.json(
         { error: `Erro Pagar.me: ${errMsg}` },
         { status: 400 }
