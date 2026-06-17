@@ -786,7 +786,7 @@ Regra simples: quanto menor o número do grão, mais agressiva é a lixa; quanto
   {
     prefix:"6.GAN.LV",
     slug:"6-gan-lv",
-    name:"Gancho de Rede",
+    name:"Kit Par de Gancho de Rede Aço Reforçado | Com parafusos e buchas",
     description:"Gancho de Rede · Dourado",
     category:"Fixação",
     subcategory:"Ganchos",
@@ -1174,7 +1174,7 @@ Regra simples: quanto menor o número do grão, mais agressiva é a lixa; quanto
   {
     prefix:"14.TS.BR",
     slug:"14-ts-br",
-    name:"Trilho Simples",
+    name:"Trilho Cremalheira Simples em Aço Carbono Branco",
     description:"Trilho Simples · Branco · 50cm",
     category:"Ferragens",
     subcategory:"Trilhos",
