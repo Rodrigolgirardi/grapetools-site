@@ -5,6 +5,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase-admin'
 import { createClient } from '@/lib/supabase-server'
+import { documentoValido } from '@/lib/documento'
 
 const PAGARME_API = 'https://api.pagar.me/core/v5'
 const SECRET_KEY = process.env.PAGARME_SECRET_KEY!
@@ -75,6 +76,11 @@ export async function POST(request: NextRequest) {
       .single()
     if (!pedidoRow || pedidoRow.user_id !== user.id) {
       return NextResponse.json({ error: 'Pedido inválido.' }, { status: 403 })
+    }
+
+    // 0c) Valida o documento (CPF/CNPJ real) antes de chamar o Pagar.me
+    if (forma_pagamento !== 'transferencia' && !documentoValido(cliente?.documento || '')) {
+      return NextResponse.json({ error: 'CPF ou CNPJ inválido.' }, { status: 400 })
     }
 
     // Só processa Pix e Boleto por agora

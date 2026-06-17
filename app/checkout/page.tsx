@@ -8,6 +8,7 @@ import { useAuth } from '@/hooks/useAuth'
 import { useCart } from '@/hooks/useCart'
 import { products } from '@/lib/data'
 import { productImageSrc, handleProductImageError } from '@/lib/product-image'
+import { documentoValido } from '@/lib/documento'
 import { formatCurrency, getTierForQuantity } from '@/lib/pricing'
 import { BackToSite } from '@/components/BackToSite'
 
@@ -121,11 +122,6 @@ export default function CheckoutPage() {
 
   function enderecoCompleto() {
     return endereco.rua && endereco.numero && endereco.cidade && endereco.estado && endereco.cep
-  }
-
-  function documentoValido() {
-    const d = documento.replace(/\D/g, '')
-    return d.length === 11 || d.length === 14 // CPF (11) ou CNPJ (14)
   }
 
   async function finalizarPedido() {
@@ -410,6 +406,11 @@ export default function CheckoutPage() {
                       onChange={e => setDocumento(e.target.value)}
                       placeholder="Obrigatório para o pagamento"
                     />
+                    {documento.replace(/\D/g, '').length > 0 && !documentoValido(documento) && (
+                      <span style={{ color: '#dc2626', fontSize: '12px', marginTop: 4 }}>
+                        CPF ou CNPJ inválido
+                      </span>
+                    )}
                   </div>
 
                   {entregaTipo === 'entrega' && (
@@ -483,7 +484,7 @@ export default function CheckoutPage() {
                     className="checkoutBtnPrimary"
                     onClick={() => setStep('pagamento')}
                     disabled={
-                      !documentoValido() ||
+                      !documentoValido(documento) ||
                       (entregaTipo === 'entrega' ? !enderecoCompleto() : !(nomeContato && telefoneContato))
                     }
                   >
