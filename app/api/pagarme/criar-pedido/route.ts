@@ -116,6 +116,16 @@ export async function POST(request: NextRequest) {
           installments: parcelas && parcelas > 0 ? parcelas : 1,
           statement_descriptor: 'GRAPETOOLS',
           card_token,
+          card: {
+            // Endereço de cobrança (exigido pelo Pagar.me no cartão)
+            billing_address: {
+              line_1: `${endereco.numero}, ${endereco.rua}`,
+              zip_code: cleanDoc(endereco.cep),
+              city: endereco.cidade,
+              state: endereco.estado,
+              country: 'BR',
+            },
+          },
         },
         amount: toAmountCents(total),
       }
