@@ -206,16 +206,15 @@ export async function POST(request: NextRequest) {
     const data = await response.json()
 
     if (!response.ok) {
-      console.error('Pagar.me error status:', response.status)
-      console.error('Pagar.me error body:', JSON.stringify(data, null, 2))
-      console.error('Pagar.me request body sent:', JSON.stringify(pagarmeBody, null, 2))
       // Pagar.me v5 manda os erros detalhados em data.errors (objeto por campo)
       const detalhes = data?.errors && typeof data.errors === 'object'
         ? Object.entries(data.errors)
             .map(([campo, msgs]) => `${campo}: ${Array.isArray(msgs) ? msgs.join(', ') : msgs}`)
             .join(' | ')
         : ''
-      const errMsg = detalhes || data?.message || JSON.stringify(data)
+      const errMsg = detalhes || data?.message || 'erro desconhecido'
+      // Loga só o status e o motivo do erro — NUNCA o corpo (tem dados do cliente)
+      console.error(`Pagar.me ${forma_pagamento} falhou (HTTP ${response.status}): ${errMsg}`)
       return NextResponse.json(
         { error: `Erro Pagar.me: ${errMsg}` },
         { status: 400 }
@@ -234,12 +233,9 @@ export async function POST(request: NextRequest) {
       // Não interrompe o fluxo: o cliente ainda recebe o Pix/boleto
     }
 
-    // Extrai os dados de pagamento da resposta
-    console.log('Pagar.me success response:', JSON.stringify(data, null, 2))
+    // Extrai os dados de pagamento da resposta (sem logar — contém dados do cliente)
     const charge = data.charges?.[0]
     const lastTransaction = charge?.last_transaction
-    console.log('charge:', JSON.stringify(charge, null, 2))
-    console.log('lastTransaction:', JSON.stringify(lastTransaction, null, 2))
 
     if (forma_pagamento === 'cartao') {
       // Cartão é aprovado/recusado na hora

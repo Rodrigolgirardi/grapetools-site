@@ -37,8 +37,13 @@ export async function GET(request: NextRequest) {
       .limit(limite)
 
     if (busca) {
-      // procura em nome OU email OU cnpj
-      query = query.or(`nome.ilike.%${busca}%,email.ilike.%${busca}%,cnpj.ilike.%${busca}%`)
+      // Remove caracteres com significado na sintaxe de filtro do PostgREST
+      // (vírgula, parênteses, *, :, %, aspas, barra) pra evitar "filter injection".
+      const buscaSegura = busca.replace(/[,()*:%\\"]/g, '').slice(0, 80)
+      if (buscaSegura) {
+        // procura em nome OU email OU cnpj
+        query = query.or(`nome.ilike.%${buscaSegura}%,email.ilike.%${buscaSegura}%,cnpj.ilike.%${buscaSegura}%`)
+      }
     }
 
     const { data: perfis, error } = await query

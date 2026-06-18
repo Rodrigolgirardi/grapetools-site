@@ -156,7 +156,8 @@ export default function ProductPage({ params }: Props) {
       <main className="productDetail">
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd(product)) }}
+          // escapa "<" pra nenhum dado conseguir fechar a tag <script> (anti-XSS)
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd(product)).replace(/</g, '\\u003c') }}
         />
 
         <section className="detailHero">
