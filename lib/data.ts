@@ -807,36 +807,6 @@ Regra simples: quanto menor o número do grão, mais agressiva é a lixa; quanto
     stock:999,sold:0,isPromotion:false,isLaunch:false,
   },
   {
-    prefix:"7.PF.3.5",
-    slug:"7-pf-3-5",
-    name:"Parafuso",
-    description:"Parafuso · Philips · Minichipboard · 3,5 x 14mm",
-    category:"Fixação",
-    subcategory:"Parafusos",
-    brand:"Jomarca",
-    supplier:"Jomarca",
-    keywords:["parafuso","philips","minichipboard","3,5 x 14mm"],
-    variations:[
-      {sku:"7.PF.3.5.14",label:"Minichipboard · 3,5 x 14mm",tiers:[{minQty:10,label:"10",price:4.26}, {minQty:50,label:"50",price:3.83}, {minQty:100,label:"100",price:3.49}, {minQty:500,label:"500",price:3.07}],weight:"A consultar",ncm:"73181200"}
-    ],
-    stock:999,sold:0,isPromotion:false,isLaunch:false,
-  },
-  {
-    prefix:"7.PF.3.16",
-    slug:"7-pf-3-16",
-    name:"Parafuso",
-    description:"Parafuso · Sextavado · 3/16 x 40mm",
-    category:"Fixação",
-    subcategory:"Parafusos",
-    brand:"Jomarca",
-    supplier:"Jomarca",
-    keywords:["parafuso","sextavado","3/16 x 40mm"],
-    variations:[
-      {sku:"7.PF.3.16.40",label:"Sextavado · 3/16 x 40mm",tiers:[{minQty:10,label:"10",price:27.99}, {minQty:50,label:"50",price:25.19}, {minQty:100,label:"100",price:22.95}, {minQty:500,label:"500",price:20.15}],weight:"A consultar",ncm:"73181200"}
-    ],
-    stock:999,sold:0,isPromotion:false,isLaunch:false,
-  },
-  {
     prefix:"7.PF.4.5",
     slug:"7-pf-4-5",
     name:"Parafuso",
@@ -1126,19 +1096,24 @@ Regra simples: quanto menor o número do grão, mais agressiva é a lixa; quanto
     stock:999,sold:0,isPromotion:false,isLaunch:false,
   },
   {
-    prefix:"14.SUP.BR",
-    slug:"14-sup-br",
-    name:"Suporte Simples",
-    description:"Suporte Simples · Branco · 20cm",
+    prefix:"14.SUP",
+    slug:"suporte-simples",
+    name:"Suporte Simples para Encaixe em Trilho Cremalheira Simples",
+    description:"Suporte Simples para Encaixe em Trilho Cremalheira Simples · Branco e Preto · 15cm, 20cm, 25cm e 30cm",
     category:"Ferragens",
     subcategory:"Suportes",
     brand:"Fertak",
     supplier:"Fertak",
-    keywords:["suporte simples","branco","20cm","25cm","30cm"],
+    keywords:["suporte simples","trilho cremalheira","encaixe","branco","preto","15cm","20cm","25cm","30cm"],
     variations:[
+      {sku:"25.SUP.BR.15",label:"Branco · 15cm",tiers:[{minQty:10,label:"10",price:5.12}, {minQty:50,label:"50",price:4.61}, {minQty:100,label:"100",price:4.2}, {minQty:500,label:"500",price:3.69}],weight:"A consultar",ncm:"83024200"},
       {sku:"14.SUP.BR.20",label:"Branco · 20cm",tiers:[{minQty:10,label:"10",price:4.75}, {minQty:50,label:"50",price:4.28}, {minQty:100,label:"100",price:3.89}, {minQty:500,label:"500",price:3.42}],weight:"A consultar",ncm:"83024900"},
       {sku:"14.SUP.BR.25",label:"Branco · 25cm",tiers:[{minQty:10,label:"10",price:6.7}, {minQty:50,label:"50",price:6.03}, {minQty:100,label:"100",price:5.49}, {minQty:500,label:"500",price:4.82}],weight:"A consultar",ncm:"83024900"},
-      {sku:"14.SUP.BR.30",label:"Branco · 30cm",tiers:[{minQty:10,label:"10",price:7.53}, {minQty:50,label:"50",price:6.78}, {minQty:100,label:"100",price:6.17}, {minQty:500,label:"500",price:5.42}],weight:"A consultar",ncm:"83024900"}
+      {sku:"14.SUP.BR.30",label:"Branco · 30cm",tiers:[{minQty:10,label:"10",price:7.53}, {minQty:50,label:"50",price:6.78}, {minQty:100,label:"100",price:6.17}, {minQty:500,label:"500",price:5.42}],weight:"A consultar",ncm:"83024900"},
+      {sku:"25.SUP.PT.15",label:"Preto · 15cm",tiers:[{minQty:10,label:"10",price:5.12}, {minQty:50,label:"50",price:4.61}, {minQty:100,label:"100",price:4.2}, {minQty:500,label:"500",price:3.69}],weight:"A consultar",ncm:"83024200"},
+      {sku:"25.SUP.PT.20",label:"Preto · 20cm",tiers:[{minQty:10,label:"10",price:6.02}, {minQty:50,label:"50",price:5.42}, {minQty:100,label:"100",price:4.94}, {minQty:500,label:"500",price:4.33}],weight:"A consultar",ncm:"83024200"},
+      {sku:"25.SUP.PT.25",label:"Preto · 25cm",tiers:[{minQty:10,label:"10",price:7.11}, {minQty:50,label:"50",price:6.4}, {minQty:100,label:"100",price:5.83}, {minQty:500,label:"500",price:5.12}],weight:"A consultar",ncm:"83024200"},
+      {sku:"25.SUP.PT.30",label:"Preto · 30cm",tiers:[{minQty:10,label:"10",price:6}, {minQty:50,label:"50",price:5.4}, {minQty:100,label:"100",price:4.92}, {minQty:500,label:"500",price:4.32}],weight:"A consultar",ncm:"83024200"}
     ],
     stock:999,sold:0,isPromotion:false,isLaunch:false,
   },
@@ -1498,15 +1473,16 @@ Regra simples: quanto menor o número do grão, mais agressiva é a lixa; quanto
   {
     prefix:"21.PF.3.16",
     slug:"21-pf-3-16",
-    name:"Parafuso Soberba 3/16 x 40mm",
-    description:"Parafuso Soberba 3/16 x 40mm · Sextavado",
+    name:"Parafuso Soberba Sextavado | Caixa com 100 Unidades",
+    description:"Parafuso Soberba Sextavado | Caixa com 100 Unidades · 3/16 x 40mm e 1/4 x 70mm",
     category:"Fixação",
     subcategory:"Parafusos",
     brand:"Newfix",
     supplier:"Newfix",
-    keywords:["parafuso soberba 3/16 x 40mm","sextavado"],
+    keywords:["parafuso soberba","sextavado","caixa com 100 unidades","3/16 x 40mm","1/4 x 70mm"],
     variations:[
-      {sku:"21.PF.3.16.40",label:"Sextavado",tiers:[{minQty:10,label:"10",price:21.81}, {minQty:50,label:"50",price:19.63}, {minQty:100,label:"100",price:17.88}, {minQty:500,label:"500",price:15.7}],weight:"A consultar",ncm:"73181200"}
+      {sku:"21.PF.3.16.40",label:"3/16 x 40mm",tiers:[{minQty:10,label:"10",price:21.81}, {minQty:50,label:"50",price:19.63}, {minQty:100,label:"100",price:17.88}, {minQty:500,label:"500",price:15.7}],weight:"A consultar",ncm:"73181200"},
+      {sku:"21.PF.1.4.70",label:"1/4 x 70mm",tiers:[{minQty:10,label:"10",price:43.62}, {minQty:50,label:"50",price:39.26}, {minQty:100,label:"100",price:35.76}, {minQty:500,label:"500",price:31.4}],weight:"A consultar",ncm:"73181200"}
     ],
     stock:999,sold:0,isPromotion:false,isLaunch:false,
   },
@@ -1573,38 +1549,6 @@ Regra simples: quanto menor o número do grão, mais agressiva é a lixa; quanto
     keywords:["dobradiça curva","com amortecedor"],
     variations:[
       {sku:"24.DOB.AMORT.CUR",label:"Com Amortecedor",tiers:[{minQty:10,label:"10",price:3.42}, {minQty:50,label:"50",price:3.08}, {minQty:100,label:"100",price:2.8}, {minQty:500,label:"500",price:2.46}],weight:"A consultar",ncm:""}
-    ],
-    stock:999,sold:0,isPromotion:false,isLaunch:false,
-  },
-  {
-    prefix:"25.SUP.BR",
-    slug:"25-sup-br",
-    name:"Suporte Simples",
-    description:"Suporte Simples · 15cm · Branco",
-    category:"Ferragens",
-    subcategory:"Suportes",
-    brand:"Kian",
-    supplier:"Kian",
-    keywords:["suporte simples","15cm","branco"],
-    variations:[
-      {sku:"25.SUP.BR.15",label:"15cm · Branco",tiers:[{minQty:10,label:"10",price:5.12}, {minQty:50,label:"50",price:4.61}, {minQty:100,label:"100",price:4.2}, {minQty:500,label:"500",price:3.69}],weight:"A consultar",ncm:"83024200"}
-    ],
-    stock:999,sold:0,isPromotion:false,isLaunch:false,
-  },
-  {
-    prefix:"25.SUP.PT",
-    slug:"25-sup-pt",
-    name:"Suporte Simples",
-    description:"Suporte Simples · 15cm · Preto",
-    category:"Ferragens",
-    subcategory:"Suportes",
-    brand:"Kian",
-    supplier:"Kian",
-    keywords:["suporte simples","15cm","preto","20cm","25cm"],
-    variations:[
-      {sku:"25.SUP.PT.15",label:"15cm · Preto",tiers:[{minQty:10,label:"10",price:5.12}, {minQty:50,label:"50",price:4.61}, {minQty:100,label:"100",price:4.2}, {minQty:500,label:"500",price:3.69}],weight:"A consultar",ncm:"83024200"},
-      {sku:"25.SUP.PT.20",label:"20cm · Preto",tiers:[{minQty:10,label:"10",price:6.02}, {minQty:50,label:"50",price:5.42}, {minQty:100,label:"100",price:4.94}, {minQty:500,label:"500",price:4.33}],weight:"A consultar",ncm:"83024200"},
-      {sku:"25.SUP.PT.25",label:"25cm · Preto",tiers:[{minQty:10,label:"10",price:7.11}, {minQty:50,label:"50",price:6.4}, {minQty:100,label:"100",price:5.83}, {minQty:500,label:"500",price:5.12}],weight:"A consultar",ncm:"83024200"}
     ],
     stock:999,sold:0,isPromotion:false,isLaunch:false,
   },
