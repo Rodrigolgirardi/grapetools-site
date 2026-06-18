@@ -807,36 +807,6 @@ Regra simples: quanto menor o número do grão, mais agressiva é a lixa; quanto
     stock:999,sold:0,isPromotion:false,isLaunch:false,
   },
   {
-    prefix:"7.PF.4.5",
-    slug:"7-pf-4-5",
-    name:"Parafuso",
-    description:"Parafuso · Philips · 4,5 x 50mm",
-    category:"Fixação",
-    subcategory:"Parafusos",
-    brand:"Jomarca",
-    supplier:"Jomarca",
-    keywords:["parafuso","philips","4,5 x 50mm"],
-    variations:[
-      {sku:"7.PF.4.5.50",label:"Philips · 4,5 x 50mm",tiers:[{minQty:10,label:"10",price:21.04}, {minQty:50,label:"50",price:18.94}, {minQty:100,label:"100",price:17.25}, {minQty:500,label:"500",price:15.15}],weight:"A consultar",ncm:"73181200"}
-    ],
-    stock:999,sold:0,isPromotion:false,isLaunch:false,
-  },
-  {
-    prefix:"7.PF.5.0",
-    slug:"7-pf-5-0",
-    name:"Parafuso",
-    description:"Parafuso · Philips · 5,0 x 40mm",
-    category:"Fixação",
-    subcategory:"Parafusos",
-    brand:"Jomarca",
-    supplier:"Jomarca",
-    keywords:["parafuso","philips","5,0 x 40mm"],
-    variations:[
-      {sku:"7.PF.5.0.40",label:"Philips · 5,0 x 40mm",tiers:[{minQty:10,label:"10",price:19.94}, {minQty:50,label:"50",price:17.95}, {minQty:100,label:"100",price:16.35}, {minQty:500,label:"500",price:14.36}],weight:"A consultar",ncm:"73181200"}
-    ],
-    stock:999,sold:0,isPromotion:false,isLaunch:false,
-  },
-  {
     prefix:"8.MINI",
     slug:"8-mini",
     name:"Mini Balança Digital",
@@ -1487,21 +1457,6 @@ Regra simples: quanto menor o número do grão, mais agressiva é a lixa; quanto
     stock:999,sold:0,isPromotion:false,isLaunch:false,
   },
   {
-    prefix:"21.PF.3.5",
-    slug:"21-pf-3-5",
-    name:"Parafuso Minichipboard",
-    description:"Parafuso Minichipboard · 3,5 x 14mm",
-    category:"Fixação",
-    subcategory:"Parafusos",
-    brand:"Newfix",
-    supplier:"Newfix",
-    keywords:["parafuso minichipboard","3,5 x 14mm"],
-    variations:[
-      {sku:"21.PF.3.5.14",label:"3,5 x 14mm",tiers:[{minQty:10,label:"10",price:4.06}, {minQty:50,label:"50",price:3.65}, {minQty:100,label:"100",price:3.33}, {minQty:500,label:"500",price:2.92}],weight:"A consultar",ncm:""}
-    ],
-    stock:999,sold:0,isPromotion:false,isLaunch:false,
-  },
-  {
     prefix:"21.PF.5.0",
     slug:"21-pf-5-0",
     name:"Parafuso Chipboard",
@@ -1570,8 +1525,8 @@ Regra simples: quanto menor o número do grão, mais agressiva é a lixa; quanto
   {
     prefix:"26.CAB",
     slug:"26-cab",
-    name:"Cabeça de Parafuso",
-    description:"Cabeça de Parafuso · Veipar",
+    name:"Protetor De Cabeça Parafusos Telhas Metálicas Vedação Inox 304 | Veipar",
+    description:"Protetor De Cabeça Parafusos Telhas Metálicas Vedação Inox 304 | Veipar",
     category:"Fixação",
     subcategory:"Parafusos",
     brand:"Veipar",

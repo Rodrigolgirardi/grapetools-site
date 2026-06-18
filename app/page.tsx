@@ -371,10 +371,21 @@ function CategoryDropdown({ category, setCategory, supplier, setSupplier }: {
   );
 }
 
+// Mais vendidos: prefixos dos produtos escolhidos pelo dono (preencher quando ele passar a lista).
+// Enquanto estiver vazio, "Mais vendidos" mostra os mais vendidos por nº de vendas.
+const MAIS_VENDIDOS: string[] = [];
+
+// Fornecedores em destaque na sidebar (nesta ordem). O resto fica dentro de "Outros".
+const FORNECEDORES_DESTAQUE = ["Grape Tools", "Elgin", "Termogel", "Tekbond", "Squadroni", "Ivplast", "Coimbra"];
+
 export default function HomePage() {
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("Todas");
+  const [subcategory, setSubcategory] = useState("Todas");
   const [supplier, setSupplier] = useState("Todos");
+  const [maisVendidos, setMaisVendidos] = useState(false);
+  const [fornecedorAberto, setFornecedorAberto] = useState(true);
+  const [outrosAberto, setOutrosAberto] = useState(false);
   const [grapeOnly, setGrapeOnly] = useState(false);
   const [grapeLogoSrc, setGrapeLogoSrc] = useState("/grape-tools-logo.png");
   const [grapeLogoErro, setGrapeLogoErro] = useState(false);
@@ -389,6 +400,28 @@ export default function HomePage() {
   });
   const { cart, addToCart: addToCartHook, updateQuantity } = useCart();
 
+  // Lê categoria/subcategoria da URL (vindo do breadcrumb da página de produto)
+  useEffect(() => {
+    const sp = new URLSearchParams(window.location.search);
+    const cat = sp.get("categoria");
+    const sub = sp.get("subcategoria");
+    if (cat) setCategory(cat);
+    if (sub) setSubcategory(sub);
+  }, []);
+
+  // Se trocar de categoria e a subcategoria atual não pertencer a ela, zera a sub
+  useEffect(() => {
+    if (category !== "Todas" && subcategory !== "Todas" &&
+        !products.some(p => p.category === category && p.subcategory === subcategory)) {
+      setSubcategory("Todas");
+    }
+  }, [category]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Escolher uma categoria desliga o modo "Mais vendidos"
+  useEffect(() => {
+    if (category !== "Todas") setMaisVendidos(false);
+  }, [category]);
+
   const filteredProducts = useMemo(() => {
     const q = semAcento(query.trim());
     return products
@@ -398,7 +431,10 @@ export default function HomePage() {
         return (
           (!q || text.includes(q)) &&
           (!grapeOnly || p.prefix.startsWith("CH.")) &&
+          // No modo "Mais vendidos": se há lista curada, filtra por ela; senão mostra tudo (ordenado por vendas)
+          (!maisVendidos || MAIS_VENDIDOS.length === 0 || MAIS_VENDIDOS.includes(p.prefix)) &&
           (category === "Todas" || p.category === category) &&
+          (subcategory === "Todas" || p.subcategory === subcategory) &&
           (supplier === "Todos" || p.supplier === supplier) &&
           (!perfilAtivo || perfilAtivo.categorias.length === 0 ||
             perfilAtivo.categorias.includes(p.category) ||
@@ -406,6 +442,7 @@ export default function HomePage() {
         );
       })
       .sort((a, b) => {
+        if (maisVendidos) return b.sold - a.sold;
         const aPrice = a.variations[0].tiers[0].price;
         const bPrice = b.variations[0].tiers[0].price;
         if (sort === "high") return bPrice - aPrice;
@@ -413,7 +450,7 @@ export default function HomePage() {
         if (sort === "sold") return b.sold - a.sold;
         return Number(b.isPromotion) - Number(a.isPromotion) || b.sold - a.sold;
       });
-  }, [category, query, sort, supplier, grapeOnly, perfilAtivo]);
+  }, [category, subcategory, query, sort, supplier, grapeOnly, perfilAtivo, maisVendidos]);
 
   const cartLines = products.flatMap((p) =>
     p.variations
@@ -435,7 +472,9 @@ export default function HomePage() {
 
   const activeFilters = [
     grapeOnly && { label: "Grape Tools", clear: () => setGrapeOnly(false) },
-    category !== "Todas" && { label: category, clear: () => setCategory("Todas") },
+    maisVendidos && { label: "Mais vendidos", clear: () => setMaisVendidos(false) },
+    category !== "Todas" && { label: category, clear: () => { setCategory("Todas"); setSubcategory("Todas"); } },
+    subcategory !== "Todas" && { label: subcategory, clear: () => setSubcategory("Todas") },
     supplier !== "Todos" && { label: supplier, clear: () => setSupplier("Todos") },
   ].filter(Boolean) as { label: string; clear: () => void }[];
 
@@ -567,8 +606,14 @@ export default function HomePage() {
               </div>
               <div className="sidePanelBody">
                 <button
-                  className={`sidePanelRoot ${category === "Todas" ? "active" : ""}`}
-                  onClick={() => { setCategory("Todas"); setSideOpen(false); }}
+                  className={`sidePanelRoot sidePanelMaisVendidos ${maisVendidos ? "active" : ""}`}
+                  onClick={() => { setMaisVendidos(true); setCategory("Todas"); setSubcategory("Todas"); setSideOpen(false); }}
+                >
+                  🔥 Mais vendidos
+                </button>
+                <button
+                  className={`sidePanelRoot ${category === "Todas" && !maisVendidos ? "active" : ""}`}
+                  onClick={() => { setCategory("Todas"); setSubcategory("Todas"); setMaisVendidos(false); setSideOpen(false); }}
                 >
                   Todos os produtos
                   <span>{products.length}</span>
@@ -578,23 +623,56 @@ export default function HomePage() {
                   setCategory={setCategory}
                   setSideOpen={setSideOpen}
                 />
-                <div className="sidePanelDivider">Fornecedor</div>
                 <button
-                  className={`sidePanelRoot ${supplier === "Todos" ? "active" : ""}`}
-                  onClick={() => { setSupplier("Todos"); setSideOpen(false); }}
+                  className="sidePanelDivider sidePanelDividerBtn"
+                  onClick={() => setFornecedorAberto(o => !o)}
+                  aria-expanded={fornecedorAberto}
                 >
-                  Todos os fornecedores
+                  <span>Fornecedor</span>
+                  <span className={`sidePanelChevron ${fornecedorAberto ? "open" : ""}`}>▶</span>
                 </button>
-                {suppliers.map((s) => (
-                  <button
-                    key={s}
-                    className={`sidePanelCat ${supplier === s ? "active" : ""}`}
-                    onClick={() => { setSupplier(s); setSideOpen(false); }}
-                  >
-                    <span>{s}</span>
-                    <span className="sidePanelCount">{products.filter(p => p.supplier === s).length}</span>
-                  </button>
-                ))}
+                {fornecedorAberto && (
+                  <>
+                    <button
+                      className={`sidePanelRoot ${supplier === "Todos" ? "active" : ""}`}
+                      onClick={() => { setSupplier("Todos"); setSideOpen(false); }}
+                    >
+                      Todos os fornecedores
+                    </button>
+                    {FORNECEDORES_DESTAQUE.map((s) => (
+                      <button
+                        key={s}
+                        className={`sidePanelCat ${supplier === s ? "active" : ""}`}
+                        onClick={() => { setSupplier(s); setSideOpen(false); }}
+                      >
+                        <span>{s}</span>
+                        <span className="sidePanelCount">{products.filter(p => p.supplier === s).length}</span>
+                      </button>
+                    ))}
+                    <button
+                      className="sidePanelCat sidePanelOutros"
+                      onClick={() => setOutrosAberto(o => !o)}
+                      aria-expanded={outrosAberto}
+                    >
+                      <span className="sidePanelCatLabel">
+                        <span className={`sidePanelChevron ${outrosAberto ? "open" : ""}`}>▶</span>
+                        Outros
+                      </span>
+                    </button>
+                    {outrosAberto && suppliers
+                      .filter((s) => !FORNECEDORES_DESTAQUE.includes(s))
+                      .map((s) => (
+                        <button
+                          key={s}
+                          className={`sidePanelCat sidePanelOutrosItem ${supplier === s ? "active" : ""}`}
+                          onClick={() => { setSupplier(s); setSideOpen(false); }}
+                        >
+                          <span>{s}</span>
+                          <span className="sidePanelCount">{products.filter(p => p.supplier === s).length}</span>
+                        </button>
+                      ))}
+                  </>
+                )}
               </div>
             </aside>
           </div>

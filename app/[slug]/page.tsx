@@ -1,7 +1,7 @@
 "use client";
 
 import { use, useEffect, useState } from "react";
-import { notFound } from "next/navigation";
+import { notFound, useRouter } from "next/navigation";
 import { ChevronDown, ChevronUp, CreditCard, Smartphone } from "lucide-react";
 import { FloatingWhatsApp } from "@/components/FloatingWhatsApp";
 import { Footer } from "@/components/Footer";
@@ -108,6 +108,7 @@ export default function ProductPage({ params }: Props) {
   const product = products.find((p) => p.slug === slug);
   if (!product) notFound();
 
+  const router = useRouter();
   const [selectedIdx, setSelectedIdx] = useState(0);
   const [fichaOpen, setFichaOpen] = useState(false);
   const [qty, setQty] = useState(1);
@@ -166,7 +167,13 @@ export default function ProductPage({ params }: Props) {
 
           {/* COL 2 — INFO */}
           <div>
-            <span className="eyebrow">{product.category} / {product.subcategory}</span>
+            <div className="detailBreadcrumb">
+              <button className="detailVoltar" onClick={() => router.back()}>Voltar</button>
+              <span className="detailBreadcrumbSep">|</span>
+              <a href={`/?categoria=${encodeURIComponent(product.category)}`}>{product.category}</a>
+              <span className="detailBreadcrumbChevron">›</span>
+              <a href={`/?categoria=${encodeURIComponent(product.category)}&subcategoria=${encodeURIComponent(product.subcategory)}`}>{product.subcategory}</a>
+            </div>
             <div className="detailTitleRow">
               <h1>{product.name}</h1>
             </div>
