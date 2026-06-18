@@ -74,7 +74,7 @@ export function ProductCard({ product, onAdd }: Props) {
         </div>
 
         <button className="addButton" onClick={() => onAdd(product, variation.sku, qty)}>
-          Adicionar
+          Adicionar ao carrinho
         </button>
       </div>
     </article>

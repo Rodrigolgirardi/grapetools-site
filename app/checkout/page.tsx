@@ -9,7 +9,7 @@ import { useCart } from '@/hooks/useCart'
 import { products } from '@/lib/data'
 import { productImageSrc, handleProductImageError } from '@/lib/product-image'
 import { documentoValido } from '@/lib/documento'
-import { formatCurrency, getTierForQuantity } from '@/lib/pricing'
+import { formatCurrency, getTierForQuantity, descontoCarrinhoPercent } from '@/lib/pricing'
 import { BackToSite } from '@/components/BackToSite'
 
 interface Endereco {
@@ -93,6 +93,11 @@ export default function CheckoutPage() {
   )
   const subtotal = lines.reduce((s, l) => s + l.total, 0)
   const totalQty = lines.reduce((s, l) => s + l.quantity, 0)
+  // Desconto por valor total do carrinho (2% a 5%), aplicado no preço unitário
+  const descPercent = descontoCarrinhoPercent(subtotal)
+  const precoComDesc = (preco: number) => Math.round(preco * (100 - descPercent)) / 100
+  const totalComDesc = lines.reduce((s, l) => s + precoComDesc(l.tier.price) * l.quantity, 0)
+  const descValor = subtotal - totalComDesc
 
   // Redireciona se não logado ou carrinho vazio
   useEffect(() => {
@@ -178,9 +183,9 @@ export default function CheckoutPage() {
       .insert({
         user_id: user.id,
         status: 'pendente',
-        total: subtotal,
+        total: totalComDesc,
         forma_pagamento: formaPagamento,
-        observacao: `Entrega: ${entregaLabel}${obs ? ' | Obs: ' + obs : ''}`,
+        observacao: `Entrega: ${entregaLabel}${descPercent > 0 ? ` | Desconto ${descPercent}%` : ''}${obs ? ' | Obs: ' + obs : ''}`,
       })
       .select('id')
       .single()
@@ -197,7 +202,7 @@ export default function CheckoutPage() {
       sku: l.variation.sku,
       descricao: `${l.product.name} — ${l.variation.label}`,
       quantidade: l.quantity,
-      preco_unitario: l.tier.price,
+      preco_unitario: precoComDesc(l.tier.price),
     }))
     await supabase.from('pedido_itens').insert(itens)
 
@@ -241,11 +246,12 @@ export default function CheckoutPage() {
       }
     }
 
-    // Valor cobrado: 3x sem juros; acima disso, repassa os juros (2% por parcela)
+    // Valor cobrado: parte do total JÁ COM desconto. 3x sem juros; acima disso,
+    // repassa os juros (2% por parcela).
     const valorCobrar =
       formaPagamento === 'cartao' && parcelas > 3
-        ? Math.round(subtotal * (1 + 0.02 * parcelas) * 100) / 100
-        : subtotal
+        ? Math.round(totalComDesc * (1 + 0.02 * parcelas) * 100) / 100
+        : totalComDesc
 
     // 5. Chama o Pagar.me
     const pagarmeRes = await fetch('/api/pagarme/criar-pedido', {
@@ -259,7 +265,7 @@ export default function CheckoutPage() {
           sku: i.sku,
           descricao: i.descricao,
           quantidade: i.quantidade,
-          preco_unitario: lines.find(l => l.variation.sku === i.sku)?.tier.price || 0,
+          preco_unitario: i.preco_unitario,
         })),
         cliente: {
           nome: nomeContato || user.user_metadata?.full_name || user.email || 'Cliente',
@@ -654,7 +660,7 @@ export default function CheckoutPage() {
                       <select value={parcelas} onChange={e => setParcelas(Number(e.target.value))}>
                         {Array.from({ length: 12 }, (_, i) => i + 1).map(n => {
                           const comJuros = n > 3
-                          const totalParc = comJuros ? subtotal * (1 + 0.02 * n) : subtotal
+                          const totalParc = comJuros ? totalComDesc * (1 + 0.02 * n) : totalComDesc
                           return (
                             <option key={n} value={n}>
                               {n}x de {formatCurrency(totalParc / n)}
@@ -674,7 +680,7 @@ export default function CheckoutPage() {
                     onClick={finalizarPedido}
                     disabled={submitting || (formaPagamento === 'cartao' && !cartaoValido())}
                   >
-                    {submitting ? 'Processando…' : `Finalizar pedido · ${formatCurrency(subtotal)}`}
+                    {submitting ? 'Processando…' : `Finalizar pedido · ${formatCurrency(totalComDesc)}`}
                   </button>
                 </div>
               </div>
@@ -694,9 +700,15 @@ export default function CheckoutPage() {
                 ))}
               </div>
               <div className="checkoutSidebarDivider" />
+              {descPercent > 0 && (
+                <div className="checkoutSidebarTotal" style={{ color: '#16a34a', fontWeight: 500 }}>
+                  <span>Desconto ({descPercent}%)</span>
+                  <strong>− {formatCurrency(descValor)}</strong>
+                </div>
+              )}
               <div className="checkoutSidebarTotal">
                 <span>{totalQty} itens</span>
-                <strong>{formatCurrency(subtotal)}</strong>
+                <strong>{formatCurrency(totalComDesc)}</strong>
               </div>
               <div className="checkoutSidebarFrete">
                 <span>Frete</span>

@@ -430,6 +430,7 @@ export default function HomePage() {
 
   function addProduct(_product: Product, sku: string, qty: number = 1) {
     addToCartHook(sku, qty);
+    setCartDrawerOpen(true);
   }
 
   const activeFilters = [

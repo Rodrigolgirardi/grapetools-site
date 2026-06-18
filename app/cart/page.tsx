@@ -3,7 +3,7 @@
 import "./cart.css"
 import { useState, useMemo } from 'react'
 import { products } from '@/lib/data'
-import { formatCurrency, getTierForQuantity } from '@/lib/pricing'
+import { formatCurrency, getTierForQuantity, descontoCarrinhoPercent } from '@/lib/pricing'
 import { useCart } from '@/hooks/useCart'
 import { productImageSrc, handleProductImageError } from '@/lib/product-image'
 import { BackToSite } from '@/components/BackToSite'
@@ -41,7 +41,14 @@ export default function CartPage() {
   const subtotal = lines.reduce((s, l) => s + l.total, 0)
   const totalQty = lines.reduce((s, l) => s + l.quantity, 0)
   const totalEconomia = lines.reduce((s, l) => s + l.economiaTotal, 0)
-  const pixSubtotal = subtotal // desconto Pix quando implementado
+  // Desconto por valor total do carrinho (2% a 5%) — aplicado por preço unitário
+  const descPercent = descontoCarrinhoPercent(subtotal)
+  const totalComDesc = lines.reduce(
+    (s, l) => s + (Math.round(l.tier.price * (100 - descPercent)) / 100) * l.quantity,
+    0
+  )
+  const descValor = subtotal - totalComDesc
+  const pixSubtotal = totalComDesc // desconto Pix quando implementado
 
   const freteProgress = Math.min((subtotal / FRETE_GRATIS) * 100, 100)
   const freteGratis = subtotal >= FRETE_GRATIS
@@ -335,6 +342,13 @@ export default function CartPage() {
                   </div>
                 )}
 
+                {descPercent > 0 && (
+                  <div className="cartSidebarRow cartSidebarEconomia">
+                    <span>Desconto ({descPercent}%)</span>
+                    <strong>− {formatCurrency(descValor)}</strong>
+                  </div>
+                )}
+
                 <div className="cartSidebarRow cartSidebarFrete">
                   <span>Frete</span>
                   <span>{freteGratis ? <span className="cartFreteGratisTag">Grátis 🚚</span> : 'A calcular'}</span>
@@ -344,7 +358,7 @@ export default function CartPage() {
 
                 <div className="cartSidebarRow cartSidebarTotal">
                   <span>Total</span>
-                  <strong>{formatCurrency(subtotal)}</strong>
+                  <strong>{formatCurrency(totalComDesc)}</strong>
                 </div>
 
                 <div className="cartSidebarRow cartSidebarPixRow">

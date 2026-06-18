@@ -1,9 +1,10 @@
 "use client";
 
 import { X, ShoppingCart, Minus, Plus, Trash2 } from "lucide-react";
-import { formatCurrency, getTierForQuantity } from "@/lib/pricing";
+import { formatCurrency, getTierForQuantity, descontoCarrinhoPercent } from "@/lib/pricing";
 import { products } from "@/lib/data";
 import { productImageSrc, handleProductImageError } from "@/lib/product-image";
+import { CartProgressBar } from "@/components/CartProgressBar";
 
 type CartLine = {
   sku: string;
@@ -30,6 +31,19 @@ export function CartDrawer({ open, onClose, cart, onUpdate }: Props) {
 
   const subtotal = lines.reduce((s, l) => s + l.total, 0);
   const totalQty = lines.reduce((s, l) => s + l.quantity, 0);
+  const descPercent = descontoCarrinhoPercent(subtotal);
+  const totalComDesc = lines.reduce(
+    (s, l) => s + (Math.round(l.tier.price * (100 - descPercent)) / 100) * l.quantity,
+    0
+  );
+  const descValor = subtotal - totalComDesc;
+
+  // Sugestões (cross-sell): prioriza mesma categoria dos itens, depois outros
+  const cartPrefixes = new Set(lines.map((l) => l.product.prefix));
+  const cartCategories = new Set(lines.map((l) => l.product.category));
+  const sameCat = products.filter((p) => !cartPrefixes.has(p.prefix) && cartCategories.has(p.category));
+  const others = products.filter((p) => !cartPrefixes.has(p.prefix) && !cartCategories.has(p.category));
+  const sugestoes = [...sameCat, ...others].slice(0, 8);
 
   return (
     <>
@@ -53,6 +67,7 @@ export function CartDrawer({ open, onClose, cart, onUpdate }: Props) {
 
         {/* Itens */}
         <div className="cartDrawerBody">
+          {lines.length > 0 && <CartProgressBar subtotal={subtotal} />}
           {lines.length === 0 ? (
             <div className="cartDrawerEmpty">
               <ShoppingCart size={40} style={{ color: "var(--line)" }} />
@@ -107,6 +122,41 @@ export function CartDrawer({ open, onClose, cart, onUpdate }: Props) {
               </div>
             ))
           )}
+
+          {/* Sugestões (igual Mercado Livre) */}
+          {lines.length > 0 && sugestoes.length > 0 && (
+            <div className="cartDrawerSugestoes">
+              <h4 className="cartDrawerSugestoesTitle">Adicione mais ao seu pedido</h4>
+              <div className="cartDrawerSugestoesGrid">
+                {sugestoes.map((p) => {
+                  const v0 = p.variations[0];
+                  const lowestPrice = Math.min(...p.variations.flatMap((v) => v.tiers.map((t) => t.price)));
+                  return (
+                    <div key={p.prefix} className="cartDrawerSugestaoCard">
+                      <a href={`/${p.slug}`} className="cartDrawerSugestaoImg">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={productImageSrc(v0.sku)}
+                          alt={p.name}
+                          onError={handleProductImageError(v0.sku)}
+                        />
+                      </a>
+                      <a href={`/${p.slug}`} className="cartDrawerSugestaoNome">{p.name}</a>
+                      <p className="cartDrawerSugestaoPreco">
+                        a partir de <strong>{formatCurrency(lowestPrice)}</strong>
+                      </p>
+                      <button
+                        className="cartDrawerSugestaoBtn"
+                        onClick={() => onUpdate(v0.sku, (cart[v0.sku] ?? 0) + 1)}
+                      >
+                        + Adicionar
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Footer */}
@@ -116,8 +166,20 @@ export function CartDrawer({ open, onClose, cart, onUpdate }: Props) {
               <span>Subtotal ({totalQty} un.)</span>
               <strong>{formatCurrency(subtotal)}</strong>
             </div>
+            {descPercent > 0 && (
+              <div className="cartDrawerSubtotal" style={{ color: "#16a34a" }}>
+                <span>Desconto ({descPercent}%)</span>
+                <strong>− {formatCurrency(descValor)}</strong>
+              </div>
+            )}
+            {descPercent > 0 && (
+              <div className="cartDrawerSubtotal">
+                <span><strong>Total</strong></span>
+                <strong>{formatCurrency(totalComDesc)}</strong>
+              </div>
+            )}
             <div className="cartDrawerPix">
-              <span>Ou <strong>{formatCurrency(subtotal)}</strong> com Pix</span>
+              <span>Ou <strong>{formatCurrency(totalComDesc)}</strong> com Pix</span>
             </div>
             <a href="/checkout" className="cartDrawerCheckout">
               Iniciar compra
