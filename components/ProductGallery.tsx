@@ -61,10 +61,12 @@ export function ProductGallery({ product, variation }: Props) {
       let principal = await resolveFromBases(skuBases);
       if (!principal) principal = await resolveFromBases(prefixBases);
 
-      // Secundárias (-2, -3, ...): testa TODAS em paralelo
+      // Secundárias (-2, -3, ...): testa TODAS em paralelo. Tenta pelo SKU e,
+      // se for kit, também pelo prefixo (1 jogo de fotos serve o anúncio todo).
+      const basesExtras = [...new Set([...skuBases, ...prefixBases])];
       const extras = (await Promise.all(
         Array.from({ length: MAX_EXTRAS }, (_, i) => i + 2).map((n) =>
-          resolveFromBases(skuBases.map((b) => `${b}-${n}`))
+          resolveFromBases(basesExtras.map((b) => `${b}-${n}`))
         )
       )).filter(Boolean) as string[];
 

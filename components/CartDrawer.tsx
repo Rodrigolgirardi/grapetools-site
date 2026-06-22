@@ -72,9 +72,9 @@ export function CartDrawer({ open, onClose, cart, onUpdate }: Props) {
                 <div className="cartDrawerItemImg">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
-                    src={productImageSrc(variation.sku)}
+                    src={productImageSrc(variation.sku, product.prefix)}
                     alt={product.name}
-                    onError={handleProductImageError(variation.sku)}
+                    onError={handleProductImageError(variation.sku, product.prefix)}
                   />
                 </div>
                 <div className="cartDrawerItemInfo">

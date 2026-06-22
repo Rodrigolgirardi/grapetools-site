@@ -186,9 +186,9 @@ export default function CartPage() {
                       <a href={`/${product.slug}`} className="cartItemImg">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
-                          src={productImageSrc(variation.sku)}
+                          src={productImageSrc(variation.sku, product.prefix)}
                           alt={product.name}
-                          onError={handleProductImageError(variation.sku)}
+                          onError={handleProductImageError(variation.sku, product.prefix)}
                         />
                       </a>
 
@@ -280,9 +280,9 @@ export default function CartPage() {
                         <div className="cartSugestaoImg">
                           {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img
-                            src={productImageSrc(p.variations[0].sku)}
+                            src={productImageSrc(p.variations[0].sku, p.prefix)}
                             alt={p.name}
-                            onError={handleProductImageError(p.variations[0].sku)}
+                            onError={handleProductImageError(p.variations[0].sku, p.prefix)}
                           />
                         </div>
                         <div className="cartSugestaoInfo">
