@@ -1765,13 +1765,20 @@ _kits.push(_kit("3.PIS.KIT2", "kit-pis-2", "Kit 2 Pistões a Gás com Amortecedo
   ..._varsDoProduto("3.PIS.CZ").map((v) => _kitVar(`${v.sku}_2`, `2x ${v.label}`, [{ sku: v.sku, quantidade: 2 }])),
 ]));
 
-// 17-19) Trilho 1m + 9 suportes (20/25/30 branco)
-const _trilho: [string, string][] = [["20", "14.KIT.3X100BR.9X20BR"], ["25", "14.KIT.3X100BR.9X25BR"], ["30", "14.KIT.3X100BR.9X30BR"]];
-for (const [tam, sku] of _trilho) {
-  _kits.push(_kit(sku, _slug(sku), `Kit 3 Trilhos 1m + 9 Suportes ${tam}cm Branco`, "Trilhos",
-    [_kitVar(sku, `3 trilhos 1m + 9 suportes ${tam}cm`, [
-      { sku: "14.TS.BR.100", quantidade: 3 }, { sku: `14.SUP.BR.${tam}`, quantidade: 9 }])]));
-}
+// 17) Trilho 1m + 9 suportes BRANCO — 1 anúncio, variação por tamanho do suporte
+_kits.push(_kit("14.KIT.3X100BR.SUP", "kit-trilho-suporte", "Kit 3 Trilhos 1m + 9 Suportes Branco", "Trilhos",
+  ([["15", "14.KIT.3X100BR.9X15BR", "25.SUP.BR.15"],
+    ["20", "14.KIT.3X100BR.9X20BR", "14.SUP.BR.20"],
+    ["25", "14.KIT.3X100BR.9X25BR", "14.SUP.BR.25"],
+    ["30", "14.KIT.3X100BR.9X30BR", "14.SUP.BR.30"]] as const)
+    .map(([tam, sku, supSku]) => _kitVar(sku, `9 suportes ${tam}cm`, [
+      { sku: "14.TS.BR.100", quantidade: 3 }, { sku: supSku, quantidade: 9 }]))));
+
+// 18) Trilho 1m + 9 suportes PRETO — novo (trilho 25.TS.100.PT + suportes pretos)
+_kits.push(_kit("25.KIT.3X100PT.SUP", "kit-trilho-suporte-preto", "Kit 3 Trilhos 1m + 9 Suportes Preto", "Trilhos",
+  (["15", "20", "25", "30"] as const)
+    .map((tam) => _kitVar(`25.KIT.3X100PT.9X${tam}PT`, `9 suportes ${tam}cm`, [
+      { sku: "25.TS.100.PT", quantidade: 3 }, { sku: `25.SUP.PT.${tam}`, quantidade: 9 }]))));
 
 // 20) Trava porta de metal (piso) Renna — 5x
 _kits.push(_kit("3.TPOR.PISO_5", "kit-tpor-piso-5", "Kit 5 Travas de Porta de Piso Renna", "Travas",
