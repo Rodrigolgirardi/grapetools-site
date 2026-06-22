@@ -1,4 +1,4 @@
-import { products, type Tier } from "@/lib/data";
+import { products, type Tier, type Product, type Variation } from "@/lib/data";
 
 export function getTierForQuantity(tiers: Tier[], qty: number): Tier {
   let best = tiers[0];
@@ -6,6 +6,33 @@ export function getTierForQuantity(tiers: Tier[], qty: number): Tier {
     if (qty >= tier.minQty) best = tier;
   }
   return best;
+}
+
+export type CartLine = {
+  product: Product;
+  variation: Variation;
+  quantity: number;
+  tier: Tier;
+  total: number;
+};
+
+// Monta as linhas do carrinho a partir do {sku: qtd}, deduplicando por SKU.
+// (Um mesmo SKU pode aparecer em mais de um produto — ex.: chicote avulso E como
+//  variação do botão. Sem dedup, o carrinho contaria duas vezes.)
+export function getCartLines(cart: Record<string, number>): CartLine[] {
+  const seen = new Set<string>();
+  const lines: CartLine[] = [];
+  for (const p of products) {
+    for (const v of p.variations) {
+      const quantity = cart[v.sku];
+      if (quantity && quantity > 0 && !seen.has(v.sku)) {
+        seen.add(v.sku);
+        const tier = getTierForQuantity(v.tiers, quantity);
+        lines.push({ product: p, variation: v, quantity, tier, total: tier.price * quantity });
+      }
+    }
+  }
+  return lines;
 }
 
 // ---- Frete grátis e desconto por valor do carrinho ----
@@ -36,14 +63,7 @@ export function descontoCarrinhoPercent(subtotal: number): number {
 
 // Soma o subtotal do carrinho (já com o preço de atacado por quantidade)
 export function getCartSubtotal(cart: Record<string, number>): number {
-  let s = 0;
-  for (const p of products) {
-    for (const v of p.variations) {
-      const q = cart[v.sku];
-      if (q && q > 0) s += getTierForQuantity(v.tiers, q).price * q;
-    }
-  }
-  return s;
+  return getCartLines(cart).reduce((s, l) => s + l.total, 0);
 }
 
 export function formatCurrency(value: number): string {

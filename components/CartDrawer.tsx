@@ -1,7 +1,7 @@
 "use client";
 
 import { X, ShoppingCart, Minus, Plus, Trash2 } from "lucide-react";
-import { formatCurrency, getTierForQuantity, descontoCarrinhoPercent } from "@/lib/pricing";
+import { formatCurrency, getCartLines, descontoCarrinhoPercent } from "@/lib/pricing";
 import { products } from "@/lib/data";
 import { productImageSrc, handleProductImageError } from "@/lib/product-image";
 import { CartProgressBar } from "@/components/CartProgressBar";
@@ -19,15 +19,7 @@ type Props = {
 };
 
 export function CartDrawer({ open, onClose, cart, onUpdate }: Props) {
-  const lines = products.flatMap((p) =>
-    p.variations
-      .filter((v) => cart[v.sku])
-      .map((v) => {
-        const quantity = cart[v.sku];
-        const tier = getTierForQuantity(v.tiers, quantity);
-        return { product: p, variation: v, quantity, tier, total: tier.price * quantity };
-      })
-  );
+  const lines = getCartLines(cart);
 
   const subtotal = lines.reduce((s, l) => s + l.total, 0);
   const totalQty = lines.reduce((s, l) => s + l.quantity, 0);

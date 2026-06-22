@@ -3,7 +3,7 @@
 import "./cart.css"
 import { useState, useMemo } from 'react'
 import { products } from '@/lib/data'
-import { formatCurrency, getTierForQuantity, descontoCarrinhoPercent } from '@/lib/pricing'
+import { formatCurrency, getTierForQuantity, getCartLines, descontoCarrinhoPercent } from '@/lib/pricing'
 import { useCart } from '@/hooks/useCart'
 import { productImageSrc, handleProductImageError } from '@/lib/product-image'
 import { BackToSite } from '@/components/BackToSite'
@@ -24,19 +24,11 @@ export default function CartPage() {
     setCupomErro('Cupom inválido ou expirado.')
   }
 
-  const lines = products.flatMap(p =>
-    p.variations
-      .filter(v => cart[v.sku])
-      .map(v => {
-        const quantity = cart[v.sku]
-        const tier = getTierForQuantity(v.tiers, quantity)
-        // Economia vs. preço do tier mais caro (menor quantidade)
-        const maxPrice = v.tiers[0].price
-        const economiaUnit = maxPrice - tier.price
-        const economiaTotal = economiaUnit * quantity
-        return { product: p, variation: v, quantity, tier, total: tier.price * quantity, economiaTotal }
-      })
-  )
+  const lines = getCartLines(cart).map(l => {
+    // Economia vs. preço do tier mais caro (menor quantidade)
+    const economiaTotal = (l.variation.tiers[0].price - l.tier.price) * l.quantity
+    return { ...l, economiaTotal }
+  })
 
   const subtotal = lines.reduce((s, l) => s + l.total, 0)
   const totalQty = lines.reduce((s, l) => s + l.quantity, 0)

@@ -6,10 +6,9 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase-client'
 import { useAuth } from '@/hooks/useAuth'
 import { useCart } from '@/hooks/useCart'
-import { products } from '@/lib/data'
 import { productImageSrc, handleProductImageError } from '@/lib/product-image'
 import { documentoValido } from '@/lib/documento'
-import { formatCurrency, getTierForQuantity, descontoCarrinhoPercent } from '@/lib/pricing'
+import { formatCurrency, getCartLines, descontoCarrinhoPercent } from '@/lib/pricing'
 import { BackToSite } from '@/components/BackToSite'
 
 interface Endereco {
@@ -82,15 +81,7 @@ export default function CheckoutPage() {
   } | null>(null)
 
   // Linhas do carrinho
-  const lines = products.flatMap(p =>
-    p.variations
-      .filter(v => cart[v.sku])
-      .map(v => {
-        const quantity = cart[v.sku]
-        const tier = getTierForQuantity(v.tiers, quantity)
-        return { product: p, variation: v, quantity, tier, total: tier.price * quantity }
-      })
-  )
+  const lines = getCartLines(cart)
   const subtotal = lines.reduce((s, l) => s + l.total, 0)
   const totalQty = lines.reduce((s, l) => s + l.quantity, 0)
   // Desconto por valor total do carrinho (2% a 5%), aplicado no preço unitário

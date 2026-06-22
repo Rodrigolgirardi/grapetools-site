@@ -9,7 +9,7 @@ import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { ProductCard } from "@/components/ProductCard";
 import { categories, products, suppliers, type Product } from "@/lib/data";
-import { formatCurrency, getTierForQuantity } from "@/lib/pricing";
+import { formatCurrency, getCartLines } from "@/lib/pricing";
 import { useCart } from "@/hooks/useCart";
 
 type SortOption = "best" | "high" | "low" | "sold";
@@ -452,15 +452,7 @@ export default function HomePage() {
       });
   }, [category, subcategory, query, sort, supplier, grapeOnly, perfilAtivo, maisVendidos]);
 
-  const cartLines = products.flatMap((p) =>
-    p.variations
-      .filter((v) => cart[v.sku])
-      .map((v) => {
-        const quantity = cart[v.sku];
-        const tier = getTierForQuantity(v.tiers, quantity);
-        return { product: p, variation: v, quantity, tier, total: tier.price * quantity };
-      })
-  );
+  const cartLines = getCartLines(cart);
 
   const cartTotal = cartLines.reduce((s, l) => s + l.total, 0);
   const cartCount = cartLines.reduce((s, l) => s + l.quantity, 0);

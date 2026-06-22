@@ -899,18 +899,19 @@ Regra simples: quanto menor o número do grão, mais agressiva é a lixa; quanto
   {
     prefix:"12.BOT",
     slug:"12-bot",
-    name:"Botão ON/OFF",
-    description:"Botão ON/OFF · 19mm · 3A · Azul",
+    name:"Botão On Off Inox 19mm Prata 3a Com Led 12v - 4 Cores",
+    description:"Botão On Off Inox 19mm Prata 3a Com Led 12v - 4 Cores",
     category:"Elétrica",
     subcategory:"Botões",
     brand:"Storm",
     supplier:"Storm",
-    keywords:["botão on/off","19mm","3a","azul","vermelho","verde","branco"],
+    keywords:["botão on/off","19mm","3a","azul","vermelho","verde","branco","chicote","led","12v"],
     variations:[
       {sku:"12.BOT.AZ",label:"3A · Azul",tiers:[{minQty:10,label:"10",price:32.62}, {minQty:50,label:"50",price:29.36}, {minQty:100,label:"100",price:26.75}, {minQty:500,label:"500",price:23.49}],weight:"A consultar",ncm:"85365090"},
       {sku:"12.BOT.VM",label:"3A · Vermelho",tiers:[{minQty:10,label:"10",price:32.62}, {minQty:50,label:"50",price:29.36}, {minQty:100,label:"100",price:26.75}, {minQty:500,label:"500",price:23.49}],weight:"A consultar",ncm:"85365090"},
       {sku:"12.BOT.VD",label:"3A · Verde",tiers:[{minQty:10,label:"10",price:32.62}, {minQty:50,label:"50",price:29.36}, {minQty:100,label:"100",price:26.75}, {minQty:500,label:"500",price:23.49}],weight:"A consultar",ncm:"85365090"},
-      {sku:"12.BOT.BR",label:"3A · Branco",tiers:[{minQty:10,label:"10",price:32.62}, {minQty:50,label:"50",price:29.36}, {minQty:100,label:"100",price:26.75}, {minQty:500,label:"500",price:23.49}],weight:"A consultar",ncm:"85365090"}
+      {sku:"12.BOT.BR",label:"3A · Branco",tiers:[{minQty:10,label:"10",price:32.62}, {minQty:50,label:"50",price:29.36}, {minQty:100,label:"100",price:26.75}, {minQty:500,label:"500",price:23.49}],weight:"A consultar",ncm:"85365090"},
+      {sku:"12.CHIC.19MM",label:"Chicote · 19mm",tiers:[{minQty:10,label:"10",price:9.1}, {minQty:50,label:"50",price:8.19}, {minQty:100,label:"100",price:7.46}, {minQty:500,label:"500",price:6.55}],weight:"A consultar",ncm:"85444200"}
     ],
     stock:999,sold:0,isPromotion:false,isLaunch:false,
   },
