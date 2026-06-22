@@ -522,16 +522,16 @@ Regra simples: quanto menor o número do grão, mais agressiva é a lixa; quanto
   {
     prefix:"3.DOB.AMORT",
     slug:"3-dob-amort",
-    name:"Dobradiça Com Amortecedor Curva",
-    description:"Dobradiça Com Amortecedor Curva · 35mm",
+    name:"Dobradiça 35mm com Amortecedor para Móveis",
+    description:"Dobradiça 35mm com Amortecedor para Móveis · Curva e Reta",
     category:"Ferragens",
     subcategory:"Dobradiças",
     brand:"Renna",
     supplier:"Renna",
-    keywords:["dobradiça com amortecedor curva","35mm","dobradiça com amortecedor reta"],
+    keywords:["dobradiça","amortecedor","35mm","curva","reta","móveis"],
     variations:[
-      {sku:"3.DOB.AMORT.CUR",label:"35mm",tiers:[{minQty:10,label:"10",price:3.15}, {minQty:50,label:"50",price:2.83}, {minQty:100,label:"100",price:2.58}, {minQty:500,label:"500",price:2.27}],weight:"A consultar",ncm:"83021000"},
-      {sku:"3.DOB.AMORT.RET",label:"Dobradiça Com Amortecedor Reta · 35mm",tiers:[{minQty:10,label:"10",price:3.1}, {minQty:50,label:"50",price:2.79}, {minQty:100,label:"100",price:2.54}, {minQty:500,label:"500",price:2.23}],weight:"A consultar",ncm:"83021000"}
+      {sku:"3.DOB.AMORT.CUR",label:"Curva com Amortecedor 35mm",tiers:[{minQty:10,label:"10",price:3.15}, {minQty:50,label:"50",price:2.83}, {minQty:100,label:"100",price:2.58}, {minQty:500,label:"500",price:2.27}],weight:"A consultar",ncm:"83021000"},
+      {sku:"3.DOB.AMORT.RET",label:"Reta com Amortecedor 35mm",tiers:[{minQty:10,label:"10",price:3.1}, {minQty:50,label:"50",price:2.79}, {minQty:100,label:"100",price:2.54}, {minQty:500,label:"500",price:2.23}],weight:"A consultar",ncm:"83021000"}
     ],
     stock:999,sold:0,isPromotion:false,isLaunch:false,
   },
@@ -879,22 +879,6 @@ Regra simples: quanto menor o número do grão, mais agressiva é a lixa; quanto
     variations:[
       {sku:"9.BOLS.TER.GRA",label:"Grande · 650ml",tiers:[{minQty:10,label:"10",price:26.39}, {minQty:50,label:"50",price:23.75}, {minQty:100,label:"100",price:21.64}, {minQty:500,label:"500",price:19.0}],weight:"A consultar",ncm:"39123119"},
       {sku:"9.BOLS.TERM.PEQ",label:"Pequena · 350ml",tiers:[{minQty:10,label:"10",price:14.36}, {minQty:50,label:"50",price:12.92}, {minQty:100,label:"100",price:11.78}, {minQty:500,label:"500",price:10.34}],weight:"A consultar",ncm:"39123119"}
-    ],
-    stock:999,sold:0,isPromotion:false,isLaunch:false,
-  },
-  {
-    prefix:"10.DOB.AMORT",
-    slug:"10-dob-amort",
-    name:"Dobradiça Com Amortecedor Curva",
-    description:"Dobradiça Com Amortecedor Curva · 35mm",
-    category:"Ferragens",
-    subcategory:"Dobradiças",
-    brand:"HD",
-    supplier:"HD",
-    keywords:["dobradiça com amortecedor curva","35mm","dobradiça com amortecedor reta"],
-    variations:[
-      {sku:"10.DOB.AMORT.CUR",label:"35mm",tiers:[{minQty:10,label:"10",price:3.7}, {minQty:50,label:"50",price:3.33}, {minQty:100,label:"100",price:3.03}, {minQty:500,label:"500",price:2.66}],weight:"A consultar",ncm:"83021000"},
-      {sku:"10.DOB.AMORT.RET",label:"Dobradiça Com Amortecedor Reta · 35mm",tiers:[{minQty:10,label:"10",price:4.56}, {minQty:50,label:"50",price:4.1}, {minQty:100,label:"100",price:3.74}, {minQty:500,label:"500",price:3.28}],weight:"A consultar",ncm:"83021000"}
     ],
     stock:999,sold:0,isPromotion:false,isLaunch:false,
   },
