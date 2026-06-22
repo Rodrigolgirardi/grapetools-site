@@ -10,6 +10,7 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase-admin'
+import { baixarEstoquePedido } from '@/lib/estoque'
 
 // Descobre o id do pedido no Pagar.me a partir do payload (order ou charge).
 function extrairPagarmeOrderId(evento: string, data: Record<string, unknown>): string | null {
@@ -54,6 +55,12 @@ export async function POST(request: NextRequest) {
 
     const supabase = createAdminClient()
 
+    // Estado ANTES do update (pra dar baixa de estoque só na 1ª vez que vira "pago")
+    const { data: antes } = await supabase
+      .from('pedidos')
+      .select('id, pagamento_status')
+      .eq('pagarme_order_id', pagarmeOrderId)
+
     const update: Record<string, unknown> = { pagamento_status: novoStatus }
     if (novoStatus === 'pago') {
       update.pago_em = new Date().toISOString()
@@ -70,6 +77,15 @@ export async function POST(request: NextRequest) {
       console.error('Webhook: erro ao atualizar pedido:', error)
       // Responde 500 para o Pagar.me TENTAR DE NOVO depois
       return NextResponse.json({ error: 'Erro ao atualizar.' }, { status: 500 })
+    }
+
+    // Baixa de estoque: só nos pedidos que NÃO estavam "pago" antes (evita baixar 2x)
+    if (novoStatus === 'pago' && antes) {
+      for (const ped of antes) {
+        if (ped.pagamento_status !== 'pago') {
+          await baixarEstoquePedido(ped.id as string)
+        }
+      }
     }
 
     console.log(`Webhook ${evento}: ${atualizados?.length || 0} pedido(s) -> ${novoStatus}`)

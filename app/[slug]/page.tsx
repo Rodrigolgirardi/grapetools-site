@@ -10,6 +10,7 @@ import { ProductGallery } from "@/components/ProductGallery";
 import { SimilarProducts } from "@/components/SimilarProducts";
 import { products } from "@/lib/data";
 import { useCart } from "@/hooks/useCart";
+import { useEstoque } from "@/hooks/useEstoque";
 import { formatCurrency } from "@/lib/pricing";
 import { productJsonLd } from "@/lib/seo";
 import { FreteCalc } from "@/components/FreteCalc";
@@ -116,6 +117,9 @@ export default function ProductPage({ params }: Props) {
   const variation = product.variations[selectedIdx];
   const basePrice = variation.tiers[0].price;
   const rating = getRating(product.prefix);
+  const estoque = useEstoque();
+  const qtdEstoque = variation.sku in estoque ? estoque[variation.sku] : null;
+  const esgotado = qtdEstoque !== null && qtdEstoque <= 0;
   const { addToCart, cart } = useCart();
   const cartCountFromHook = Object.values(cart).reduce((s, q) => s + q, 0);
 
@@ -254,10 +258,16 @@ export default function ProductPage({ params }: Props) {
               </div>
             </div>
 
-            <span className="stockDot">● Em estoque</span>
+            {esgotado ? (
+              <span className="stockDot stockDotEsgotado">● Esgotado</span>
+            ) : qtdEstoque !== null && qtdEstoque <= 10 ? (
+              <span className="stockDot stockDotBaixo">● Últimas {qtdEstoque} unidades!</span>
+            ) : (
+              <span className="stockDot">● Em estoque</span>
+            )}
 
-            <button className="detailBtnPrimary" onClick={() => { addToCart(variation.sku, qty); window.location.href = "/checkout"; }}>Comprar agora</button>
-            <button className="detailBtnSecondary" onClick={() => { addToCart(variation.sku, qty); window.location.href = "/cart"; }}>Adicionar ao carrinho</button>
+            <button className="detailBtnPrimary" disabled={esgotado} onClick={() => { addToCart(variation.sku, qty); window.location.href = "/checkout"; }}>{esgotado ? "Esgotado" : "Comprar agora"}</button>
+            <button className="detailBtnSecondary" disabled={esgotado} onClick={() => { addToCart(variation.sku, qty); window.location.href = "/cart"; }}>Adicionar ao carrinho</button>
 
             <div className="detailTrustRow">
               <span>✓ Nota fiscal emitida</span>

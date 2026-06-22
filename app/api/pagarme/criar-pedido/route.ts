@@ -6,6 +6,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase-admin'
 import { createClient } from '@/lib/supabase-server'
 import { documentoValido } from '@/lib/documento'
+import { getEstoqueMap, baixarEstoquePedido } from '@/lib/estoque'
 
 const PAGARME_API = 'https://api.pagar.me/core/v5'
 const SECRET_KEY = process.env.PAGARME_SECRET_KEY!
@@ -96,6 +97,23 @@ export async function POST(request: NextRequest) {
         tipo: 'transferencia',
         mensagem: 'Pedido recebido! Aguarde os dados de transferência por WhatsApp.',
       })
+    }
+
+    // 0e) Bloqueia venda acima do estoque (só SKUs controlados; os demais passam normal)
+    const estoque = await getEstoqueMap()
+    const semEstoque = (itens || []).find(
+      (it) => Object.prototype.hasOwnProperty.call(estoque, it.sku) && estoque[it.sku] < it.quantidade
+    )
+    if (semEstoque) {
+      const disp = estoque[semEstoque.sku]
+      return NextResponse.json(
+        {
+          error: disp > 0
+            ? `Estoque insuficiente para "${semEstoque.descricao}". Disponível: ${disp}.`
+            : `"${semEstoque.descricao}" está esgotado no momento.`,
+        },
+        { status: 409 }
+      )
     }
 
     const docClean = cleanDoc(cliente.documento || '')
@@ -246,8 +264,11 @@ export async function POST(request: NextRequest) {
             .from('pedidos')
             .update({ pagamento_status: 'pago', pago_em: new Date().toISOString(), status: 'confirmado' })
             .eq('id', pedido_id)
+          // Baixa o estoque (cartão aprovado na hora). O webhook não baixa de novo
+          // porque o pedido já está "pago".
+          await baixarEstoquePedido(pedido_id)
         } catch (e) {
-          console.error('Falha ao marcar cartão como pago:', e)
+          console.error('Falha ao marcar cartão como pago / baixar estoque:', e)
         }
         return NextResponse.json({
           tipo: 'cartao',

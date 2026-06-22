@@ -4,6 +4,7 @@ import { Minus, Plus } from "lucide-react";
 import { useState } from "react";
 import type { Product } from "@/lib/data";
 import { formatCurrency, getMaxDiscount } from "@/lib/pricing";
+import { useEstoque } from "@/hooks/useEstoque";
 import { ProductVisual } from "./ProductVisual";
 
 type Props = { product: Product; onAdd: (product: Product, sku: string, qty: number) => void; };
@@ -11,11 +12,13 @@ type Props = { product: Product; onAdd: (product: Product, sku: string, qty: num
 export function ProductCard({ product, onAdd }: Props) {
   const [selectedIdx, setSelectedIdx] = useState(0);
   const [qty, setQty] = useState(1);
+  const estoque = useEstoque();
   const variation = product.variations[selectedIdx];
   const bestPrice = variation.tiers[variation.tiers.length - 1].price;
   const discount = getMaxDiscount(variation.tiers);
   const hasVariations = product.variations.length > 1;
   const isMarcaPropria = product.brand === "Grape Tools";
+  const esgotado = variation.sku in estoque && estoque[variation.sku] <= 0;
 
   const badge = product.isPromotion
     ? { label: "OFERTA", className: "badgeOferta" }
@@ -33,6 +36,7 @@ export function ProductCard({ product, onAdd }: Props) {
         {badge && <span className={`productBadge ${badge.className}`}>{badge.label}</span>}
         {discount > 0 && <span className="productDiscount">ATÉ {discount}% OFF</span>}
         {isMarcaPropria && <span className="marcaPropriaDot" title="Marca Própria Grape Tools">MP</span>}
+        {esgotado && <span className="productEsgotado">Esgotado</span>}
       </a>
 
       {/* INFO — 35% do card */}
@@ -73,8 +77,12 @@ export function ProductCard({ product, onAdd }: Props) {
           </div>
         </div>
 
-        <button className="addButton" onClick={() => onAdd(product, variation.sku, qty)}>
-          Adicionar ao carrinho
+        <button
+          className="addButton"
+          onClick={() => onAdd(product, variation.sku, qty)}
+          disabled={esgotado}
+        >
+          {esgotado ? "Esgotado" : "Adicionar ao carrinho"}
         </button>
       </div>
     </article>

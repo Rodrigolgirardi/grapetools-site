@@ -2573,6 +2573,34 @@ h1, h2, h3, h4 { font-family: var(--font-syne), sans-serif; margin: 0; }
   padding-left: 28px;
 }
 
+/* ===== Estoque / Esgotado ===== */
+.productEsgotado {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(17, 17, 17, 0.82);
+  color: #fff;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  padding: 6px 14px;
+  border-radius: 999px;
+}
+.stockDotEsgotado {
+  color: #dc2626;
+}
+.stockDotBaixo {
+  color: #ea580c;
+}
+.addButton:disabled,
+.detailBtnPrimary:disabled,
+.detailBtnSecondary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  filter: grayscale(0.4);
+}
+
 /* ════════════════════════════
    MAIS VENDIDOS
 ════════════════════════════ */
