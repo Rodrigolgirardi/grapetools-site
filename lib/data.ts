@@ -1503,8 +1503,8 @@ Regra simples: quanto menor o número do grão, mais agressiva é a lixa; quanto
   {
     prefix:"28.DISJ.2P",
     slug:"28-disj-2p",
-    name:"Mini Disjuntor",
-    description:"Mini Disjuntor · 2 Polos · 6A",
+    name:"Disjuntor Bipolar (2 Polos) Termomagnético | 6A até 63A | Elgin",
+    description:"Disjuntor Bipolar (2 Polos) Termomagnético | 6A até 63A | Elgin",
     category:"Elétrica",
     subcategory:"Disjuntores",
     brand:"Elgin",
