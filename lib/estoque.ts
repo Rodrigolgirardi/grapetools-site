@@ -4,6 +4,7 @@
 // Regra: SKU sem linha na tabela = "não controlado" (não bloqueia, não dá baixa).
 
 import { createAdminClient } from '@/lib/supabase-admin'
+import { composicaoDoSku } from '@/lib/data'
 
 export type EstoqueItem = { sku: string; quantidade: number }
 
@@ -54,9 +55,22 @@ export async function baixarEstoquePedido(pedidoId: string): Promise<void> {
     .eq('pedido_id', pedidoId)
   if (!itens) return
   for (const it of itens) {
-    const restante = await baixarEstoque(it.sku as string, it.quantidade as number)
+    const sku = it.sku as string
+    const qtd = it.quantidade as number
+    // Se for KIT, dá baixa nos COMPONENTES (qtd do componente × qtd vendida do kit).
+    const composicao = composicaoDoSku(sku)
+    if (composicao) {
+      for (const c of composicao) {
+        const restante = await baixarEstoque(c.sku, c.quantidade * qtd)
+        if (restante === -1) {
+          console.warn(`Estoque insuficiente na baixa do kit ${sku} → componente ${c.sku} x${c.quantidade * qtd} (pedido ${pedidoId})`)
+        }
+      }
+      continue
+    }
+    const restante = await baixarEstoque(sku, qtd)
     if (restante === -1) {
-      console.warn(`Estoque insuficiente na baixa: ${it.sku} x${it.quantidade} (pedido ${pedidoId})`)
+      console.warn(`Estoque insuficiente na baixa: ${sku} x${qtd} (pedido ${pedidoId})`)
     }
     // restante === null -> SKU não controlado (ok, ignora)
   }

@@ -8,7 +8,7 @@ import { ProductVisual } from "@/components/ProductVisual";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { ProductCard } from "@/components/ProductCard";
-import { categories, products, suppliers, type Product } from "@/lib/data";
+import { categories, products, suppliers, kitPrefixes, type Product } from "@/lib/data";
 import { formatCurrency, getCartLines } from "@/lib/pricing";
 import { useCart } from "@/hooks/useCart";
 
@@ -375,6 +375,9 @@ function CategoryDropdown({ category, setCategory, supplier, setSupplier }: {
 // Enquanto estiver vazio, "Mais vendidos" mostra os mais vendidos por nº de vendas.
 const MAIS_VENDIDOS: string[] = [];
 
+// Kits mais vendidos: por enquanto, todos os kits do catálogo.
+const KITS_MAIS_VENDIDOS: string[] = kitPrefixes;
+
 // Fornecedores em destaque na sidebar (nesta ordem). O resto fica dentro de "Outros".
 const FORNECEDORES_DESTAQUE = ["Grape Tools", "Elgin", "Termogel", "Tekbond", "Squadroni", "Ivplast", "Coimbra"];
 
@@ -384,6 +387,7 @@ export default function HomePage() {
   const [subcategory, setSubcategory] = useState("Todas");
   const [supplier, setSupplier] = useState("Todos");
   const [maisVendidos, setMaisVendidos] = useState(false);
+  const [kitsMaisVendidos, setKitsMaisVendidos] = useState(false);
   const [fornecedorAberto, setFornecedorAberto] = useState(true);
   const [outrosAberto, setOutrosAberto] = useState(false);
   const [grapeOnly, setGrapeOnly] = useState(false);
@@ -417,9 +421,9 @@ export default function HomePage() {
     }
   }, [category]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Escolher uma categoria desliga o modo "Mais vendidos"
+  // Escolher uma categoria desliga os modos "Mais vendidos" / "Kits mais vendidos"
   useEffect(() => {
-    if (category !== "Todas") setMaisVendidos(false);
+    if (category !== "Todas") { setMaisVendidos(false); setKitsMaisVendidos(false); }
   }, [category]);
 
   const filteredProducts = useMemo(() => {
@@ -433,6 +437,10 @@ export default function HomePage() {
           (!grapeOnly || p.prefix.startsWith("CH.")) &&
           // No modo "Mais vendidos": se há lista curada, filtra por ela; senão mostra tudo (ordenado por vendas)
           (!maisVendidos || MAIS_VENDIDOS.length === 0 || MAIS_VENDIDOS.includes(p.prefix)) &&
+          // No modo "Kits mais vendidos": mostra só os kits da lista curada
+          (!kitsMaisVendidos || KITS_MAIS_VENDIDOS.includes(p.prefix)) &&
+          // Kits só aparecem na aba de kits, na categoria "Kits" ou em buscas (não no grid normal)
+          (p.category !== "Kits" || kitsMaisVendidos || category === "Kits" || !!q) &&
           (category === "Todas" || p.category === category) &&
           (subcategory === "Todas" || p.subcategory === subcategory) &&
           (supplier === "Todos" || p.supplier === supplier) &&
@@ -442,7 +450,7 @@ export default function HomePage() {
         );
       })
       .sort((a, b) => {
-        if (maisVendidos) return b.sold - a.sold;
+        if (maisVendidos || kitsMaisVendidos) return b.sold - a.sold;
         const aPrice = a.variations[0].tiers[0].price;
         const bPrice = b.variations[0].tiers[0].price;
         if (sort === "high") return bPrice - aPrice;
@@ -450,7 +458,7 @@ export default function HomePage() {
         if (sort === "sold") return b.sold - a.sold;
         return Number(b.isPromotion) - Number(a.isPromotion) || b.sold - a.sold;
       });
-  }, [category, subcategory, query, sort, supplier, grapeOnly, perfilAtivo, maisVendidos]);
+  }, [category, subcategory, query, sort, supplier, grapeOnly, perfilAtivo, maisVendidos, kitsMaisVendidos]);
 
   const cartLines = getCartLines(cart);
 
@@ -465,6 +473,7 @@ export default function HomePage() {
   const activeFilters = [
     grapeOnly && { label: "Grape Tools", clear: () => setGrapeOnly(false) },
     maisVendidos && { label: "Mais vendidos", clear: () => setMaisVendidos(false) },
+    kitsMaisVendidos && { label: "Kits mais vendidos", clear: () => setKitsMaisVendidos(false) },
     category !== "Todas" && { label: category, clear: () => { setCategory("Todas"); setSubcategory("Todas"); } },
     subcategory !== "Todas" && { label: subcategory, clear: () => setSubcategory("Todas") },
     supplier !== "Todos" && { label: supplier, clear: () => setSupplier("Todos") },
@@ -599,13 +608,19 @@ export default function HomePage() {
               <div className="sidePanelBody">
                 <button
                   className={`sidePanelRoot sidePanelMaisVendidos ${maisVendidos ? "active" : ""}`}
-                  onClick={() => { setMaisVendidos(true); setCategory("Todas"); setSubcategory("Todas"); setSideOpen(false); }}
+                  onClick={() => { setMaisVendidos(true); setKitsMaisVendidos(false); setCategory("Todas"); setSubcategory("Todas"); setSideOpen(false); }}
                 >
                   🔥 Mais vendidos
                 </button>
                 <button
-                  className={`sidePanelRoot ${category === "Todas" && !maisVendidos ? "active" : ""}`}
-                  onClick={() => { setCategory("Todas"); setSubcategory("Todas"); setMaisVendidos(false); setSideOpen(false); }}
+                  className={`sidePanelRoot sidePanelMaisVendidos ${kitsMaisVendidos ? "active" : ""}`}
+                  onClick={() => { setKitsMaisVendidos(true); setMaisVendidos(false); setCategory("Todas"); setSubcategory("Todas"); setSideOpen(false); }}
+                >
+                  🧩 KITS mais vendidos
+                </button>
+                <button
+                  className={`sidePanelRoot ${category === "Todas" && !maisVendidos && !kitsMaisVendidos ? "active" : ""}`}
+                  onClick={() => { setCategory("Todas"); setSubcategory("Todas"); setMaisVendidos(false); setKitsMaisVendidos(false); setSideOpen(false); }}
                 >
                   Todos os produtos
                   <span>{products.length}</span>

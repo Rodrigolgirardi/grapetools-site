@@ -7,6 +7,7 @@ import { createAdminClient } from '@/lib/supabase-admin'
 import { createClient } from '@/lib/supabase-server'
 import { documentoValido } from '@/lib/documento'
 import { getEstoqueMap, baixarEstoquePedido } from '@/lib/estoque'
+import { composicaoDoSku } from '@/lib/data'
 
 const PAGARME_API = 'https://api.pagar.me/core/v5'
 const SECRET_KEY = process.env.PAGARME_SECRET_KEY!
@@ -99,19 +100,24 @@ export async function POST(request: NextRequest) {
       })
     }
 
-    // 0e) Bloqueia venda acima do estoque (só SKUs controlados; os demais passam normal)
+    // 0e) Bloqueia venda acima do estoque (só SKUs controlados; os demais passam normal).
+    //     Kits são expandidos em seus componentes (somando necessidades por SKU).
     const estoque = await getEstoqueMap()
-    const semEstoque = (itens || []).find(
-      (it) => Object.prototype.hasOwnProperty.call(estoque, it.sku) && estoque[it.sku] < it.quantidade
+    const necessidade: Record<string, number> = {}
+    for (const it of itens || []) {
+      const comp = composicaoDoSku(it.sku)
+      if (comp) {
+        for (const c of comp) necessidade[c.sku] = (necessidade[c.sku] || 0) + c.quantidade * it.quantidade
+      } else {
+        necessidade[it.sku] = (necessidade[it.sku] || 0) + it.quantidade
+      }
+    }
+    const faltando = Object.entries(necessidade).some(
+      ([sku, need]) => Object.prototype.hasOwnProperty.call(estoque, sku) && estoque[sku] < need
     )
-    if (semEstoque) {
-      const disp = estoque[semEstoque.sku]
+    if (faltando) {
       return NextResponse.json(
-        {
-          error: disp > 0
-            ? `Estoque insuficiente para "${semEstoque.descricao}". Disponível: ${disp}.`
-            : `"${semEstoque.descricao}" está esgotado no momento.`,
-        },
+        { error: 'Um item do seu pedido está sem estoque suficiente. Revise as quantidades.' },
         { status: 409 }
       )
     }

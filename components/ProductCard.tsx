@@ -5,6 +5,7 @@ import { useState } from "react";
 import type { Product } from "@/lib/data";
 import { formatCurrency, getMaxDiscount } from "@/lib/pricing";
 import { useEstoque } from "@/hooks/useEstoque";
+import { kitDisponivel } from "@/lib/kit";
 import { ProductVisual } from "./ProductVisual";
 
 type Props = { product: Product; onAdd: (product: Product, sku: string, qty: number) => void; };
@@ -18,7 +19,10 @@ export function ProductCard({ product, onAdd }: Props) {
   const discount = getMaxDiscount(variation.tiers);
   const hasVariations = product.variations.length > 1;
   const isMarcaPropria = product.brand === "Grape Tools";
-  const esgotado = variation.sku in estoque && estoque[variation.sku] <= 0;
+  const kitDisp = variation.composicao ? kitDisponivel(variation.composicao, estoque) : null;
+  const esgotado = variation.composicao
+    ? (kitDisp !== null && kitDisp <= 0)
+    : (variation.sku in estoque && estoque[variation.sku] <= 0);
 
   const badge = product.isPromotion
     ? { label: "OFERTA", className: "badgeOferta" }

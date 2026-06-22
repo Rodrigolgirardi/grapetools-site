@@ -7,12 +7,17 @@ export type Tier = {
   price: number;
 };
 
+export type KitComponente = { sku: string; quantidade: number };
+
 export type Variation = {
   sku: string;
   label: string;
   tiers: Tier[];
   weight: string;
   ncm: string;
+  // Se presente, esta variação é um KIT: composta por outros SKUs.
+  // O estoque é calculado dos componentes e a venda dá baixa neles.
+  composicao?: KitComponente[];
 };
 
 export type Product = {
@@ -1666,7 +1671,143 @@ Regra simples: quanto menor o número do grão, mais agressiva é a lixa; quanto
   },
 ];
 
-export const categories: string[] = ["Abrasivos", "Elétrica", "Ferragens", "Ferramentas", "Fixação", "Outros", "Utilidades"];
+// ============================================================
+// KITS (compostos por outros produtos)
+// Preço de cada variação = soma (quantidade × preço unitário base do componente).
+// O ESTOQUE do kit não é fixo: é calculado dos componentes (ver lib/kit.ts) e a
+// venda dá baixa nos componentes (ver lib/estoque.ts). Editar preços depois, se quiser.
+// ============================================================
+
+const _precoBasePorSku: Record<string, number> = {};
+for (const _p of products) for (const _v of _p.variations) {
+  _precoBasePorSku[_v.sku] = _v.tiers[0]?.price ?? 0;
+}
+function _precoUnit(sku: string): number { return _precoBasePorSku[sku] ?? 0; }
+function _r2(n: number): number { return Math.round(n * 100) / 100; }
+function _varsDoProduto(prefix: string): Variation[] {
+  const p = products.find((pp) => pp.prefix === prefix);
+  return p ? p.variations : [];
+}
+function _kitVar(sku: string, label: string, composicao: KitComponente[]): Variation {
+  const preco = _r2(composicao.reduce((s, c) => s + c.quantidade * _precoUnit(c.sku), 0));
+  return { sku, label, tiers: [{ minQty: 1, label: "1", price: preco }], weight: "A consultar", ncm: "", composicao };
+}
+function _kit(prefix: string, slug: string, name: string, subcategory: string, variations: Variation[]): Product {
+  return {
+    prefix, slug, name, description: name,
+    category: "Kits", subcategory, brand: "Grape Tools", supplier: "Grape Tools",
+    keywords: ["kit", ...name.toLowerCase().replace(/[|]/g, " ").split(/\s+/).filter(Boolean)],
+    variations, stock: 999, sold: 0, isPromotion: false, isLaunch: false,
+  };
+}
+
+const _kits: Product[] = [];
+
+// 1) Mão francesa — 8 variações (12 unidades cada)
+_kits.push(_kit("KIT.MAOF", "kit-maof", "Kit 12 Mãos Francesas | Grape Tools", "Mãos Francesas", [
+  _kitVar("KIT.MAOF.BR.20", "12x Branca 20cm", [{ sku: "14.MAOF.BR.20", quantidade: 12 }]),
+  _kitVar("KIT.MAOF.BR.25", "12x Branca 25cm", [{ sku: "14.MAOF.BR.25", quantidade: 12 }]),
+  _kitVar("KIT.MAOF.BR.30", "12x Branca 30cm", [{ sku: "14.MAOF.BR.30", quantidade: 12 }]),
+  _kitVar("KIT.MAOF.BR.40", "12x Branca 40cm", [{ sku: "14.MAOF.BR.40", quantidade: 12 }]),
+  _kitVar("KIT.MAOF.PT.20", "12x Preta 20cm", [{ sku: "14.MAOF.PT.20", quantidade: 12 }]),
+  _kitVar("KIT.MAOF.PT.25", "12x Preta 25cm", [{ sku: "14.MAOF.PT.25", quantidade: 12 }]),
+  _kitVar("KIT.MAOF.PT.30", "12x Preta 30cm", [{ sku: "14.MAOF.PT.30", quantidade: 12 }]),
+  _kitVar("KIT.MAOF.PT.40", "12x Preta 40cm", [{ sku: "14.MAOF.PT.40", quantidade: 12 }]),
+]));
+
+// 2-7) Rodízios (metade com trava, metade sem)
+function _kitRod(tam: string, n: number): Product {
+  const meta = n / 2;
+  return _kit(`KIT.ROD.${tam}.${n}`, `kit-rod-${tam}-${n}`,
+    `Kit ${n} Rodízios ${tam}mm — ${meta} com trava + ${meta} sem trava`, "Rodízios",
+    [_kitVar(`KIT.ROD.${tam}.${n}`, `${n} rodízios ${tam}mm`, [
+      { sku: `29.ROD.COMT.${tam}`, quantidade: meta },
+      { sku: `29.ROD.SEMT.${tam}`, quantidade: meta },
+    ])]);
+}
+_kits.push(_kitRod("35", 4), _kitRod("50", 4), _kitRod("35", 6), _kitRod("50", 6), _kitRod("35", 8), _kitRod("50", 8));
+
+// 8) Termogel
+_kits.push(_kit("KIT.TERMOGEL", "kit-termogel", "Kit Termogel — Pequena + Grande", "Bolsas Térmicas",
+  [_kitVar("KIT.TERMOGEL", "Pequena + Grande", [
+    { sku: "9.BOLS.TER.GRA", quantidade: 1 }, { sku: "9.BOLS.TERM.PEQ", quantidade: 1 }])]));
+
+// 9) Trava porta Cobrirel — 5x, 4 cores
+_kits.push(_kit("KIT.TPOR.COBRIREL", "kit-tpor-cobrirel", "Kit 5 Travas de Porta Cobrirel", "Travas", [
+  _kitVar("KIT.TPOR.COBRIREL.BR", "5x Branco", [{ sku: "1.TPOR.BR", quantidade: 5 }]),
+  _kitVar("KIT.TPOR.COBRIREL.CZ", "5x Cinza", [{ sku: "1.TPOR.CZ", quantidade: 5 }]),
+  _kitVar("KIT.TPOR.COBRIREL.MR", "5x Marrom", [{ sku: "1.TPOR.MR", quantidade: 5 }]),
+  _kitVar("KIT.TPOR.COBRIREL.PT", "5x Preto", [{ sku: "1.TPOR.PT", quantidade: 5 }]),
+]));
+
+// 10) Fecho rolete — 10x, 2 cores
+_kits.push(_kit("KIT.ROLET", "kit-rolet", "Kit 10 Fechos Rolete | Grape Tools", "Fechos", [
+  _kitVar("KIT.ROLET.DO", "10x Dourado", [{ sku: "CH.ROLET.DO", quantidade: 10 }]),
+  _kitVar("KIT.ROLET.PR", "10x Zincado", [{ sku: "CH.ROLET.PR", quantidade: 10 }]),
+]));
+
+// 11) Conector de emenda longo — 30x, cinza/transparente
+_kits.push(_kit("KIT.CONEC", "kit-conec", "Kit 30 Conectores de Emenda Longo | Grape Tools", "Conectores", [
+  _kitVar("KIT.CONEC.CZ", "30x Cinza", [{ sku: "CH.CONEC.DUP.CZ", quantidade: 30 }]),
+  _kitVar("KIT.CONEC.TS", "30x Transparente", [{ sku: "CH.CONEC.LONG.TS", quantidade: 30 }]),
+]));
+
+// 12-15) Discos de lixa (por grão), vermelho (com furos) e branco (pluma)
+_kits.push(_kit("KIT.DISC.VM.50", "kit-disc-vm-50", "Kit 50 Discos de Lixa Vermelho | Grape Tools", "Discos de Lixa",
+  _varsDoProduto("CH.DISC.LIX.125").map((v) => _kitVar(`KIT.DISC.VM.50.${v.sku.slice("CH.DISC.LIX.125.".length)}`, `50x ${v.label}`, [{ sku: v.sku, quantidade: 50 }]))));
+_kits.push(_kit("KIT.DISC.BR.50", "kit-disc-br-50", "Kit 50 Discos de Lixa Branco | Grape Tools", "Discos de Lixa",
+  _varsDoProduto("CH.DISC.125.BR").map((v) => _kitVar(`KIT.DISC.BR.50.${v.sku.slice("CH.DISC.125.BR.".length)}`, `50x ${v.label}`, [{ sku: v.sku, quantidade: 50 }]))));
+_kits.push(_kit("KIT.DISC.VM.30.M14", "kit-disc-vm-30-m14", "Kit 30 Discos Vermelho + Suporte M14 | Grape Tools", "Discos de Lixa",
+  _varsDoProduto("CH.DISC.LIX.125").map((v) => _kitVar(`KIT.DISC.VM.30.M14.${v.sku.slice("CH.DISC.LIX.125.".length)}`, `30x ${v.label} + M14`, [{ sku: v.sku, quantidade: 30 }, { sku: "4.M14.125", quantidade: 1 }]))));
+_kits.push(_kit("KIT.DISC.BR.30.M14", "kit-disc-br-30-m14", "Kit 30 Discos Branco + Suporte M14 | Grape Tools", "Discos de Lixa",
+  _varsDoProduto("CH.DISC.125.BR").map((v) => _kitVar(`KIT.DISC.BR.30.M14.${v.sku.slice("CH.DISC.125.BR.".length)}`, `30x ${v.label} + M14`, [{ sku: v.sku, quantidade: 30 }, { sku: "4.M14.125", quantidade: 1 }]))));
+
+// 16) Pistão a gás — 2x, todas cores/forças
+_kits.push(_kit("KIT.PIS.2X", "kit-pis-2x", "Kit 2 Pistões a Gás com Amortecedor", "Pistões", [
+  ..._varsDoProduto("3.PIS.BR").map((v) => _kitVar(`KIT.PIS.2X.${v.sku.slice("3.PIS.".length)}`, `2x ${v.label}`, [{ sku: v.sku, quantidade: 2 }])),
+  ..._varsDoProduto("3.PIS.CZ").map((v) => _kitVar(`KIT.PIS.2X.${v.sku.slice("3.PIS.".length)}`, `2x ${v.label}`, [{ sku: v.sku, quantidade: 2 }])),
+]));
+
+// 17-19) Trilho 1m + 9 suportes (20/25/30 branco)
+function _kitTrilho(tam: string): Product {
+  return _kit(`KIT.TS.SUP.${tam}`, `kit-ts-sup-${tam}`, `Kit 3 Trilhos 1m + 9 Suportes ${tam}cm Branco`, "Trilhos",
+    [_kitVar(`KIT.TS.SUP.${tam}`, `3 trilhos 1m + 9 suportes ${tam}cm`, [
+      { sku: "14.TS.BR.100", quantidade: 3 }, { sku: `14.SUP.BR.${tam}`, quantidade: 9 }])]);
+}
+_kits.push(_kitTrilho("20"), _kitTrilho("25"), _kitTrilho("30"));
+
+// 20) Trava porta de metal (piso) Renna — 5x
+_kits.push(_kit("KIT.TPOR.PISO", "kit-tpor-piso", "Kit 5 Travas de Porta de Piso Renna", "Travas",
+  [_kitVar("KIT.TPOR.PISO", "5x Trava de piso", [{ sku: "3.TPOR.PISO", quantidade: 5 }])]));
+
+// 21) Disco de polir + M14
+_kits.push(_kit("KIT.DISC.POL.M14", "kit-disc-pol-m14", "Kit Disco de Polir + Suporte M14", "Discos de Lixa",
+  [_kitVar("KIT.DISC.POL.M14", "Disco de polir + M14", [{ sku: "4.DISC.POL.5", quantidade: 1 }, { sku: "4.M14.125", quantidade: 1 }])]));
+
+// 22) Fecho botão trinco — 10x, 2 cores
+_kits.push(_kit("KIT.TRAV.PIS", "kit-trav-pis", "Kit 10 Fechos Botão Trinco | Grape Tools", "Fechos", [
+  _kitVar("KIT.TRAV.PIS.BR", "10x Branco", [{ sku: "CH.TRAV.PIS.BR", quantidade: 10 }]),
+  _kitVar("KIT.TRAV.PIS.PT", "10x Preto", [{ sku: "CH.TRAV.PIS.PT", quantidade: 10 }]),
+]));
+
+// 23) Fecho magnético com ímã — 8x
+_kits.push(_kit("KIT.FEC.MAGNET", "kit-fec-magnet", "Kit 8 Fechos Magnéticos com Ímã | Grape Tools", "Fechos",
+  [_kitVar("KIT.FEC.MAGNET", "8x Fecho magnético", [{ sku: "CH.FEC.MAGNET", quantidade: 8 }])]));
+
+products.push(..._kits);
+
+// Prefixos dos kits (usado na aba "KITS mais vendidos")
+export const kitPrefixes: string[] = _kits.map((k) => k.prefix);
+
+// Composição de um SKU de kit (ou null se não for kit)
+export function composicaoDoSku(sku: string): KitComponente[] | null {
+  for (const k of _kits) for (const v of k.variations) {
+    if (v.sku === sku && v.composicao) return v.composicao;
+  }
+  return null;
+}
+
+export const categories: string[] = ["Abrasivos", "Elétrica", "Ferragens", "Ferramentas", "Fixação", "Kits", "Outros", "Utilidades"];
 export const suppliers: string[] = ["Cobrirel", "Coimbra", "Disflex", "Duler", "Elgin", "FGVTN", "Fertak", "Grape Tools", "HD", "Idea", "Ivplast", "Jomarca", "Kian", "Metalnox", "Máxima", "Newfix", "Papaiz", "RCA", "Renna", "Sfor", "Sim", "Squadroni", "Starfer", "Storm", "São Raphael", "Tekbond", "Termogel", "USAF", "Utimix", "Veipar"];
 export const brands: string[] = ["", "Cobrirel", "Coimbra", "Disflex", "Duler", "Elgin", "FGVTN", "Fertak", "Grape Tools", "HD", "Idea", "Ivplast", "Jomarca", "Kian", "Metalnox", "Máxima", "Newfix", "Papaiz", "RCA", "Renna", "Sfor", "Sim", "Squadroni", "Starfer", "Storm", "São Raphael", "Tekbond", "Termogel", "USAF", "Utimix", "Veipar"];
 export const partnerBrands: string[] = ["Cobrirel", "Coimbra", "Disflex", "Duler", "Elgin", "FGVTN", "Fertak", "Grape Tools", "HD", "Idea", "Ivplast"];
