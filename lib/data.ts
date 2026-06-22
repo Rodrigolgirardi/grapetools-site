@@ -481,7 +481,7 @@ Regra simples: quanto menor o número do grão, mais agressiva é a lixa; quanto
   {
     prefix:"3.PIS.BR",
     slug:"3-pis-br",
-    name:"Pistão a Gás com Amortecedor | Abre a porta para Cima",
+    name:"Pistão a Gás Branco com Amortecedor | Abre a porta para Cima",
     description:"Pistão Fit · 40N · Branco",
     category:"Ferragens",
     subcategory:"Pistões",
@@ -502,7 +502,7 @@ Regra simples: quanto menor o número do grão, mais agressiva é a lixa; quanto
   {
     prefix:"3.PIS.CZ",
     slug:"3-pis-cz",
-    name:"Pistão a Gás com Amortecedor | Abre a porta para Cima",
+    name:"Pistão a Gás Cinza com Amortecedor | Abre a porta para Cima",
     description:"Pistão Fit · 40N · Cinza",
     category:"Ferragens",
     subcategory:"Pistões",
@@ -680,22 +680,6 @@ Regra simples: quanto menor o número do grão, mais agressiva é a lixa; quanto
     keywords:["disco para polimento de vidro","5\""],
     variations:[
       {sku:"4.DISC.POL.5",label:"5\"",tiers:[{minQty:10,label:"10",price:32.16}, {minQty:50,label:"50",price:28.94}, {minQty:100,label:"100",price:26.37}, {minQty:500,label:"500",price:23.16}],weight:"A consultar",ncm:""}
-    ],
-    stock:999,sold:0,isPromotion:false,isLaunch:false,
-  },
-  {
-    prefix:"4.DISC.125.BR",
-    slug:"4-disc-125-br",
-    name:"Disco de Lixa",
-    description:"Disco de Lixa · Pluma · Branco · Grão 220",
-    category:"Abrasivos",
-    subcategory:"Discos de Lixa",
-    brand:"Starfer",
-    supplier:"Starfer",
-    keywords:["disco de lixa","pluma","branco","grão 220","grão 320"],
-    variations:[
-      {sku:"4.DISC.125.BR.220",label:"Branco · Grão 220",tiers:[{minQty:10,label:"10",price:1.9}, {minQty:50,label:"50",price:1.71}, {minQty:100,label:"100",price:1.56}, {minQty:500,label:"500",price:1.37}],weight:"A consultar",ncm:"68053090"},
-      {sku:"4.DISC.125.BR.320",label:"Branco · Grão 320",tiers:[{minQty:10,label:"10",price:1.9}, {minQty:50,label:"50",price:1.71}, {minQty:100,label:"100",price:1.56}, {minQty:500,label:"500",price:1.37}],weight:"A consultar",ncm:"68053090"}
     ],
     stock:999,sold:0,isPromotion:false,isLaunch:false,
   },
@@ -879,46 +863,6 @@ Regra simples: quanto menor o número do grão, mais agressiva é a lixa; quanto
     variations:[
       {sku:"9.BOLS.TER.GRA",label:"Grande · 650ml",tiers:[{minQty:10,label:"10",price:26.39}, {minQty:50,label:"50",price:23.75}, {minQty:100,label:"100",price:21.64}, {minQty:500,label:"500",price:19.0}],weight:"A consultar",ncm:"39123119"},
       {sku:"9.BOLS.TERM.PEQ",label:"Pequena · 350ml",tiers:[{minQty:10,label:"10",price:14.36}, {minQty:50,label:"50",price:12.92}, {minQty:100,label:"100",price:11.78}, {minQty:500,label:"500",price:10.34}],weight:"A consultar",ncm:"39123119"}
-    ],
-    stock:999,sold:0,isPromotion:false,isLaunch:false,
-  },
-  {
-    prefix:"10.PIS.BR",
-    slug:"10-pis-br",
-    name:"Pistão a Gás com Amortecedor | Abre a porta para Cima",
-    description:"Pistão Fit · 40N · Branco",
-    category:"Ferragens",
-    subcategory:"Pistões",
-    brand:"HD",
-    supplier:"HD",
-    keywords:["pistão fit","40n","branco","60n","80n","100n","120n","150n"],
-    variations:[
-      {sku:"10.PIS.BR.40",label:"40N · Branco",tiers:[{minQty:10,label:"10",price:6.97}, {minQty:50,label:"50",price:6.27}, {minQty:100,label:"100",price:5.72}, {minQty:500,label:"500",price:5.02}],weight:"A consultar",ncm:"83024200"},
-      {sku:"10.PIS.BR.60",label:"60N · Branco",tiers:[{minQty:10,label:"10",price:6.86}, {minQty:50,label:"50",price:6.17}, {minQty:100,label:"100",price:5.63}, {minQty:500,label:"500",price:4.94}],weight:"A consultar",ncm:"83024200"},
-      {sku:"10.PIS.BR.80",label:"80N · Branco",tiers:[{minQty:10,label:"10",price:6.97}, {minQty:50,label:"50",price:6.27}, {minQty:100,label:"100",price:5.72}, {minQty:500,label:"500",price:5.02}],weight:"A consultar",ncm:"83024200"},
-      {sku:"10.PIS.BR.100",label:"100N · Branco",tiers:[{minQty:10,label:"10",price:6.86}, {minQty:50,label:"50",price:6.17}, {minQty:100,label:"100",price:5.63}, {minQty:500,label:"500",price:4.94}],weight:"A consultar",ncm:"83024200"},
-      {sku:"10.PIS.BR.120",label:"120N · Branco",tiers:[{minQty:10,label:"10",price:6.97}, {minQty:50,label:"50",price:6.27}, {minQty:100,label:"100",price:5.72}, {minQty:500,label:"500",price:5.02}],weight:"A consultar",ncm:"83024200"},
-      {sku:"10.PIS.BR.150",label:"150n · Branco",tiers:[{minQty:10,label:"10",price:7.25}, {minQty:50,label:"50",price:6.53}, {minQty:100,label:"100",price:5.94}, {minQty:500,label:"500",price:5.22}],weight:"A consultar",ncm:"83024200"}
-    ],
-    stock:999,sold:0,isPromotion:false,isLaunch:false,
-  },
-  {
-    prefix:"10.PIS.CZ",
-    slug:"10-pis-cz",
-    name:"Pistão a Gás com Amortecedor | Abre a porta para Cima",
-    description:"Pistão Fit · 40N · Cinza",
-    category:"Ferragens",
-    subcategory:"Pistões",
-    brand:"HD",
-    supplier:"HD",
-    keywords:["pistão fit","40n","cinza","60n","80n","100n","120n","150n"],
-    variations:[
-      {sku:"10.PIS.CZ.40",label:"40N · Cinza",tiers:[{minQty:10,label:"10",price:7.64}, {minQty:50,label:"50",price:6.88}, {minQty:100,label:"100",price:6.26}, {minQty:500,label:"500",price:5.5}],weight:"A consultar",ncm:"83024200"},
-      {sku:"10.PIS.CZ.60",label:"60N · Cinza",tiers:[{minQty:10,label:"10",price:7.64}, {minQty:50,label:"50",price:6.88}, {minQty:100,label:"100",price:6.26}, {minQty:500,label:"500",price:5.5}],weight:"A consultar",ncm:"83024200"},
-      {sku:"10.PIS.CZ.80",label:"80N · Cinza",tiers:[{minQty:10,label:"10",price:7.25}, {minQty:50,label:"50",price:6.53}, {minQty:100,label:"100",price:5.94}, {minQty:500,label:"500",price:5.22}],weight:"A consultar",ncm:"83024200"},
-      {sku:"10.PIS.CZ.100",label:"100N · Cinza",tiers:[{minQty:10,label:"10",price:7.25}, {minQty:50,label:"50",price:6.53}, {minQty:100,label:"100",price:5.94}, {minQty:500,label:"500",price:5.22}],weight:"A consultar",ncm:"83024200"},
-      {sku:"10.PIS.CZ.120",label:"120N · Cinza",tiers:[{minQty:10,label:"10",price:7.64}, {minQty:50,label:"50",price:6.88}, {minQty:100,label:"100",price:6.26}, {minQty:500,label:"500",price:5.5}],weight:"A consultar",ncm:"83024200"},
-      {sku:"10.PIS.CZ.150",label:"150n · Cinza",tiers:[{minQty:10,label:"10",price:7.25}, {minQty:50,label:"50",price:6.53}, {minQty:100,label:"100",price:5.94}, {minQty:500,label:"500",price:5.22}],weight:"A consultar",ncm:"83024200"}
     ],
     stock:999,sold:0,isPromotion:false,isLaunch:false,
   },
@@ -1269,8 +1213,8 @@ Regra simples: quanto menor o número do grão, mais agressiva é a lixa; quanto
   {
     prefix:"15.MOSQ",
     slug:"15-mosq",
-    name:"Mosquetão Mola",
-    description:"Mosquetão Mola · 7 x 70 · 180kgs",
+    name:"Mosquetão Aço com Mola Profissional Academia",
+    description:"Mosquetão Aço com Mola Profissional Academia · 7 x 70 · 180kgs",
     category:"Fixação",
     subcategory:"Ganchos",
     brand:"São Raphael",
@@ -1350,22 +1294,6 @@ Regra simples: quanto menor o número do grão, mais agressiva é a lixa; quanto
     keywords:["batente de porta","cromado","max 118"],
     variations:[
       {sku:"19.BATENT.MAX118",label:"Cromado · Max 118",tiers:[{minQty:10,label:"10",price:39.28}, {minQty:50,label:"50",price:35.35}, {minQty:100,label:"100",price:32.21}, {minQty:500,label:"500",price:28.28}],weight:"A consultar",ncm:"83024100"}
-    ],
-    stock:999,sold:0,isPromotion:false,isLaunch:false,
-  },
-  {
-    prefix:"19.TRAV.PIS",
-    slug:"19-trav-pis",
-    name:"Trava Plástica com Pistão",
-    description:"Trava Plástica com Pistão · Branco",
-    category:"Ferragens",
-    subcategory:"Travas",
-    brand:"Máxima",
-    supplier:"Máxima",
-    keywords:["trava plástica com pistão","branco","preto"],
-    variations:[
-      {sku:"19.TRAV.PIS.BR",label:"Branco",tiers:[{minQty:10,label:"10",price:2.69}, {minQty:50,label:"50",price:2.42}, {minQty:100,label:"100",price:2.21}, {minQty:500,label:"500",price:1.94}],weight:"A consultar",ncm:"83014000"},
-      {sku:"19.TRAV.PIS.PT",label:"Preto",tiers:[{minQty:10,label:"10",price:2.69}, {minQty:50,label:"50",price:2.42}, {minQty:100,label:"100",price:2.21}, {minQty:500,label:"500",price:1.94}],weight:"A consultar",ncm:"83014000"}
     ],
     stock:999,sold:0,isPromotion:false,isLaunch:false,
   },
