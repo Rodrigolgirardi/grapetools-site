@@ -1737,9 +1737,11 @@ _kits.push(_kit("1.KIT.TPOR.COBRIREL", "kit-tpor-cobrirel", "Kit 5 Travas de Por
   ([["BR", "Branco"], ["CZ", "Cinza"], ["MR", "Marrom"], ["PT", "Preto"]] as const)
     .map(([c, nome]) => _kitVar(`1.TPOR.${c}_5`, `5x ${nome}`, [{ sku: `1.TPOR.${c}`, quantidade: 5 }]))));
 
-// 10) Fecho rolete — 10x (só Zincado/Prata; dourado não existe no GrapeOne)
-_kits.push(_kit("CH.ROLET.PR_10", "kit-rolet-pr-10", "Kit 10 Fechos Rolete Zincado | Grape Tools", "Fechos",
-  [_kitVar("CH.ROLET.PR_10", "10x Zincado", [{ sku: "CH.ROLET.PR", quantidade: 10 }])]));
+// 10) Fecho rolete — 10x, Dourado e Zincado
+_kits.push(_kit("CH.ROLET.KIT10", "kit-rolet-10", "Kit 10 Fechos Rolete | Grape Tools", "Fechos", [
+  _kitVar("CH.ROLET.DO_10", "10x Dourado", [{ sku: "CH.ROLET.DO", quantidade: 10 }]),
+  _kitVar("CH.ROLET.PR_10", "10x Zincado", [{ sku: "CH.ROLET.PR", quantidade: 10 }]),
+]));
 
 // 11) Conector de emenda — 30x, cinza/transparente
 _kits.push(_kit("CH.CONEC.KIT30", "kit-conec-30", "Kit 30 Conectores de Emenda | Grape Tools", "Conectores", [
