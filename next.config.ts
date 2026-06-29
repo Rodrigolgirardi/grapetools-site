@@ -1,10 +1,27 @@
 import type { NextConfig } from "next";
 
+// Content-Security-Policy: limita de onde scripts/conexões/imagens podem vir.
+// Libera só o que o site usa: Supabase (auth/db/realtime) e Pagar.me (tokenização
+// do cartão). 'unsafe-inline'/'unsafe-eval' são exigidos pelo Next (sem nonce); o
+// ganho real aqui é bloquear script EXTERNO, exfiltração (connect-src) e clickjacking.
+const csp = [
+  "default-src 'self'",
+  "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
+  "style-src 'self' 'unsafe-inline'",
+  "img-src 'self' data: blob: https:",
+  "font-src 'self' data:",
+  "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.pagar.me",
+  "frame-src 'self' https://accounts.google.com",
+  "frame-ancestors 'none'",
+  "base-uri 'self'",
+  "form-action 'self'",
+  "object-src 'none'",
+].join("; ");
+
 // Cabeçalhos de segurança aplicados a todas as páginas.
-// (CSP — Content-Security-Policy — foi deixado de fora de propósito: exige
-//  testar página por página por causa de Supabase/Pagar.me/Google, fica como
-//  endurecimento futuro.)
 const securityHeaders = [
+  // Content-Security-Policy (anti-XSS / anti-injeção de script externo)
+  { key: "Content-Security-Policy", value: csp },
   // Impede que o site seja embutido em iframe de terceiros (anti-clickjacking)
   { key: "X-Frame-Options", value: "SAMEORIGIN" },
   // Impede o navegador de "adivinhar" tipos de arquivo (anti-MIME-sniffing)
