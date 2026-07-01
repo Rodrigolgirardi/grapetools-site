@@ -8,6 +8,7 @@ import { createClient } from '@/lib/supabase-server'
 import { documentoValido } from '@/lib/documento'
 import { getEstoqueMap, baixarEstoquePedido } from '@/lib/estoque'
 import { composicaoDoSku } from '@/lib/data'
+import { calcularPedidoServidor } from '@/lib/pricing'
 
 const PAGARME_API = 'https://api.pagar.me/core/v5'
 const SECRET_KEY = process.env.PAGARME_SECRET_KEY!
@@ -68,7 +69,9 @@ export async function POST(request: NextRequest) {
     }
 
     const body: CriarPedidoPayload = await request.json()
-    const { pedido_id, total, forma_pagamento, itens, cliente, endereco, card_token, parcelas } = body
+    // Obs.: `total` e `itens[].preco_unitario` do corpo NÃO são confiáveis — o preço
+    // é recalculado no servidor (0f). Só usamos sku + quantidade do cliente.
+    const { pedido_id, forma_pagamento, itens, cliente, endereco, card_token, parcelas } = body
 
     // 0b) Confere que o pedido existe E pertence a quem está logado
     //     (impede criar cobranças para pedidos de outras pessoas)
@@ -122,6 +125,36 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // 0f) FONTE DE VERDADE DO PREÇO: recalcula preço/desconto/juros no servidor a
+    //     partir do catálogo, IGNORANDO total/preço enviados pelo cliente
+    //     (impede adulteração de preço — pagar R$0,01). O cliente só informa sku+qtd.
+    const calc = calcularPedidoServidor(
+      (itens || []).map((i) => ({ sku: i.sku, quantidade: i.quantidade })),
+      { cartao: forma_pagamento === 'cartao', parcelas: parcelas && parcelas > 0 ? parcelas : 1 }
+    )
+    if (!calc.ok) {
+      return NextResponse.json({ error: calc.erro || 'Itens do pedido inválidos.' }, { status: 400 })
+    }
+
+    // Sobrescreve o pedido/itens com os valores autoritativos (o cliente havia
+    // inserido total/preço próprios). Assim o registro no banco e o que o ERP lê
+    // batem exatamente com o que é cobrado.
+    try {
+      await admin.from('pedidos').update({ total: calc.total }).eq('id', pedido_id)
+      await admin.from('pedido_itens').delete().eq('pedido_id', pedido_id)
+      await admin.from('pedido_itens').insert(
+        calc.itens.map((it) => ({
+          pedido_id,
+          sku: it.sku,
+          descricao: it.descricao,
+          quantidade: it.quantidade,
+          preco_unitario: it.preco_unitario,
+        }))
+      )
+    } catch (e) {
+      console.error('Falha ao normalizar pedido/itens server-side:', e)
+    }
+
     const docClean = cleanDoc(cliente.documento || '')
     const docType = docClean.length === 11 ? 'cpf' : 'cnpj'
 
@@ -131,7 +164,7 @@ export async function POST(request: NextRequest) {
       pagamento = {
         payment_method: 'pix',
         pix: { expires_in: 3600 }, // 1 hora
-        amount: toAmountCents(total),
+        amount: toAmountCents(calc.valorCobrar),
       }
     } else if (forma_pagamento === 'cartao') {
       pagamento = {
@@ -151,7 +184,7 @@ export async function POST(request: NextRequest) {
             },
           },
         },
-        amount: toAmountCents(total),
+        amount: toAmountCents(calc.valorCobrar),
       }
     } else {
       pagamento = {
@@ -160,21 +193,21 @@ export async function POST(request: NextRequest) {
           instructions: 'Pagar até o vencimento. Após o vencimento, o pedido será cancelado.',
           due_at: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(), // 3 dias
         },
-        amount: toAmountCents(total),
+        amount: toAmountCents(calc.valorCobrar),
       }
     }
 
     // Itens; se o total cobrado for maior que a soma (juros do parcelamento no
     // cartão), adiciona um item de "Juros" para o Pagar.me bater o valor.
     const itemsBody: Array<{ code: string; description: string; amount: number; quantity: number }> =
-      itens.map(item => ({
+      calc.itens.map(item => ({
         code: item.sku,
         description: item.descricao.slice(0, 100),
         amount: toAmountCents(item.preco_unitario),
         quantity: item.quantidade,
       }))
     const somaItens = itemsBody.reduce((s, it) => s + it.amount * it.quantity, 0)
-    const totalCents = toAmountCents(total)
+    const totalCents = toAmountCents(calc.valorCobrar)
     if (totalCents > somaItens) {
       itemsBody.push({
         code: 'JUROS',
