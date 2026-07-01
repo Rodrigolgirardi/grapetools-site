@@ -59,6 +59,24 @@ function cleanPhone(phone: string): string {
   return digits.startsWith('55') ? digits : `55${digits}`
 }
 
+// Grava um patch no pedido com algumas tentativas. O client do Supabase NÃO lança
+// em erro de banco (retorna { error }); então checamos e re-tentamos com um pequeno
+// backoff. Retorna true se gravou, false se falhou em todas as tentativas.
+async function atualizarPedidoComRetry(
+  admin: ReturnType<typeof createAdminClient>,
+  pedidoId: string,
+  patch: Record<string, unknown>,
+  tentativas = 3
+): Promise<boolean> {
+  for (let i = 0; i < tentativas; i++) {
+    const { error } = await admin.from('pedidos').update(patch).eq('id', pedidoId)
+    if (!error) return true
+    console.error(`Falha ao atualizar pedido ${pedidoId} (tentativa ${i + 1}/${tentativas}):`, error.message)
+    if (i < tentativas - 1) await new Promise((r) => setTimeout(r, 150 * (i + 1)))
+  }
+  return false
+}
+
 export async function POST(request: NextRequest) {
   try {
     // 0) Segurança: precisa estar logado
@@ -235,6 +253,9 @@ export async function POST(request: NextRequest) {
     // Monta o body para a API do Pagar.me
     const pagarmeBody: Record<string, unknown> = {
       code: pedido_id.slice(0, 8).toUpperCase(),
+      // Link bidirecional: mesmo que o banco perca o pagarme_order_id, dá pra
+      // reconciliar lendo este pedido no Pagar.me (metadata guarda o nosso id).
+      metadata: { pedido_id },
       customer: {
         name: cliente.nome,
         email: cliente.email,
@@ -296,16 +317,16 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Vincula a cobrança do Pagar.me ao pedido no Supabase.
-    // Isso permite, depois, o webhook marcar o pedido como pago.
-    try {
-      await admin
-        .from('pedidos')
-        .update({ pagarme_order_id: data.id })
-        .eq('id', pedido_id)
-    } catch (e) {
-      console.error('Falha ao salvar pagarme_order_id no pedido:', e)
-      // Não interrompe o fluxo: o cliente ainda recebe o Pix/boleto
+    // Vincula a cobrança do Pagar.me ao pedido — este é o ÚNICO elo que deixa o
+    // webhook reconciliar um pagamento assíncrono (Pix/boleto). Gravamos com retry;
+    // se ainda assim falhar, gritamos no log ([RECONCILIAR]) — o pedido tem
+    // metadata.pedido_id no Pagar.me, então dá pra reconciliar manualmente/por cron.
+    // Nunca perdemos a venda em silêncio.
+    if (data?.id) {
+      const salvou = await atualizarPedidoComRetry(admin, pedido_id, { pagarme_order_id: data.id })
+      if (!salvou) {
+        console.error(`[RECONCILIAR] Cobranca criada no Pagar.me mas NAO salvei pagarme_order_id. pedido=${pedido_id} pagarme_order=${data.id}`)
+      }
     }
 
     // Extrai os dados de pagamento da resposta (sem logar — contém dados do cliente)
@@ -318,18 +339,24 @@ export async function POST(request: NextRequest) {
         // Marca pago e REIVINDICA a baixa atomicamente (estoque_baixado false→true).
         // Se o webhook já tiver confirmado (corrida), este UPDATE não pega linha e a
         // baixa não repete. Idem ao contrário. Baixa ocorre exatamente uma vez.
-        try {
-          const { data: claimed } = await admin
-            .from('pedidos')
-            .update({ pagamento_status: 'pago', pago_em: new Date().toISOString(), status: 'confirmado', estoque_baixado: true })
-            .eq('id', pedido_id)
-            .eq('estoque_baixado', false)
-            .select('id')
-          if (claimed && claimed.length > 0) {
+        const { data: claimed, error: errPago } = await admin
+          .from('pedidos')
+          .update({ pagamento_status: 'pago', pago_em: new Date().toISOString(), status: 'confirmado', estoque_baixado: true })
+          .eq('id', pedido_id)
+          .eq('estoque_baixado', false)
+          .select('id')
+        if (errPago) {
+          // Cartão FOI cobrado, mas não gravamos "pago". O webhook (order.paid/
+          // charge.paid) reconcilia depois via pagarme_order_id — por isso ainda
+          // retornamos sucesso (não mandar o cliente pagar de novo). Grita no log.
+          console.error(`[RECONCILIAR] Cartao aprovado mas falhou ao gravar "pago". pedido=${pedido_id} pagarme_order=${data.id}:`, errPago.message)
+        } else if (claimed && claimed.length > 0) {
+          // Baixa não pode derrubar a resposta de sucesso (cliente já pagou).
+          try {
             await baixarEstoquePedido(pedido_id)
+          } catch (e) {
+            console.error(`[RECONCILIAR] Cartao pago mas falhou a baixa de estoque. pedido=${pedido_id}:`, e)
           }
-        } catch (e) {
-          console.error('Falha ao marcar cartão como pago / baixar estoque:', e)
         }
         return NextResponse.json({
           tipo: 'cartao',
