@@ -136,13 +136,19 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: calc.erro || 'Itens do pedido inválidos.' }, { status: 400 })
     }
 
-    // Sobrescreve o pedido/itens com os valores autoritativos (o cliente havia
-    // inserido total/preço próprios). Assim o registro no banco e o que o ERP lê
-    // batem exatamente com o que é cobrado.
-    try {
-      await admin.from('pedidos').update({ total: calc.total }).eq('id', pedido_id)
-      await admin.from('pedido_itens').delete().eq('pedido_id', pedido_id)
-      await admin.from('pedido_itens').insert(
+    // Grava o total + os itens autoritativos ANTES de cobrar (o cliente só criou o
+    // pedido; os itens são criados aqui). Se qualquer gravação falhar, ABORTA sem
+    // cobrar — fecha o buraco de "pedido órfão" (cobrança de pedido sem itens).
+    {
+      const { error: errTotal } = await admin
+        .from('pedidos')
+        .update({ total: calc.total })
+        .eq('id', pedido_id)
+      const { error: errDel } = await admin
+        .from('pedido_itens')
+        .delete()
+        .eq('pedido_id', pedido_id)
+      const { error: errIns } = await admin.from('pedido_itens').insert(
         calc.itens.map((it) => ({
           pedido_id,
           sku: it.sku,
@@ -151,8 +157,13 @@ export async function POST(request: NextRequest) {
           preco_unitario: it.preco_unitario,
         }))
       )
-    } catch (e) {
-      console.error('Falha ao normalizar pedido/itens server-side:', e)
+      if (errTotal || errDel || errIns) {
+        console.error('Falha ao gravar pedido/itens (abortando antes de cobrar):', errTotal || errDel || errIns)
+        return NextResponse.json(
+          { error: 'Não foi possível registrar o pedido. Tente novamente.' },
+          { status: 500 }
+        )
+      }
     }
 
     const docClean = cleanDoc(cliente.documento || '')

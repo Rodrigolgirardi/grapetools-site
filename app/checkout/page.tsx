@@ -187,7 +187,10 @@ export default function CheckoutPage() {
       return
     }
 
-    // 2. Cria itens do pedido
+    // 2. Monta os itens (só sku+quantidade importam; o SERVIDOR recalcula o preço
+    //    e grava os itens de forma autoritativa em criar-pedido, numa etapa que
+    //    aborta antes de cobrar se falhar — por isso NÃO inserimos itens aqui,
+    //    evitando "pedido órfão" (pedido gravado sem itens e mesmo assim cobrado).
     const itens = lines.map(l => ({
       pedido_id: pedido.id,
       sku: l.variation.sku,
@@ -195,7 +198,6 @@ export default function CheckoutPage() {
       quantidade: l.quantity,
       preco_unitario: precoComDesc(l.tier.price),
     }))
-    await supabase.from('pedido_itens').insert(itens)
 
     // 3. Salva dados no perfil (documento/telefone sempre; endereço só na entrega)
     await supabase.from('profiles').upsert({
