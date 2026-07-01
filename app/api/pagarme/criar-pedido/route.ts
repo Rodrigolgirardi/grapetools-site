@@ -78,11 +78,15 @@ export async function POST(request: NextRequest) {
     const admin = createAdminClient()
     const { data: pedidoRow } = await admin
       .from('pedidos')
-      .select('user_id')
+      .select('user_id, pagamento_status')
       .eq('id', pedido_id)
       .single()
     if (!pedidoRow || pedidoRow.user_id !== user.id) {
       return NextResponse.json({ error: 'Pedido inválido.' }, { status: 403 })
+    }
+    // Idempotência: não recobra um pedido já pago (evita cobrança dupla em retry).
+    if (pedidoRow.pagamento_status === 'pago') {
+      return NextResponse.json({ error: 'Este pedido já foi pago.' }, { status: 409 })
     }
 
     // 0c) Valida o documento (CPF/CNPJ real) antes de chamar o Pagar.me
@@ -267,6 +271,9 @@ export async function POST(request: NextRequest) {
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Basic ${Buffer.from(`${SECRET_KEY}:`).toString('base64')}`,
+        // Idempotência: um retry com a mesma chave retorna a MESMA cobrança no
+        // Pagar.me, em vez de criar uma segunda (evita cobrar o cliente 2x).
+        'Idempotency-Key': pedido_id,
       },
       body: JSON.stringify(pagarmeBody),
     })

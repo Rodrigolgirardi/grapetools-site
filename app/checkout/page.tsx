@@ -246,47 +246,52 @@ export default function CheckoutPage() {
         ? Math.round(totalComDesc * (1 + 0.02 * parcelas) * 100) / 100
         : totalComDesc
 
-    // 5. Chama o Pagar.me
-    const pagarmeRes = await fetch('/api/pagarme/criar-pedido', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        pedido_id: pedido.id,
-        total: valorCobrar,
-        forma_pagamento: formaPagamento,
-        itens: itens.map(i => ({
-          sku: i.sku,
-          descricao: i.descricao,
-          quantidade: i.quantidade,
-          preco_unitario: i.preco_unitario,
-        })),
-        cliente: {
-          nome: nomeContato || user.user_metadata?.full_name || user.email || 'Cliente',
-          email: user.email || '',
-          documento,
-          telefone: telefoneContato,
-        },
-        endereco: enderecoEnvio,
-        card_token: cardToken,
-        parcelas,
-      }),
-    })
+    // 5. Chama o Pagar.me — com tratamento de rede/erro para o botão NUNCA travar
+    try {
+      const pagarmeRes = await fetch('/api/pagarme/criar-pedido', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          pedido_id: pedido.id,
+          total: valorCobrar,
+          forma_pagamento: formaPagamento,
+          itens: itens.map(i => ({
+            sku: i.sku,
+            descricao: i.descricao,
+            quantidade: i.quantidade,
+            preco_unitario: i.preco_unitario,
+          })),
+          cliente: {
+            nome: nomeContato || user.user_metadata?.full_name || user.email || 'Cliente',
+            email: user.email || '',
+            documento,
+            telefone: telefoneContato,
+          },
+          endereco: enderecoEnvio,
+          card_token: cardToken,
+          parcelas,
+        }),
+      })
 
-    const pagarmeData = await pagarmeRes.json()
+      const pagarmeData = await pagarmeRes.json().catch(() => ({ error: 'Resposta inválida do servidor.' }))
 
-    if (pagarmeData.error) {
-      alert(pagarmeData.error)
+      if (!pagarmeRes.ok || pagarmeData.error) {
+        alert(pagarmeData.error || 'Não foi possível concluir o pagamento. Tente novamente.')
+        return
+      }
+
+      setPagamentoResult(pagarmeData)
+      clearCart()
+      setPedidoId(pedido.id)
+      setStep('confirmado')
+    } catch {
+      alert(
+        'Falha de conexão ao processar o pagamento. Verifique sua internet e tente de novo. ' +
+        'Se o valor já tiver sido cobrado, confira em "Meus pedidos" antes de refazer.'
+      )
+    } finally {
       setSubmitting(false)
-      return
     }
-
-    setPagamentoResult(pagarmeData)
-
-    // 5. Limpa carrinho e vai para confirmado
-    clearCart()
-    setPedidoId(pedido.id)
-    setStep('confirmado')
-    setSubmitting(false)
   }
 
   // Evita hydration mismatch — só renderiza após montar no cliente
