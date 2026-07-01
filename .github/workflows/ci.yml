@@ -1,0 +1,40 @@
+name: CI
+
+# Portão de qualidade: roda em todo push na main e em todo Pull Request.
+# Se typecheck ou build quebrar, o commit fica marcado com ❌ no GitHub — pega o erro
+# ANTES de ir pro deploy do Netlify.
+
+on:
+  push:
+    branches: [main]
+  pull_request: {}
+
+jobs:
+  verificar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Node 22 (mesma versão do dev e do deploy)
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Instalar dependências
+        run: npm ci
+
+      - name: Typecheck (tsc)
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build de produção
+        # Envs placeholder: o build só compila/verifica; nenhuma chave real é usada
+        # aqui (as sensíveis ficam no Netlify). Assim o CI roda sem configurar secrets.
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: https://placeholder.supabase.co
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: placeholder-anon-key
+          SUPABASE_SERVICE_ROLE_KEY: placeholder-service-role
+        run: npm run build

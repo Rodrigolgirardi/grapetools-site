@@ -1,5 +1,10 @@
 [build]
   command = "npm run build"
 
+# Trava o Node do deploy na mesma versão do dev/CI (LTS 22), evitando quebra por
+# uma versão nova/surpresa do Node no build do Netlify.
+[build.environment]
+  NODE_VERSION = "22"
+
 [[plugins]]
   package = "@netlify/plugin-nextjs"
