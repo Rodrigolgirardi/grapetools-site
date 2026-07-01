@@ -9,8 +9,36 @@
 // Segurança: o token na URL precisa bater com a env PAGARME_WEBHOOK_SECRET.
 
 import { NextRequest, NextResponse } from 'next/server'
+import { timingSafeEqual } from 'crypto'
 import { createAdminClient } from '@/lib/supabase-admin'
 import { baixarEstoquePedido } from '@/lib/estoque'
+
+// Compara dois segredos em tempo constante (não vaza o tamanho do acerto por timing).
+function segredoConfere(recebido: string | null, esperado: string): boolean {
+  if (!recebido) return false
+  const a = Buffer.from(recebido)
+  const b = Buffer.from(esperado)
+  if (a.length !== b.length) return false
+  return timingSafeEqual(a, b)
+}
+
+// Extrai o segredo do webhook de onde o Pagar.me mandar:
+//  - Authorization: Basic base64(user:senha) → mecanismo nativo do Pagar.me
+//    (preferido: mantém o segredo FORA da URL, que vaza em logs de proxy/CDN)
+//  - ?token=<segredo> → compatibilidade com a configuração antiga
+function extrairSegredo(request: NextRequest): string | null {
+  const auth = request.headers.get('authorization') || ''
+  if (auth.startsWith('Basic ')) {
+    try {
+      const decoded = Buffer.from(auth.slice(6), 'base64').toString('utf8')
+      const idx = decoded.indexOf(':')
+      return idx >= 0 ? decoded.slice(idx + 1) : decoded // a senha do Basic Auth
+    } catch {
+      // corpo Basic inválido → cai pro token
+    }
+  }
+  return new URL(request.url).searchParams.get('token')
+}
 
 // Descobre o id do pedido no Pagar.me a partir do payload (order ou charge).
 function extrairPagarmeOrderId(evento: string, data: Record<string, unknown>): string | null {
@@ -33,11 +61,11 @@ function statusDoEvento(evento: string): 'pago' | 'falhou' | 'estornado' | null 
 }
 
 export async function POST(request: NextRequest) {
-  // 1) Segurança: confere o token da URL
+  // 1) Segurança: confere o segredo (header Basic — preferido — ou ?token=),
+  //    em tempo constante. Sem segredo válido, recusa.
   const esperado = process.env.PAGARME_WEBHOOK_SECRET
-  const recebido = new URL(request.url).searchParams.get('token')
-  if (!esperado || recebido !== esperado) {
-    return NextResponse.json({ error: 'Token inválido.' }, { status: 401 })
+  if (!esperado || !segredoConfere(extrairSegredo(request), esperado)) {
+    return NextResponse.json({ error: 'Não autorizado.' }, { status: 401 })
   }
 
   try {
@@ -86,11 +114,14 @@ export async function POST(request: NextRequest) {
     }
 
     // Outros status (falhou/estornado): só atualiza o pagamento, sem tocar em estoque.
-    const { data: atualizados, error } = await supabase
+    // Guarda: um "falhou" atrasado/reentregue NÃO pode rebaixar um pedido já pago
+    // (regressão de status). Estorno (refund) é transição real e pode vir após o pago.
+    let query = supabase
       .from('pedidos')
       .update({ pagamento_status: novoStatus })
       .eq('pagarme_order_id', pagarmeOrderId)
-      .select('id')
+    if (novoStatus === 'falhou') query = query.neq('pagamento_status', 'pago')
+    const { data: atualizados, error } = await query.select('id')
 
     if (error) {
       console.error('Webhook: erro ao atualizar pedido:', error)
