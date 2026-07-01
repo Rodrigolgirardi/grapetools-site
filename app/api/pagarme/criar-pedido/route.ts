@@ -6,7 +6,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase-admin'
 import { createClient } from '@/lib/supabase-server'
 import { documentoValido } from '@/lib/documento'
-import { getEstoqueMap, baixarEstoquePedido } from '@/lib/estoque'
+import { getEstoqueMap, confirmarPedidoPago } from '@/lib/estoque'
 import { composicaoDoSku } from '@/lib/data'
 import { calcularPedidoServidor } from '@/lib/pricing'
 
@@ -336,28 +336,11 @@ export async function POST(request: NextRequest) {
     if (forma_pagamento === 'cartao') {
       // Cartão é aprovado/recusado na hora
       if (data.status === 'paid') {
-        // Marca pago e REIVINDICA a baixa atomicamente (estoque_baixado false→true).
-        // Se o webhook já tiver confirmado (corrida), este UPDATE não pega linha e a
-        // baixa não repete. Idem ao contrário. Baixa ocorre exatamente uma vez.
-        const { data: claimed, error: errPago } = await admin
-          .from('pedidos')
-          .update({ pagamento_status: 'pago', pago_em: new Date().toISOString(), status: 'confirmado', estoque_baixado: true })
-          .eq('id', pedido_id)
-          .eq('estoque_baixado', false)
-          .select('id')
-        if (errPago) {
-          // Cartão FOI cobrado, mas não gravamos "pago". O webhook (order.paid/
-          // charge.paid) reconcilia depois via pagarme_order_id — por isso ainda
-          // retornamos sucesso (não mandar o cliente pagar de novo). Grita no log.
-          console.error(`[RECONCILIAR] Cartao aprovado mas falhou ao gravar "pago". pedido=${pedido_id} pagarme_order=${data.id}:`, errPago.message)
-        } else if (claimed && claimed.length > 0) {
-          // Baixa não pode derrubar a resposta de sucesso (cliente já pagou).
-          try {
-            await baixarEstoquePedido(pedido_id)
-          } catch (e) {
-            console.error(`[RECONCILIAR] Cartao pago mas falhou a baixa de estoque. pedido=${pedido_id}:`, e)
-          }
-        }
+        // Confirma pago + baixa de forma atômica/idempotente (mesma fonte do cron).
+        // Cartão FOI cobrado; mesmo se a gravação falhar, o webhook/cron reconcilia
+        // depois via pagarme_order_id — por isso ainda retornamos sucesso abaixo (não
+        // mandar o cliente pagar de novo). confirmarPedidoPago já loga [RECONCILIAR].
+        await confirmarPedidoPago(pedido_id)
         return NextResponse.json({
           tipo: 'cartao',
           pagarme_order_id: data.id,

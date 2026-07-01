@@ -46,6 +46,38 @@ export async function baixarEstoque(sku: string, qtd: number): Promise<number | 
   return data as number | null
 }
 
+// Confirma um pedido como PAGO e dá baixa no estoque — de forma ATÔMICA e idempotente.
+// Reivindica a transição virando estoque_baixado false→true numa só operação: só quem
+// "ganha" o UPDATE dá baixa. Retorna true se ESTE chamador confirmou agora, false se o
+// pedido já estava pago (no-op) ou em erro. Fonte ÚNICA usada pelo cartão e pelo cron.
+// (O webhook tem uma versão-irmã que reivindica em lote por pagarme_order_id.)
+export async function confirmarPedidoPago(pedidoId: string): Promise<boolean> {
+  const admin = createAdminClient()
+  const { data: claimed, error } = await admin
+    .from('pedidos')
+    .update({
+      pagamento_status: 'pago',
+      pago_em: new Date().toISOString(),
+      status: 'confirmado',
+      estoque_baixado: true,
+    })
+    .eq('id', pedidoId)
+    .eq('estoque_baixado', false)
+    .select('id')
+  if (error) {
+    console.error(`[RECONCILIAR] Falha ao gravar "pago" no pedido ${pedidoId}:`, error.message)
+    return false
+  }
+  if (!claimed || claimed.length === 0) return false // já estava pago → nada a fazer
+  // Baixa não pode derrubar o fluxo (o pedido já está pago); loga alto se falhar.
+  try {
+    await baixarEstoquePedido(pedidoId)
+  } catch (e) {
+    console.error(`[RECONCILIAR] Pedido ${pedidoId} pago mas falhou a baixa de estoque:`, e)
+  }
+  return true
+}
+
 // Dá baixa em todos os itens de um pedido (chamar uma única vez, quando vira "pago").
 export async function baixarEstoquePedido(pedidoId: string): Promise<void> {
   const admin = createAdminClient()
