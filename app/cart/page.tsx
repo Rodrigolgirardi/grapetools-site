@@ -1,7 +1,7 @@
 'use client'
 
 import "./cart.css"
-import { useState, useMemo } from 'react'
+import { useMemo } from 'react'
 import { products } from '@/lib/data'
 import { formatCurrency, getTierForQuantity, getCartLines, descontoCarrinhoPercent } from '@/lib/pricing'
 import { useCart } from '@/hooks/useCart'
@@ -13,16 +13,6 @@ const FRETE_GRATIS = 199
 
 export default function CartPage() {
   const { cart, updateQuantity, clearCart } = useCart()
-  const [cupom, setCupom] = useState('')
-  const [cupomAplicado, setCupomAplicado] = useState(false)
-  const [cupomErro, setCupomErro] = useState('')
-
-  function aplicarCupom() {
-    if (!cupom.trim()) { setCupomErro('Digite um cupom válido.'); return }
-    setCupomErro('')
-    setCupomAplicado(false)
-    setCupomErro('Cupom inválido ou expirado.')
-  }
 
   const lines = getCartLines(cart).map(l => {
     // Economia vs. preço do tier mais caro (menor quantidade)
@@ -368,24 +358,6 @@ export default function CartPage() {
                     </div>
                   </div>
                 )}
-
-                {/* Cupom */}
-                <div className="cartCupomWrap">
-                  <label className="cartCupomLabel">Cupom de desconto</label>
-                  <div className="cartCupomRow">
-                    <input
-                      type="text"
-                      className="cartCupomInput"
-                      placeholder="Digite seu cupom"
-                      value={cupom}
-                      onChange={e => { setCupom(e.target.value.toUpperCase()); setCupomErro(''); setCupomAplicado(false) }}
-                      onKeyDown={e => e.key === 'Enter' && aplicarCupom()}
-                    />
-                    <button className="cartCupomBtn" onClick={aplicarCupom}>Aplicar</button>
-                  </div>
-                  {cupomErro && <p className="cartCupomErro">⚠ {cupomErro}</p>}
-                  {cupomAplicado && <p className="cartCupomSucesso">✓ Cupom aplicado!</p>}
-                </div>
 
                 <a href="/checkout" className="cartSidebarCheckout">
                   Finalizar compra →
