@@ -42,7 +42,7 @@ export const FRETE_GRATIS_MIN = 199;
 
 // Desconto aplicado sobre o subtotal conforme o valor total do carrinho.
 // Maior para menor (a primeira faixa atingida vence).
-const DESCONTO_TIERS = [
+export const DESCONTO_TIERS = [
   { min: 400, percent: 5 },
   { min: 200, percent: 4 },
   { min: 100, percent: 3 },

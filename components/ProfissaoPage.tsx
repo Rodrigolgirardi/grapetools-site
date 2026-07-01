@@ -6,7 +6,7 @@ import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { ProductCard } from "@/components/ProductCard";
 import { products, type Product } from "@/lib/data";
-import { formatCurrency, getTierForQuantity } from "@/lib/pricing";
+import { formatCurrency, getTierForQuantity, descontoCarrinhoPercent, DESCONTO_TIERS } from "@/lib/pricing";
 import { SlidersHorizontal } from "lucide-react";
 
 const PERFIS = {
@@ -109,7 +109,7 @@ function ProfissaoPage({ perfilId }: { perfilId: PerfilId }) {
             </div>
             <div className="profissaoHeroStats">
               <div><strong>{filteredProducts.length}</strong><span>produtos</span></div>
-              <div><strong>ATÉ 28%</strong><span>de desconto</span></div>
+              <div><strong>ATÉ 28%</strong><span>por volume</span></div>
               <div><strong>✓</strong><span>Nota fiscal</span></div>
             </div>
           </div>
@@ -148,19 +148,17 @@ function ProfissaoPage({ perfilId }: { perfilId: PerfilId }) {
             </div>
             <div className="discountMeter">
               <div className="discountCurrentLabel">
-                <span>Seu desconto atual</span>
-                <strong className="discountCurrentPct">
-                  {cartCount >= 500 ? "28%" : cartCount >= 100 ? "18%" : cartCount >= 50 ? "10%" : "0%"}
-                </strong>
+                <span>Bônus por valor do pedido</span>
+                <strong className="discountCurrentPct">{descontoCarrinhoPercent(cartTotal)}%</strong>
               </div>
-              {[{qty:50,label:"50 un. → -10%"},{qty:100,label:"100 un. → -18%"},{qty:500,label:"500 un. → -28%"}].map((tier) => {
-                const prev = tier.qty === 50 ? 0 : tier.qty === 100 ? 50 : 100;
-                const progress = Math.min(100, Math.max(0, ((cartCount - prev) / (tier.qty - prev)) * 100));
-                const reached = cartCount >= tier.qty;
+              {[...DESCONTO_TIERS].sort((a, b) => a.min - b.min).map((tier, i, arr) => {
+                const prev = i === 0 ? 0 : arr[i - 1].min;
+                const progress = Math.min(100, Math.max(0, ((cartTotal - prev) / (tier.min - prev)) * 100));
+                const reached = cartTotal >= tier.min;
                 return (
-                  <div key={tier.qty} className="progressTier">
+                  <div key={tier.min} className="progressTier">
                     <div className="progressTierLabel">
-                      <span>{tier.label}</span>
+                      <span>{formatCurrency(tier.min)} → -{tier.percent}%</span>
                       {reached && <span className="progressReached">✓</span>}
                     </div>
                     <div className="progressBar">
@@ -169,13 +167,14 @@ function ProfissaoPage({ perfilId }: { perfilId: PerfilId }) {
                   </div>
                 );
               })}
-              {cartCount < 500 && (
-                <p className="discountHint">
-                  {cartCount < 50 ? `Faltam ${50 - cartCount} un. para -10%`
-                    : cartCount < 100 ? `Faltam ${100 - cartCount} un. para -18%`
-                    : `Faltam ${500 - cartCount} un. para -28%`}
-                </p>
-              )}
+              {(() => {
+                const proximo = [...DESCONTO_TIERS].sort((a, b) => a.min - b.min).find((t) => cartTotal < t.min);
+                return proximo ? (
+                  <p className="discountHint">
+                    Faltam {formatCurrency(proximo.min - cartTotal)} para -{proximo.percent}% no pedido
+                  </p>
+                ) : null;
+              })()}
             </div>
             {cartLines.length === 0 ? (
               <p className="muted" style={{ fontSize: "12px", textAlign: "center", padding: "8px 0" }}>
