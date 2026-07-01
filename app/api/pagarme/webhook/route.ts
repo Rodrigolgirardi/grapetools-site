@@ -55,37 +55,46 @@ export async function POST(request: NextRequest) {
 
     const supabase = createAdminClient()
 
-    // Estado ANTES do update (pra dar baixa de estoque só na 1ª vez que vira "pago")
-    const { data: antes } = await supabase
-      .from('pedidos')
-      .select('id, pagamento_status')
-      .eq('pagarme_order_id', pagarmeOrderId)
-
-    const update: Record<string, unknown> = { pagamento_status: novoStatus }
     if (novoStatus === 'pago') {
-      update.pago_em = new Date().toISOString()
-      update.status = 'confirmado' // andamento: pagamento confirmado
+      // Transição ATÔMICA: marca pago E reivindica a baixa de estoque numa só
+      // operação. Só as linhas com estoque_baixado=false são retornadas → a baixa
+      // ocorre EXATAMENTE uma vez, mesmo com entregas concorrentes/retry do webhook
+      // ou corrida com o caminho do cartão.
+      const { data: claimed, error } = await supabase
+        .from('pedidos')
+        .update({
+          pagamento_status: 'pago',
+          pago_em: new Date().toISOString(),
+          status: 'confirmado',
+          estoque_baixado: true,
+        })
+        .eq('pagarme_order_id', pagarmeOrderId)
+        .eq('estoque_baixado', false)
+        .select('id')
+
+      if (error) {
+        console.error('Webhook: erro ao confirmar pagamento:', error)
+        return NextResponse.json({ error: 'Erro ao atualizar.' }, { status: 500 })
+      }
+
+      for (const ped of claimed || []) {
+        await baixarEstoquePedido(ped.id as string)
+      }
+
+      console.log(`Webhook ${evento}: ${claimed?.length || 0} pedido(s) confirmados (baixa aplicada)`)
+      return NextResponse.json({ received: true, atualizados: claimed?.length || 0 })
     }
 
+    // Outros status (falhou/estornado): só atualiza o pagamento, sem tocar em estoque.
     const { data: atualizados, error } = await supabase
       .from('pedidos')
-      .update(update)
+      .update({ pagamento_status: novoStatus })
       .eq('pagarme_order_id', pagarmeOrderId)
       .select('id')
 
     if (error) {
       console.error('Webhook: erro ao atualizar pedido:', error)
-      // Responde 500 para o Pagar.me TENTAR DE NOVO depois
       return NextResponse.json({ error: 'Erro ao atualizar.' }, { status: 500 })
-    }
-
-    // Baixa de estoque: só nos pedidos que NÃO estavam "pago" antes (evita baixar 2x)
-    if (novoStatus === 'pago' && antes) {
-      for (const ped of antes) {
-        if (ped.pagamento_status !== 'pago') {
-          await baixarEstoquePedido(ped.id as string)
-        }
-      }
     }
 
     console.log(`Webhook ${evento}: ${atualizados?.length || 0} pedido(s) -> ${novoStatus}`)

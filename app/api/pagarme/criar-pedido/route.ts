@@ -315,15 +315,19 @@ export async function POST(request: NextRequest) {
     if (forma_pagamento === 'cartao') {
       // Cartão é aprovado/recusado na hora
       if (data.status === 'paid') {
-        // Marca como pago já (o webhook é só reforço)
+        // Marca pago e REIVINDICA a baixa atomicamente (estoque_baixado false→true).
+        // Se o webhook já tiver confirmado (corrida), este UPDATE não pega linha e a
+        // baixa não repete. Idem ao contrário. Baixa ocorre exatamente uma vez.
         try {
-          await admin
+          const { data: claimed } = await admin
             .from('pedidos')
-            .update({ pagamento_status: 'pago', pago_em: new Date().toISOString(), status: 'confirmado' })
+            .update({ pagamento_status: 'pago', pago_em: new Date().toISOString(), status: 'confirmado', estoque_baixado: true })
             .eq('id', pedido_id)
-          // Baixa o estoque (cartão aprovado na hora). O webhook não baixa de novo
-          // porque o pedido já está "pago".
-          await baixarEstoquePedido(pedido_id)
+            .eq('estoque_baixado', false)
+            .select('id')
+          if (claimed && claimed.length > 0) {
+            await baixarEstoquePedido(pedido_id)
+          }
         } catch (e) {
           console.error('Falha ao marcar cartão como pago / baixar estoque:', e)
         }
