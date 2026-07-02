@@ -12,6 +12,8 @@ const fustat = Fustat({
 });
 
 export const metadata: Metadata = {
+  // Base p/ URLs absolutas de OG/canonical (compartilhamento no WhatsApp, Google, etc.)
+  metadataBase: new URL("https://grapetools.com.br"),
   title: {
     default: "Grape Tools | Ferragens e Ferramentas",
     template: "%s | Grape Tools"
@@ -22,7 +24,8 @@ export const metadata: Metadata = {
     title: "Grape Tools",
     description: "Ferragens e ferramentas com desconto progressivo.",
     type: "website",
-    locale: "pt_BR"
+    locale: "pt_BR",
+    siteName: "Grape Tools"
   }
 };
 
