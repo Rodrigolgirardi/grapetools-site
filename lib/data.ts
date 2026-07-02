@@ -1488,15 +1488,15 @@ Regra simples: quanto menor o número do grão, mais agressiva é a lixa; quanto
   {
     prefix:"27.COLA793",
     slug:"27-cola793",
-    name:"Cola instantânea",
-    description:"Cola instantânea · 793 · 100g",
+    name:"Cola Instantânea Média Viscosidade | Tek Bond 793",
+    description:"Cola Instantânea Média Viscosidade | Tek Bond 793",
     category:"Fixação",
     subcategory:"Colas",
     brand:"Tekbond",
     supplier:"Tekbond",
-    keywords:["cola instantânea","793","100g"],
+    keywords:["cola instantânea","média viscosidade","tek bond","793","100g","20g","super cola","adesivo"],
     variations:[
-      {sku:"27.COLA793.100G",label:"793 · 100g",tiers:[{minQty:10,label:"10",price:54.6}, {minQty:50,label:"50",price:49.14}, {minQty:100,label:"100",price:44.77}, {minQty:500,label:"500",price:39.31}],weight:"A consultar",ncm:"35061010"}
+      {sku:"27.COLA793.100G",label:"100 gramas",tiers:[{minQty:10,label:"10",price:54.6}, {minQty:50,label:"50",price:49.14}, {minQty:100,label:"100",price:44.77}, {minQty:500,label:"500",price:39.31}],weight:"A consultar",ncm:"35061010"}
     ],
     stock:999,sold:0,isPromotion:false,isLaunch:false,
   },
