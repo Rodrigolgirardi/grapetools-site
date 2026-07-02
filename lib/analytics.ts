@@ -22,11 +22,16 @@ export type GaItem = {
   item_category?: string
 }
 
-// Registra a visita a uma página (SPA — chamado a cada mudança de rota)
+// Registra a visita a uma página (SPA — chamado a cada mudança de rota).
+// Padrão GA4 p/ SPA: dispara o evento page_view (o config inicial usa
+// send_page_view:false, então quem conta as visitas é isto aqui).
 export function pageview(url: string) {
   const g = getGtag()
   if (!g || !GA_ID) return
-  g('config', GA_ID, { page_path: url })
+  g('event', 'page_view', {
+    page_path: url,
+    page_location: typeof window !== 'undefined' ? window.location.origin + url : url,
+  })
 }
 
 // Evento genérico
