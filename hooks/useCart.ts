@@ -8,6 +8,8 @@
 import { useEffect, useState, useCallback } from 'react'
 import { createClient } from '@/lib/supabase-client'
 import { useAuth } from '@/hooks/useAuth'
+import { findVariation, getTierForQuantity } from '@/lib/pricing'
+import { trackAddToCart } from '@/lib/analytics'
 
 export type Cart = Record<string, number> // { [sku]: quantity }
 
@@ -106,6 +108,17 @@ export function useCart() {
 
   function addToCart(sku: string, qty: number = 1) {
     setCart(c => ({ ...c, [sku]: (c[sku] ?? 0) + qty }))
+    // Analytics (best-effort; não bloqueia o carrinho)
+    const found = findVariation(sku)
+    if (found) {
+      trackAddToCart({
+        item_id: sku,
+        item_name: `${found.product.name} — ${found.variation.label}`,
+        price: getTierForQuantity(found.variation.tiers, qty).price,
+        quantity: qty,
+        item_category: found.product.category,
+      })
+    }
   }
 
   function updateQuantity(sku: string, quantity: number) {

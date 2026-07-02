@@ -1,7 +1,7 @@
 'use client'
 
 import "./checkout.css"
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase-client'
 import { useAuth } from '@/hooks/useAuth'
@@ -9,6 +9,7 @@ import { useCart } from '@/hooks/useCart'
 import { productImageSrc, handleProductImageError } from '@/lib/product-image'
 import { documentoValido } from '@/lib/documento'
 import { formatCurrency, getCartLines, descontoCarrinhoPercent } from '@/lib/pricing'
+import { trackBeginCheckout, trackPurchase, type GaItem } from '@/lib/analytics'
 import { BackToSite } from '@/components/BackToSite'
 
 interface Endereco {
@@ -89,6 +90,25 @@ export default function CheckoutPage() {
   const precoComDesc = (preco: number) => Math.round(preco * (100 - descPercent)) / 100
   const totalComDesc = lines.reduce((s, l) => s + precoComDesc(l.tier.price) * l.quantity, 0)
   const descValor = subtotal - totalComDesc
+
+  // Itens no formato de e-commerce do Google Analytics (funil de venda)
+  const buildGaItems = (): GaItem[] =>
+    lines.map((l) => ({
+      item_id: l.variation.sku,
+      item_name: `${l.product.name} — ${l.variation.label}`,
+      price: precoComDesc(l.tier.price),
+      quantity: l.quantity,
+      item_category: l.product.category,
+    }))
+
+  // Dispara begin_checkout uma única vez, quando o carrinho já tem itens
+  const beganCheckout = useRef(false)
+  useEffect(() => {
+    if (beganCheckout.current || lines.length === 0) return
+    beganCheckout.current = true
+    trackBeginCheckout(buildGaItems(), totalComDesc)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lines.length])
 
   // Redireciona se não logado ou carrinho vazio
   useEffect(() => {
@@ -280,6 +300,8 @@ export default function CheckoutPage() {
         return
       }
 
+      // Conversão! Registra a compra no GA antes de limpar o carrinho.
+      trackPurchase({ transactionId: pedido.id, value: totalComDesc, items: buildGaItems() })
       setPagamentoResult(pagarmeData)
       clearCart()
       setPedidoId(pedido.id)

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Fustat } from "next/font/google";
 import "./globals.css";
+import { Analytics } from "@/components/Analytics";
 
 // Fonte única do site (igual abacatepay.com). As variáveis --font-syne e
 // --font-dm-sans usadas no CSS apontam para esta fonte (alias no globals.css).
@@ -32,7 +33,10 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="pt-BR" className={fustat.variable}>
-      <body>{children}</body>
+      <body>
+        {children}
+        <Analytics />
+      </body>
     </html>
   );
 }
