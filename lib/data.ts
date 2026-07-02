@@ -1061,13 +1061,13 @@ Regra simples: quanto menor o número do grão, mais agressiva é a lixa; quanto
   {
     prefix:"14.MAOF.BR",
     slug:"14-maof-br",
-    name:"Mão Francesa Leve",
-    description:"Mão Francesa Leve · Branca · 20cm",
+    name:"Mão Francesa Cantoneira Leve | 19cm a 38,5cm",
+    description:"Mão Francesa Cantoneira Leve | 19cm a 38,5cm",
     category:"Ferragens",
     subcategory:"Mãos Francesas",
     brand:"Fertak",
     supplier:"Fertak",
-    keywords:["mão francesa leve","branca","20cm","25cm","30cm","40cm"],
+    keywords:["mão francesa cantoneira leve","cantoneira","branca","20cm","25cm","30cm","40cm"],
     variations:[
       {sku:"14.MAOF.BR.20",label:"Branca · 20cm",tiers:[{minQty:10,label:"10",price:4.21}, {minQty:50,label:"50",price:3.79}, {minQty:100,label:"100",price:3.45}, {minQty:500,label:"500",price:3.03}],weight:"A consultar",ncm:"83024900"},
       {sku:"14.MAOF.BR.25",label:"Branca · 25cm",tiers:[{minQty:10,label:"10",price:5.28}, {minQty:50,label:"50",price:4.75}, {minQty:100,label:"100",price:4.33}, {minQty:500,label:"500",price:3.8}],weight:"A consultar",ncm:"83024900"},
@@ -1079,13 +1079,13 @@ Regra simples: quanto menor o número do grão, mais agressiva é a lixa; quanto
   {
     prefix:"14.MAOF.PT",
     slug:"14-maof-pt",
-    name:"Mão Francesa Leve",
-    description:"Mão Francesa Leve · Preta · 20cm",
+    name:"Mão Francesa Cantoneira Leve | 19cm a 38,5cm",
+    description:"Mão Francesa Cantoneira Leve | 19cm a 38,5cm",
     category:"Ferragens",
     subcategory:"Mãos Francesas",
     brand:"Fertak",
     supplier:"Fertak",
-    keywords:["mão francesa leve","preta","20cm","25cm","30cm","40cm"],
+    keywords:["mão francesa cantoneira leve","cantoneira","preta","20cm","25cm","30cm","40cm"],
     variations:[
       {sku:"14.MAOF.PT.20",label:"Preta · 20cm",tiers:[{minQty:10,label:"10",price:4.3}, {minQty:50,label:"50",price:3.87}, {minQty:100,label:"100",price:3.53}, {minQty:500,label:"500",price:3.1}],weight:"A consultar",ncm:"83024900"},
       {sku:"14.MAOF.PT.25",label:"Preta · 25cm",tiers:[{minQty:10,label:"10",price:5.28}, {minQty:50,label:"50",price:4.75}, {minQty:100,label:"100",price:4.33}, {minQty:500,label:"500",price:3.8}],weight:"A consultar",ncm:"83024900"},
