@@ -1473,13 +1473,13 @@ Regra simples: quanto menor o número do grão, mais agressiva é a lixa; quanto
   {
     prefix:"27.COLA.MOV",
     slug:"27-cola-mov",
-    name:"Cola Instantânea",
-    description:"Cola Instantânea · Moveleiro · 100g",
+    name:"Cola Instantânea Moveleiro 100g | Tek Bond",
+    description:"Cola Instantânea Moveleiro 100g | Tek Bond",
     category:"Fixação",
     subcategory:"Colas",
     brand:"Tekbond",
     supplier:"Tekbond",
-    keywords:["cola instantânea","moveleiro","100g"],
+    keywords:["cola instantânea","moveleiro","100g","tek bond","tekbond","super cola","adesivo"],
     variations:[
       {sku:"27.COLA.MOV.100G",label:"Moveleiro · 100g",tiers:[{minQty:10,label:"10",price:26.18}, {minQty:50,label:"50",price:23.56}, {minQty:100,label:"100",price:21.47}, {minQty:500,label:"500",price:18.85}],weight:"A consultar",ncm:"35061010"}
     ],
