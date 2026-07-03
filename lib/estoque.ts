@@ -9,13 +9,37 @@ import { composicaoDoSku } from '@/lib/data'
 export type EstoqueItem = { sku: string; quantidade: number }
 
 // Mapa { sku: quantidade } de todos os SKUs controlados.
+// SKU pausado entra como 0 (esgotado) — assim TODO o site (página, card, carrinho,
+// checkout) já o trata como indisponível sem precisar mudar mais nada.
 export async function getEstoqueMap(): Promise<Record<string, number>> {
   const admin = createAdminClient()
   const { data, error } = await admin.from('estoque').select('sku, quantidade')
-  if (error || !data) return {}
   const map: Record<string, number> = {}
-  for (const r of data) map[r.sku] = r.quantidade as number
+  if (!error && data) {
+    for (const r of data) map[r.sku] = r.quantidade as number
+  }
+  // Pausados forçam "esgotado" (0), independente da quantidade real. Ficam numa
+  // tabela separada de propósito, pra não brigar com o GrapeOne (que só mexe em `estoque`).
+  for (const sku of await getPausados()) map[sku] = 0
   return map
+}
+
+// Lista dos SKUs pausados manualmente (indisponíveis para venda).
+export async function getPausados(): Promise<string[]> {
+  const admin = createAdminClient()
+  const { data, error } = await admin.from('produtos_pausados').select('sku')
+  if (error || !data) return [] // tabela ausente/erro → nada pausado (degrada suave)
+  return data.map((r) => r.sku as string)
+}
+
+// Pausa (true) ou reativa (false) um SKU. Pausar insere; reativar remove a linha.
+export async function setPausado(sku: string, pausado: boolean): Promise<void> {
+  const admin = createAdminClient()
+  if (pausado) {
+    await admin.from('produtos_pausados').upsert({ sku }, { onConflict: 'sku' })
+  } else {
+    await admin.from('produtos_pausados').delete().eq('sku', sku)
+  }
 }
 
 // Define (sobrescreve) as quantidades. Usado pelo GrapeOne via API ERP.

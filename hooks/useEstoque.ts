@@ -16,9 +16,14 @@ async function carregar(): Promise<Record<string, number>> {
   inflight = (async () => {
     try {
       const supabase = createClient()
-      const { data } = await supabase.from('estoque').select('sku, quantidade')
+      const [estoqueRes, pausadosRes] = await Promise.all([
+        supabase.from('estoque').select('sku, quantidade'),
+        supabase.from('produtos_pausados').select('sku'),
+      ])
       const map: Record<string, number> = {}
-      if (data) for (const r of data) map[r.sku as string] = r.quantidade as number
+      if (estoqueRes.data) for (const r of estoqueRes.data) map[r.sku as string] = r.quantidade as number
+      // SKU pausado → 0 (esgotado), independente da quantidade real.
+      if (pausadosRes.data) for (const r of pausadosRes.data) map[r.sku as string] = 0
       cache = map
       return map
     } catch {

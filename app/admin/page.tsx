@@ -4,6 +4,8 @@ import { Logo } from "@/components/Logo";
 import { adminModules, products } from "@/lib/data";
 import { createClient } from "@/lib/supabase-server";
 import { isAdminEmail } from "@/lib/admin";
+import { getPausados } from "@/lib/estoque";
+import { AdminEstoque } from "@/components/AdminEstoque";
 
 const stats = [
   { label: "Produtos ativos", value: products.length.toString(), icon: Boxes },
@@ -19,6 +21,8 @@ export default async function AdminPage() {
   if (!isAdminEmail(user?.email)) {
     redirect("/");
   }
+
+  const pausados = await getPausados();
 
   return (
     <main className="adminLayout">
@@ -51,20 +55,7 @@ export default async function AdminPage() {
             </article>
           ))}
         </div>
-        <div className="adminTable">
-          <div className="tableHead">
-            <strong>Produtos</strong>
-            <span>Base pronta para Supabase/PostgreSQL</span>
-          </div>
-          {products.map((product) => (
-            <div className="tableRow" key={product.prefix}>
-              <span>{product.prefix}</span>
-              <strong>{product.name}</strong>
-              <span>{product.category}</span>
-              <span>{product.stock.toLocaleString("pt-BR")} un.</span>
-            </div>
-          ))}
-        </div>
+        <AdminEstoque pausadosIniciais={pausados} />
       </section>
     </main>
   );
