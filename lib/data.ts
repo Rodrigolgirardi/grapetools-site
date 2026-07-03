@@ -1061,8 +1061,8 @@ Regra simples: quanto menor o número do grão, mais agressiva é a lixa; quanto
   {
     prefix:"14.MAOF",
     slug:"14-maof",
-    name:"Mão Francesa Cantoneira Leve | 19cm a 38,5cm",
-    description:"Mão Francesa Cantoneira Leve | 19cm a 38,5cm",
+    name:"Mão Francesa Cantoneira Leve | 20cm a 40cm",
+    description:"Mão Francesa Cantoneira Leve | 20cm a 40cm",
     category:"Ferragens",
     subcategory:"Mãos Francesas",
     brand:"Fertak",
