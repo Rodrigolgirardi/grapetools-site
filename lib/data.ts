@@ -1022,20 +1022,21 @@ Regra simples: quanto menor o número do grão, mais agressiva é a lixa; quanto
     stock:999,sold:0,isPromotion:false,isLaunch:false,
   },
   {
-    prefix:"14.TS.BR",
-    slug:"14-ts-br",
-    name:"Trilho Cremalheira Simples em Aço Carbono Branco",
-    description:"Trilho Simples · Branco · 50cm",
+    prefix:"14.TS",
+    slug:"trilho-simples",
+    name:"Trilho Cremalheira Simples em Aço Carbono | Branco e Preto",
+    description:"Trilho Cremalheira Simples em Aço Carbono | Branco e Preto · 50cm a 2m",
     category:"Ferragens",
     subcategory:"Trilhos",
     brand:"Fertak",
     supplier:"Fertak",
-    keywords:["trilho simples","branco","50cm","100cm","150cm","200cm"],
+    keywords:["trilho simples","trilho cremalheira","branco","preto","50cm","1m","1,5m","2m"],
     variations:[
       {sku:"14.TS.BR.50",label:"Branco · 50cm",tiers:[{minQty:10,label:"10",price:11.05}, {minQty:50,label:"50",price:9.95}, {minQty:100,label:"100",price:9.06}, {minQty:500,label:"500",price:7.96}],weight:"A consultar",ncm:"83024900"},
-      {sku:"14.TS.BR.100",label:"Branco · 100cm",tiers:[{minQty:10,label:"10",price:20.59}, {minQty:50,label:"50",price:18.53}, {minQty:100,label:"100",price:16.88}, {minQty:500,label:"500",price:14.82}],weight:"A consultar",ncm:"83024900"},
-      {sku:"14.TS.BR.150",label:"Branco · 150cm",tiers:[{minQty:10,label:"10",price:30.9}, {minQty:50,label:"50",price:27.81}, {minQty:100,label:"100",price:25.34}, {minQty:500,label:"500",price:22.25}],weight:"A consultar",ncm:"83024900"},
-      {sku:"14.TS.BR.200",label:"Branco · 200cm",tiers:[{minQty:10,label:"10",price:32.43}, {minQty:50,label:"50",price:29.19}, {minQty:100,label:"100",price:26.59}, {minQty:500,label:"500",price:23.35}],weight:"A consultar",ncm:"83024900"}
+      {sku:"14.TS.BR.100",label:"Branco · 1m",tiers:[{minQty:10,label:"10",price:20.59}, {minQty:50,label:"50",price:18.53}, {minQty:100,label:"100",price:16.88}, {minQty:500,label:"500",price:14.82}],weight:"A consultar",ncm:"83024900"},
+      {sku:"14.TS.BR.150",label:"Branco · 1,5m",tiers:[{minQty:10,label:"10",price:30.9}, {minQty:50,label:"50",price:27.81}, {minQty:100,label:"100",price:25.34}, {minQty:500,label:"500",price:22.25}],weight:"A consultar",ncm:"83024900"},
+      {sku:"14.TS.BR.200",label:"Branco · 2m",tiers:[{minQty:10,label:"10",price:32.43}, {minQty:50,label:"50",price:29.19}, {minQty:100,label:"100",price:26.59}, {minQty:500,label:"500",price:23.35}],weight:"A consultar",ncm:"83024900"},
+      {sku:"25.TS.100.PT",label:"Preto · 1m",tiers:[{minQty:10,label:"10",price:19.44}, {minQty:50,label:"50",price:17.5}, {minQty:100,label:"100",price:15.94}, {minQty:500,label:"500",price:14.0}],weight:"A consultar",ncm:""}
     ],
     stock:999,sold:0,isPromotion:false,isLaunch:false,
   },
@@ -1408,21 +1409,6 @@ Regra simples: quanto menor o número do grão, mais agressiva é a lixa; quanto
     keywords:["dobradiça curva","com amortecedor"],
     variations:[
       {sku:"24.DOB.AMORT.CUR",label:"Com Amortecedor",tiers:[{minQty:10,label:"10",price:3.42}, {minQty:50,label:"50",price:3.08}, {minQty:100,label:"100",price:2.8}, {minQty:500,label:"500",price:2.46}],weight:"A consultar",ncm:""}
-    ],
-    stock:999,sold:0,isPromotion:false,isLaunch:false,
-  },
-  {
-    prefix:"25.TS.100",
-    slug:"25-ts-100",
-    name:"Trilho Simples",
-    description:"Trilho Simples · 100cm · Preto",
-    category:"Ferragens",
-    subcategory:"Trilhos",
-    brand:"Kian",
-    supplier:"Kian",
-    keywords:["trilho simples","100cm","preto"],
-    variations:[
-      {sku:"25.TS.100.PT",label:"100cm · Preto",tiers:[{minQty:10,label:"10",price:19.44}, {minQty:50,label:"50",price:17.5}, {minQty:100,label:"100",price:15.94}, {minQty:500,label:"500",price:14.0}],weight:"A consultar",ncm:""}
     ],
     stock:999,sold:0,isPromotion:false,isLaunch:false,
   },
