@@ -95,12 +95,15 @@ export default async function AdminPage() {
   }));
 
   const pagos = pedidosRaw.filter((p) => p.pagamento_status === "pago");
+  const pendentes = pedidosRaw.filter((p) => p.pagamento_status === "nao_pago");
   const stats = {
     produtos: products.length,
     pedidos: pedidosRaw.length,
     pedidosPagos: pagos.length,
+    pedidosPendentes: pendentes.length,
     clientes: profiles.length,
     faturamento: pagos.reduce((s, p) => s + (Number(p.total) || 0), 0),
+    aReceber: pendentes.reduce((s, p) => s + (Number(p.total) || 0), 0),
     pedidosNoCap: pedidosRaw.length >= LIMITE_PEDIDOS,
   };
 

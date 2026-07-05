@@ -36,8 +36,10 @@ type Stats = {
   produtos: number
   pedidos: number
   pedidosPagos: number
+  pedidosPendentes: number
   clientes: number
   faturamento: number
+  aReceber: number
   pedidosNoCap: boolean
 }
 
@@ -69,19 +71,23 @@ function BadgePagamento({ status }: { status: string }) {
 
 // ---------- Aba: Início (números reais) ----------
 function Dashboard({ stats, pedidos }: { stats: Stats; pedidos: Pedido[] }) {
-  const cards = [
-    { label: 'Faturamento (pago)', valor: formatCurrency(stats.faturamento), destaque: true },
+  const cards: { label: string; valor: string; tipo?: 'destaque' | 'alerta' }[] = [
+    { label: 'Faturamento (pago)', valor: formatCurrency(stats.faturamento), tipo: 'destaque' },
+    { label: 'A receber (pendente)', valor: formatCurrency(stats.aReceber), tipo: stats.aReceber > 0 ? 'alerta' : undefined },
     { label: 'Pedidos', valor: String(stats.pedidos) },
-    { label: 'Pedidos pagos', valor: String(stats.pedidosPagos) },
+    { label: 'Pagos', valor: String(stats.pedidosPagos) },
+    { label: 'Pendentes', valor: String(stats.pedidosPendentes), tipo: stats.pedidosPendentes > 0 ? 'alerta' : undefined },
     { label: 'Clientes', valor: String(stats.clientes) },
-    { label: 'Produtos', valor: String(stats.produtos) },
   ]
   const recentes = pedidos.slice(0, 5)
   return (
     <div>
       <div className={styles.statsGrid}>
         {cards.map((c) => (
-          <div key={c.label} className={`${styles.stat} ${c.destaque ? styles.statBig : ''}`}>
+          <div
+            key={c.label}
+            className={`${styles.stat} ${c.tipo === 'destaque' ? styles.statBig : ''} ${c.tipo === 'alerta' ? styles.statAlerta : ''}`}
+          >
             <strong>{c.valor}</strong>
             <span>{c.label}</span>
           </div>
@@ -110,17 +116,52 @@ function Dashboard({ stats, pedidos }: { stats: Stats; pedidos: Pedido[] }) {
 function PedidosView({ pedidos, noCap }: { pedidos: Pedido[]; noCap: boolean }) {
   const [busca, setBusca] = useState('')
   const [aberto, setAberto] = useState<string | null>(null)
+  const [statusFiltro, setStatusFiltro] = useState<'todos' | 'nao_pago' | 'pago'>('todos')
+
+  const counts = useMemo(
+    () => ({
+      todos: pedidos.length,
+      nao_pago: pedidos.filter((p) => p.pagamento_status === 'nao_pago').length,
+      pago: pedidos.filter((p) => p.pagamento_status === 'pago').length,
+    }),
+    [pedidos]
+  )
 
   const lista = useMemo(() => {
     const t = busca.trim().toLowerCase()
-    if (!t) return pedidos
-    return pedidos.filter((p) =>
-      `${p.clienteNome} ${p.clienteEmail} ${p.id} ${p.pagamento_status} ${p.status}`.toLowerCase().includes(t)
-    )
-  }, [busca, pedidos])
+    return pedidos.filter((p) => {
+      if (statusFiltro !== 'todos' && p.pagamento_status !== statusFiltro) return false
+      if (
+        t &&
+        !`${p.clienteNome} ${p.clienteEmail} ${p.id} ${p.pagamento_status} ${p.status}`
+          .toLowerCase()
+          .includes(t)
+      )
+        return false
+      return true
+    })
+  }, [busca, statusFiltro, pedidos])
+
+  const chips: { key: 'todos' | 'nao_pago' | 'pago'; label: string; n: number }[] = [
+    { key: 'todos', label: 'Todos', n: counts.todos },
+    { key: 'nao_pago', label: 'Pendentes', n: counts.nao_pago },
+    { key: 'pago', label: 'Pagos', n: counts.pago },
+  ]
 
   return (
     <div>
+      <div className={styles.chips}>
+        {chips.map((c) => (
+          <button
+            key={c.key}
+            type="button"
+            className={`${styles.chip} ${statusFiltro === c.key ? styles.chipOn : ''}`}
+            onClick={() => setStatusFiltro(c.key)}
+          >
+            {c.label} <span className={styles.chipN}>{c.n}</span>
+          </button>
+        ))}
+      </div>
       <input
         className={styles.search}
         placeholder="Buscar por cliente, e-mail, status…"
@@ -129,7 +170,11 @@ function PedidosView({ pedidos, noCap }: { pedidos: Pedido[]; noCap: boolean }) 
       />
       {noCap && <p className={styles.aviso}>Mostrando os 300 pedidos mais recentes.</p>}
       {lista.length === 0 ? (
-        <p className={styles.vazio}>Nenhum pedido encontrado.</p>
+        <p className={styles.vazio}>
+          {statusFiltro === 'nao_pago'
+            ? 'Nenhum pedido pendente no momento. 🎉'
+            : 'Nenhum pedido encontrado.'}
+        </p>
       ) : (
         <div className={styles.list}>
           {lista.map((p) => {

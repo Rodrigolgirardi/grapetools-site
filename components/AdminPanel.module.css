@@ -23,6 +23,8 @@
 .stat span { font-size: 12px; color: var(--muted); }
 .statBig { background: linear-gradient(135deg, var(--purple-700), var(--purple-400)); border: none; }
 .statBig strong, .statBig span { color: #fff; }
+.statAlerta { border-color: var(--orange); background: var(--orange-50); }
+.statAlerta strong { color: var(--orange); }
 
 .blocoTitulo { font-size: 14px; font-weight: 700; color: var(--ink); margin: 8px 0 10px; }
 
@@ -31,6 +33,14 @@
 .search:focus { outline: 2px solid var(--purple-400); }
 .search::placeholder { color: var(--muted); }
 .aviso { font-size: 12px; color: var(--muted); margin: 0 0 10px; }
+
+/* Chips de filtro por status (Pedidos) */
+.chips { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+.chip { display: inline-flex; align-items: center; gap: 7px; padding: 7px 14px; border: 1px solid var(--line); border-radius: 20px; background: var(--white); font: inherit; font-size: 13px; font-weight: 600; color: var(--muted); cursor: pointer; }
+.chip:hover { border-color: var(--purple-400); }
+.chipOn { background: var(--purple-700); border-color: var(--purple-700); color: #fff; }
+.chipN { font-size: 11px; background: rgba(15, 10, 30, 0.07); padding: 1px 8px; border-radius: 10px; }
+.chipOn .chipN { background: rgba(255, 255, 255, 0.22); color: #fff; }
 .vazio { text-align: center; color: var(--muted); padding: 28px; font-size: 13px; }
 
 /* Listas / cards */
