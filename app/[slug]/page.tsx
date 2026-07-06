@@ -6,7 +6,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { products } from "@/lib/data";
-import { productImageSrc } from "@/lib/product-image";
+import { imagemRealDoSku } from "@/lib/product-image-server";
 import { breadcrumbJsonLd } from "@/lib/seo";
 import ProductPageClient from "./ProductPageClient";
 
@@ -25,7 +25,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!product) return {}; // deixa o notFound cuidar
 
   const description = descricaoDoProduto(slug) ?? undefined;
-  const image = productImageSrc(product.variations[0].sku, product.prefix);
+  // Foto REAL do produto (via manifesto). Se ainda não tem foto, usa a og-image.
+  const image = imagemRealDoSku(product.variations[0].sku, product.prefix);
+  const ogImages = image ? [image, "/og-image.png"] : ["/og-image.png"];
 
   return {
     title: product.name, // o template do layout adiciona " | Grape Tools"
@@ -36,14 +38,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       description,
       type: "website",
       locale: "pt_BR",
-      // Foto do produto (se existir) e og-image como reserva -> preview sempre bonito.
-      images: [image, "/og-image.png"],
+      images: ogImages,
     },
     twitter: {
       card: "summary_large_image",
       title: product.name,
       description,
-      images: [image, "/og-image.png"],
+      images: ogImages,
     },
   };
 }
