@@ -50,6 +50,18 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+
+  // Redirects 301 dos endereços antigos que sumiram ao unificar produtos (mão
+  // francesa branca/preta -> unificada; trilho branco/preto -> unificado). Preserva
+  // SEO e não perde a visita de quem chega por link antigo.
+  async redirects() {
+    return [
+      { source: "/14-maof-br", destination: "/14-maof", permanent: true },
+      { source: "/14-maof-pt", destination: "/14-maof", permanent: true },
+      { source: "/14-ts-br", destination: "/trilho-simples", permanent: true },
+      { source: "/25-ts-100", destination: "/trilho-simples", permanent: true },
+    ];
+  },
 };
 
 // Só aplica o Sentry (integração de build + upload de source maps) quando o DSN
