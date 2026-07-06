@@ -1308,13 +1308,13 @@ Regra simples: quanto menor o número do grão, mais agressiva é a lixa; quanto
   {
     prefix:"20.DISC.125.BR",
     slug:"20-disc-125-br",
-    name:"Disco de Lixa",
-    description:"Disco de Lixa · Pluma · Branco · Grão 40",
+    name:"Disco de Lixa Pluma | 125mm | Branco | Disflex",
+    description:"Disco de Lixa Pluma | 125mm | Branco | Disflex",
     category:"Abrasivos",
     subcategory:"Discos de Lixa",
     brand:"Disflex",
     supplier:"Disflex",
-    keywords:["disco de lixa","pluma","branco","grão 40","grão 60","grão 80","grão 100","grão 120","grão 150","grão 180"],
+    keywords:["disco de lixa pluma","125mm","branco","disflex","grão 40","grão 60","grão 80","grão 100","grão 120","grão 150","grão 180","grão 220","grão 320","grão 400","grão 600"],
     variations:[
       {sku:"20.DISC.125.BR.40",label:"Branco · Grão 40",tiers:[{minQty:10,label:"10",price:2.11}, {minQty:50,label:"50",price:1.9}, {minQty:100,label:"100",price:1.73}, {minQty:500,label:"500",price:1.52}],weight:"A consultar",ncm:"68053090"},
       {sku:"20.DISC.125.BR.60",label:"Branco · Grão 60",tiers:[{minQty:10,label:"10",price:2.02}, {minQty:50,label:"50",price:1.82}, {minQty:100,label:"100",price:1.66}, {minQty:500,label:"500",price:1.45}],weight:"A consultar",ncm:"68053090"},
