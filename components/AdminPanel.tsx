@@ -7,7 +7,7 @@
 import { useMemo, useState } from 'react'
 import { Logo } from '@/components/Logo'
 import { AdminEstoque } from '@/components/AdminEstoque'
-import { formatCurrency } from '@/lib/pricing'
+import { formatCurrency, findVariation } from '@/lib/pricing'
 import styles from './AdminPanel.module.css'
 
 type Item = { descricao: string; sku: string; quantidade: number; preco_unitario: number }
@@ -492,11 +492,87 @@ function FinanceiroView({ pedidos, noCap }: { pedidos: Pedido[]; noCap: boolean 
   )
 }
 
-function EmBreve({ nome }: { nome: string }) {
+// ---------- Aba: Relatórios ----------
+function RelatoriosView({ pedidos, noCap }: { pedidos: Pedido[]; noCap: boolean }) {
+  const rel = useMemo(() => {
+    const pagos = pedidos.filter((p) => p.pagamento_status === 'pago')
+    const skuMap = new Map<string, { descricao: string; qtd: number; receita: number }>()
+    const catMap = new Map<string, { qtd: number; receita: number }>()
+    for (const p of pagos) {
+      for (const it of p.itens) {
+        const receita = it.preco_unitario * it.quantidade
+        const s = skuMap.get(it.sku) || { descricao: it.descricao, qtd: 0, receita: 0 }
+        s.qtd += it.quantidade
+        s.receita += receita
+        skuMap.set(it.sku, s)
+        const cat = findVariation(it.sku)?.product.category || 'Outros'
+        const c = catMap.get(cat) || { qtd: 0, receita: 0 }
+        c.qtd += it.quantidade
+        c.receita += receita
+        catMap.set(cat, c)
+      }
+    }
+    const maisVendidos = [...skuMap.entries()]
+      .map(([sku, v]) => ({ sku, ...v }))
+      .sort((a, b) => b.qtd - a.qtd)
+    const totalCat = [...catMap.values()].reduce((s, v) => s + v.receita, 0)
+    const porCategoria = [...catMap.entries()]
+      .map(([cat, v]) => ({ cat, ...v, pct: totalCat ? (v.receita / totalCat) * 100 : 0 }))
+      .sort((a, b) => b.receita - a.receita)
+    const maxCat = Math.max(1, ...porCategoria.map((c) => c.receita))
+    return { maisVendidos, porCategoria, maxCat }
+  }, [pedidos])
+
+  if (rel.maisVendidos.length === 0) {
+    return <p className={styles.vazio}>Ainda não há vendas pagas para gerar relatórios.</p>
+  }
+
+  const top = rel.maisVendidos.slice(0, 30)
+
   return (
-    <div className={styles.emBreve}>
-      <strong>{nome}</strong>
-      <span>Em breve. Por enquanto, use a aba Início para os números.</span>
+    <div>
+      <h3 className={styles.blocoTitulo}>Produtos mais vendidos</h3>
+      <div className={styles.tabelaWrap}>
+        <table className={styles.itensTable}>
+          <thead>
+            <tr>
+              <th>Produto</th>
+              <th>SKU</th>
+              <th>Qtd vendida</th>
+              <th>Receita</th>
+            </tr>
+          </thead>
+          <tbody>
+            {top.map((m) => (
+              <tr key={m.sku}>
+                <td>{m.descricao}</td>
+                <td className={styles.mono}>{m.sku}</td>
+                <td>{m.qtd}</td>
+                <td>{formatCurrency(m.receita)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      {rel.maisVendidos.length > 30 && (
+        <p className={styles.aviso}>Mostrando os 30 mais vendidos (de {rel.maisVendidos.length} itens).</p>
+      )}
+
+      <h3 className={styles.blocoTitulo}>Vendas por categoria</h3>
+      <div className={styles.finList}>
+        {rel.porCategoria.map((c) => (
+          <div key={c.cat} className={styles.finRow}>
+            <span className={styles.finLabel}>{c.cat}</span>
+            <span className={styles.finBarWrap}>
+              <span className={styles.finBar} style={{ width: `${Math.max(2, (c.receita / rel.maxCat) * 100)}%` }} />
+            </span>
+            <span className={styles.finVal}>
+              {formatCurrency(c.receita)} <em>{c.pct.toFixed(0)}%</em>
+            </span>
+          </div>
+        ))}
+      </div>
+      {noCap && <p className={styles.aviso}>Baseado nos 300 pedidos mais recentes.</p>}
     </div>
   )
 }
@@ -549,7 +625,7 @@ export function AdminPanel({
         {tab === 'Clientes' && <ClientesView clientes={clientes} />}
         {tab === 'Estoque' && <AdminEstoque pausadosIniciais={pausadosIniciais} />}
         {tab === 'Financeiro' && <FinanceiroView pedidos={pedidos} noCap={stats.pedidosNoCap} />}
-        {tab === 'Relatórios' && <EmBreve nome="Relatórios" />}
+        {tab === 'Relatórios' && <RelatoriosView pedidos={pedidos} noCap={stats.pedidosNoCap} />}
       </section>
     </main>
   )
