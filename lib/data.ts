@@ -1200,13 +1200,13 @@ Regra simples: quanto menor o número do grão, mais agressiva é a lixa; quanto
   {
     prefix:"15.GAN.FEC",
     slug:"15-gan-fec",
-    name:"Parafuso Gancho",
-    description:"Parafuso Gancho · 8mm",
+    name:"Parafuso Gancho Zinco | Para bucha",
+    description:"Parafuso Gancho Zinco · Para bucha · 8mm / 6mm / 5mm",
     category:"Fixação",
     subcategory:"Parafusos",
     brand:"São Raphael",
     supplier:"São Raphael",
-    keywords:["parafuso gancho","8mm","6mm","5mm"],
+    keywords:["parafuso gancho","zinco","zincado","para bucha","gancho para bucha","8mm","6mm","5mm"],
     variations:[
       {sku:"15.GAN.FEC.8",label:"8mm",tiers:[{minQty:10,label:"10",price:52.08}, {minQty:50,label:"50",price:46.87}, {minQty:100,label:"100",price:42.71}, {minQty:500,label:"500",price:37.5}],weight:"A consultar",ncm:"73181300"},
       {sku:"15.GAN.FEC.6",label:"6mm",tiers:[{minQty:10,label:"10",price:26.82}, {minQty:50,label:"50",price:24.14}, {minQty:100,label:"100",price:21.99}, {minQty:500,label:"500",price:19.31}],weight:"A consultar",ncm:"73181300"},
