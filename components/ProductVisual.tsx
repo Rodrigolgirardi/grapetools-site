@@ -55,6 +55,8 @@ export function ProductVisual({ product, sku, fileBase }: Props) {
           src={sources[srcIndex]}
           alt={product.name}
           className="productImage"
+          loading="lazy"
+          decoding="async"
           onError={() => setSrcIndex((i) => i + 1)}
           onContextMenu={(e) => e.preventDefault()}
           draggable={false}
