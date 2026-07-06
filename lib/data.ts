@@ -1108,13 +1108,13 @@ Regra simples: quanto menor o número do grão, mais agressiva é a lixa; quanto
   {
     prefix:"14.FLAP.115",
     slug:"14-flap-115",
-    name:"Disco Flap",
-    description:"Disco Flap · 115mm · Grão 40",
+    name:"Disco Flap 115mm | Madeira e Aço | Fertak",
+    description:"Disco Flap 115mm | Madeira e Aço | Fertak",
     category:"Abrasivos",
     subcategory:"Disco Flap",
     brand:"Fertak",
     supplier:"Fertak",
-    keywords:["disco flap","115mm","grão 40","grão 60","grão 80","grão 120"],
+    keywords:["disco flap","madeira e aço","madeira","aço","fertak","115mm","grão 40","grão 60","grão 80","grão 120"],
     variations:[
       {sku:"14.FLAP.115.40",label:"115mm · Grão 40",tiers:[{minQty:10,label:"10",price:7.15}, {minQty:50,label:"50",price:6.44}, {minQty:100,label:"100",price:5.86}, {minQty:500,label:"500",price:5.15}],weight:"A consultar",ncm:"68053020"},
       {sku:"14.FLAP.115.60",label:"115mm · Grão 60",tiers:[{minQty:10,label:"10",price:7.02}, {minQty:50,label:"50",price:6.32}, {minQty:100,label:"100",price:5.76}, {minQty:500,label:"500",price:5.05}],weight:"A consultar",ncm:"68053020"},
