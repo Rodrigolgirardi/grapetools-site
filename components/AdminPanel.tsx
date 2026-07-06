@@ -106,6 +106,11 @@ function Dashboard({ stats, pedidos }: { stats: Stats; pedidos: Pedido[] }) {
           </div>
         ))}
       </div>
+      {stats.pedidosNoCap && (
+        <p className={styles.aviso}>
+          ⚠ Números baseados nos 300 pedidos mais recentes (há mais no banco).
+        </p>
+      )}
       <h3 className={styles.blocoTitulo}>Últimos pedidos</h3>
       {recentes.length === 0 ? (
         <p className={styles.vazio}>Nenhum pedido ainda.</p>
@@ -186,6 +191,15 @@ function PedidosView({ pedidos, noCap }: { pedidos: Pedido[]; noCap: boolean }) 
       })
       if (!res.ok) throw new Error()
       setOverrides((prev) => ({ ...prev, [id]: { ...prev[id], ...patch } }))
+      // Rastreio salvo -> limpa o rascunho pra o input refletir o valor do servidor
+      // (evita reeditar/apagar um rastreio salvo achando que é rascunho novo).
+      if (patch.rastreio !== undefined) {
+        setRastreioDraft((prev) => {
+          const n = { ...prev }
+          delete n[id]
+          return n
+        })
+      }
     } catch {
       alert('Não foi possível salvar. Confira se a migração 006 foi rodada no Supabase e tente de novo.')
     } finally {
