@@ -30,6 +30,9 @@ jobs:
       - name: Lint
         run: npm run lint
 
+      - name: Testes (núcleo de preço/estoque)
+        run: npm run test
+
       - name: Build de produção
         # Envs placeholder: o build só compila/verifica; nenhuma chave real é usada
         # aqui (as sensíveis ficam no Netlify). Assim o CI roda sem configurar secrets.
