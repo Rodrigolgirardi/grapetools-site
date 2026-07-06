@@ -7,6 +7,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { products } from "@/lib/data";
 import { productImageSrc } from "@/lib/product-image";
+import { breadcrumbJsonLd } from "@/lib/seo";
 import ProductPageClient from "./ProductPageClient";
 
 type Props = { params: Promise<{ slug: string }> };
@@ -35,7 +36,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       description,
       type: "website",
       locale: "pt_BR",
-      images: image ? [image] : undefined, // metadataBase transforma em URL absoluta
+      // Foto do produto (se existir) e og-image como reserva -> preview sempre bonito.
+      images: [image, "/og-image.png"],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: product.name,
+      description,
+      images: [image, "/og-image.png"],
     },
   };
 }
@@ -44,5 +52,16 @@ export default async function Page({ params }: Props) {
   const { slug } = await params;
   const product = products.find((p) => p.slug === slug);
   if (!product) notFound();
-  return <ProductPageClient slug={slug} />;
+  return (
+    <>
+      {/* Migalhas (Início > Categoria > Produto) para a busca do Google */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(breadcrumbJsonLd(product)).replace(/</g, "\\u003c"),
+        }}
+      />
+      <ProductPageClient slug={slug} />
+    </>
+  );
 }

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Fustat } from "next/font/google";
 import "./globals.css";
 import { Analytics } from "@/components/Analytics";
+import { organizationJsonLd, websiteJsonLd } from "@/lib/seo";
 
 // Fonte única do site (igual abacatepay.com). As variáveis --font-syne e
 // --font-dm-sans usadas no CSS apontam para esta fonte (alias no globals.css).
@@ -26,7 +27,14 @@ export const metadata: Metadata = {
     description: "Ferragens e ferramentas com desconto progressivo.",
     type: "website",
     locale: "pt_BR",
-    siteName: "Grape Tools"
+    siteName: "Grape Tools",
+    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "Grape Tools" }]
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Grape Tools | Ferragens e Ferramentas",
+    description: "Ferragens e ferramentas com desconto progressivo por quantidade.",
+    images: ["/og-image.png"]
   }
 };
 
@@ -34,6 +42,13 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="pt-BR" className={fustat.variable}>
       <body>
+        {/* Dados estruturados do site (Organização + WebSite com caixa de busca) */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify([organizationJsonLd(), websiteJsonLd()]).replace(/</g, "\\u003c"),
+          }}
+        />
         {children}
         <Analytics />
       </body>
