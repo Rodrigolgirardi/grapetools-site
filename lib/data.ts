@@ -452,19 +452,47 @@ Regra simples: quanto menor o número do grão, mais agressiva é a lixa; quanto
     stock:999,sold:0,isPromotion:false,isLaunch:false,
   },
   {
-    prefix:"3.TPOR",
-    slug:"3-tpor",
-    name:"Trava Porta Magnético",
-    description:"Trava Porta Magnético · Longo",
+    prefix:"3.TPOR.LONG",
+    slug:"3-tpor-long",
+    name:"Trava Porta Magnético Longo | Renna",
+    description:"Trava Porta Magnético Longo | Renna",
     category:"Ferragens",
     subcategory:"Travas",
     brand:"Renna",
     supplier:"Renna",
-    keywords:["trava porta magnético","longo","slim","trava porta de piso","clássico"],
+    keywords:["trava porta magnético","longo","renna","trava porta"],
     variations:[
-      {sku:"3.TPOR.LONG",label:"Longo",tiers:[{minQty:10,label:"10",price:23.81}, {minQty:50,label:"50",price:21.43}, {minQty:100,label:"100",price:19.52}, {minQty:500,label:"500",price:17.14}],weight:"A consultar",ncm:"83024100"},
-      {sku:"3.TPOR.SLIM",label:"Slim",tiers:[{minQty:10,label:"10",price:18.99}, {minQty:50,label:"50",price:17.09}, {minQty:100,label:"100",price:15.57}, {minQty:500,label:"500",price:13.67}],weight:"A consultar",ncm:"83024100"},
-      {sku:"3.TPOR.PISO",label:"Trava Porta de piso · Clássico",tiers:[{minQty:10,label:"10",price:13.86}, {minQty:50,label:"50",price:12.47}, {minQty:100,label:"100",price:11.37}, {minQty:500,label:"500",price:9.98}],weight:"A consultar",ncm:"83024100"}
+      {sku:"3.TPOR.LONG",label:"Longo",tiers:[{minQty:10,label:"10",price:23.81}, {minQty:50,label:"50",price:21.43}, {minQty:100,label:"100",price:19.52}, {minQty:500,label:"500",price:17.14}],weight:"A consultar",ncm:"83024100"}
+    ],
+    stock:999,sold:0,isPromotion:false,isLaunch:false,
+  },
+  {
+    prefix:"3.TPOR.SLIM",
+    slug:"3-tpor-slim",
+    name:"Trava Porta Magnético Slim | Renna",
+    description:"Trava Porta Magnético Slim | Renna",
+    category:"Ferragens",
+    subcategory:"Travas",
+    brand:"Renna",
+    supplier:"Renna",
+    keywords:["trava porta magnético","slim","renna","trava porta"],
+    variations:[
+      {sku:"3.TPOR.SLIM",label:"Slim",tiers:[{minQty:10,label:"10",price:18.99}, {minQty:50,label:"50",price:17.09}, {minQty:100,label:"100",price:15.57}, {minQty:500,label:"500",price:13.67}],weight:"A consultar",ncm:"83024100"}
+    ],
+    stock:999,sold:0,isPromotion:false,isLaunch:false,
+  },
+  {
+    prefix:"3.TPOR.PISO",
+    slug:"3-tpor-piso",
+    name:"Trava Porta Magnético Clássico | Renna",
+    description:"Trava Porta Magnético Clássico | Renna",
+    category:"Ferragens",
+    subcategory:"Travas",
+    brand:"Renna",
+    supplier:"Renna",
+    keywords:["trava porta magnético","clássico","piso","renna","trava porta"],
+    variations:[
+      {sku:"3.TPOR.PISO",label:"Clássico",tiers:[{minQty:10,label:"10",price:13.86}, {minQty:50,label:"50",price:12.47}, {minQty:100,label:"100",price:11.37}, {minQty:500,label:"500",price:9.98}],weight:"A consultar",ncm:"83024100"}
     ],
     stock:999,sold:0,isPromotion:false,isLaunch:false,
   },

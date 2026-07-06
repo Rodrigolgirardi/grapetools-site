@@ -60,6 +60,8 @@ const nextConfig: NextConfig = {
       { source: "/14-maof-pt", destination: "/14-maof", permanent: true },
       { source: "/14-ts-br", destination: "/trilho-simples", permanent: true },
       { source: "/25-ts-100", destination: "/trilho-simples", permanent: true },
+      // Trava Porta Magnético separada em 3 produtos -> o antigo vai pro Longo.
+      { source: "/3-tpor", destination: "/3-tpor-long", permanent: true },
     ];
   },
 };
