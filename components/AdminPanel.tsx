@@ -15,6 +15,7 @@ type Pedido = {
   id: string
   data: string
   pagoEm: string
+  clienteUserId: string
   clienteNome: string
   clienteEmail: string
   clienteTelefone: string
@@ -27,6 +28,7 @@ type Pedido = {
   itens: Item[]
 }
 type Cliente = {
+  userId: string
   nome: string
   email: string
   cnpj: string
@@ -59,6 +61,25 @@ function dataBR(iso: string): string {
     return '—'
   }
 }
+
+// Baixa um CSV que abre no Excel. Usa ';' (padrão pt-BR) e BOM p/ acentos corretos.
+function baixarCSV(nomeArquivo: string, colunas: string[], linhas: (string | number)[][]) {
+  const esc = (v: string | number) => {
+    const s = String(v ?? '')
+    return /[";\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s
+  }
+  const conteudo = [colunas, ...linhas].map((row) => row.map(esc).join(';')).join('\r\n')
+  const blob = new Blob(['﻿' + conteudo], { type: 'text/csv;charset=utf-8;' })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = nomeArquivo
+  a.click()
+  URL.revokeObjectURL(url)
+}
+
+// Número em pt-BR (vírgula decimal) para o Excel entender como número.
+const numBR = (n: number) => n.toFixed(2).replace('.', ',')
 
 const PAG_LABEL: Record<string, { texto: string; cls: string }> = {
   pago: { texto: 'Pago', cls: 'pgPago' },
@@ -223,6 +244,23 @@ function PedidosView({ pedidos, noCap }: { pedidos: Pedido[]; noCap: boolean }) 
     return `https://wa.me/${num}?text=${encodeURIComponent(msg)}`
   }
 
+  function exportarPedidos() {
+    const cols = ['Data', 'Cliente', 'E-mail', 'Telefone', 'Total (R$)', 'Forma', 'Pagamento', 'Status', 'Rastreio', 'Itens']
+    const linhas = lista.map((p) => [
+      dataBR(p.data),
+      p.clienteNome,
+      p.clienteEmail,
+      p.clienteTelefone,
+      numBR(p.total),
+      p.forma_pagamento,
+      PAG_LABEL[p.pagamento_status]?.texto || p.pagamento_status,
+      statusDe(p),
+      rastreioDe(p),
+      p.itens.map((it) => `${it.quantidade}x ${it.descricao}`).join(' | '),
+    ])
+    baixarCSV('pedidos-grapetools.csv', cols, linhas)
+  }
+
   return (
     <div>
       <div className={styles.chips}>
@@ -237,12 +275,17 @@ function PedidosView({ pedidos, noCap }: { pedidos: Pedido[]; noCap: boolean }) 
           </button>
         ))}
       </div>
-      <input
-        className={styles.search}
-        placeholder="Buscar por cliente, e-mail, status…"
-        value={busca}
-        onChange={(e) => setBusca(e.target.value)}
-      />
+      <div className={styles.barraTopo}>
+        <input
+          className={styles.search}
+          placeholder="Buscar por cliente, e-mail, status…"
+          value={busca}
+          onChange={(e) => setBusca(e.target.value)}
+        />
+        <button className={styles.btnExportar} type="button" onClick={exportarPedidos} disabled={lista.length === 0}>
+          ⬇ Exportar
+        </button>
+      </div>
       {noCap && <p className={styles.aviso}>Mostrando os 300 pedidos mais recentes.</p>}
       {lista.length === 0 ? (
         <p className={styles.vazio}>
@@ -351,8 +394,10 @@ function PedidosView({ pedidos, noCap }: { pedidos: Pedido[]; noCap: boolean }) 
 }
 
 // ---------- Aba: Clientes ----------
-function ClientesView({ clientes }: { clientes: Cliente[] }) {
+function ClientesView({ clientes, pedidos }: { clientes: Cliente[]; pedidos: Pedido[] }) {
   const [busca, setBusca] = useState('')
+  const [aberto, setAberto] = useState<string | null>(null)
+
   const lista = useMemo(() => {
     const t = busca.trim().toLowerCase()
     const base = t
@@ -361,34 +406,88 @@ function ClientesView({ clientes }: { clientes: Cliente[] }) {
     return [...base].sort((a, b) => b.numPedidos - a.numPedidos)
   }, [busca, clientes])
 
+  const pedidosPorCliente = useMemo(() => {
+    const m = new Map<string, Pedido[]>()
+    for (const p of pedidos) {
+      const arr = m.get(p.clienteUserId) || []
+      arr.push(p)
+      m.set(p.clienteUserId, arr)
+    }
+    return m
+  }, [pedidos])
+
+  function exportar() {
+    const cols = ['Nome', 'E-mail', 'CNPJ', 'Telefone', 'Nº Pedidos', 'Total Gasto (R$)']
+    const linhas = lista.map((c) => [c.nome, c.email, c.cnpj, c.telefone, c.numPedidos, numBR(c.totalGasto)])
+    baixarCSV('clientes-grapetools.csv', cols, linhas)
+  }
+
   return (
     <div>
-      <input
-        className={styles.search}
-        placeholder="Buscar cliente por nome, e-mail, CNPJ…"
-        value={busca}
-        onChange={(e) => setBusca(e.target.value)}
-      />
+      <div className={styles.barraTopo}>
+        <input
+          className={styles.search}
+          placeholder="Buscar cliente por nome, e-mail, CNPJ…"
+          value={busca}
+          onChange={(e) => setBusca(e.target.value)}
+        />
+        <button className={styles.btnExportar} type="button" onClick={exportar} disabled={lista.length === 0}>
+          ⬇ Exportar
+        </button>
+      </div>
       {lista.length === 0 ? (
         <p className={styles.vazio}>Nenhum cliente encontrado.</p>
       ) : (
         <div className={styles.list}>
-          {lista.map((c) => (
-            <div key={c.email} className={styles.clienteRow}>
-              <span className={styles.cliInfo}>
-                <span className={styles.cliNome}>{c.nome}</span>
-                <span className={styles.cliMeta}>
-                  {c.email}
-                  {c.cnpj ? ` · ${c.cnpj}` : ''}
-                  {c.telefone ? ` · ${c.telefone}` : ''}
-                </span>
-              </span>
-              <span className={styles.cliStats}>
-                <span className={styles.cliPedidos}>{c.numPedidos} pedido(s)</span>
-                <strong>{formatCurrency(c.totalGasto)}</strong>
-              </span>
-            </div>
-          ))}
+          {lista.map((c) => {
+            const exp = aberto === c.userId
+            const doCliente = pedidosPorCliente.get(c.userId) || []
+            return (
+              <div key={c.userId} className={styles.card}>
+                <button
+                  className={styles.cardHead}
+                  type="button"
+                  onClick={() => setAberto(exp ? null : c.userId)}
+                >
+                  <span className={styles.cliInfo}>
+                    <span className={styles.cliNome}>{c.nome}</span>
+                    <span className={styles.cliMeta}>
+                      {c.email}
+                      {c.cnpj ? ` · ${c.cnpj}` : ''}
+                      {c.telefone ? ` · ${c.telefone}` : ''}
+                    </span>
+                  </span>
+                  <span className={styles.cardRight}>
+                    <span className={styles.cliStats}>
+                      <span className={styles.cliPedidos}>{c.numPedidos} pedido(s)</span>
+                      <strong>{formatCurrency(c.totalGasto)}</strong>
+                    </span>
+                    <span className={`${styles.chevron} ${exp ? styles.chevronOpen : ''}`}>▾</span>
+                  </span>
+                </button>
+                {exp && (
+                  <div className={styles.cardBody}>
+                    {doCliente.length === 0 ? (
+                      <p className={styles.vazioCell}>
+                        Nenhum pedido deste cliente entre os 300 mais recentes.
+                      </p>
+                    ) : (
+                      doCliente.map((p) => (
+                        <div key={p.id} className={styles.histRow}>
+                          <span className={styles.histData}>{dataBR(p.data)}</span>
+                          <BadgePagamento status={p.pagamento_status} />
+                          <span className={styles.histItens}>
+                            {p.itens.map((it) => `${it.quantidade}× ${it.descricao}`).join(', ') || '—'}
+                          </span>
+                          <strong className={styles.histTotal}>{formatCurrency(p.total)}</strong>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                )}
+              </div>
+            )
+          })}
         </div>
       )}
     </div>
@@ -636,7 +735,7 @@ export function AdminPanel({
 
         {tab === 'Início' && <Dashboard stats={stats} pedidos={pedidos} />}
         {tab === 'Pedidos' && <PedidosView pedidos={pedidos} noCap={stats.pedidosNoCap} />}
-        {tab === 'Clientes' && <ClientesView clientes={clientes} />}
+        {tab === 'Clientes' && <ClientesView clientes={clientes} pedidos={pedidos} />}
         {tab === 'Estoque' && <AdminEstoque pausadosIniciais={pausadosIniciais} />}
         {tab === 'Financeiro' && <FinanceiroView pedidos={pedidos} noCap={stats.pedidosNoCap} />}
         {tab === 'Relatórios' && <RelatoriosView pedidos={pedidos} noCap={stats.pedidosNoCap} />}

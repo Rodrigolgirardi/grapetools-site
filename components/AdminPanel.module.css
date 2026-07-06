@@ -48,6 +48,20 @@
 .search::placeholder { color: var(--muted); }
 .aviso { font-size: 12px; color: var(--muted); margin: 0 0 10px; }
 
+/* Barra de topo: busca + botão exportar */
+.barraTopo { display: flex; gap: 8px; align-items: stretch; margin-bottom: 12px; }
+.barraTopo .search { margin-bottom: 0; }
+.btnExportar { flex-shrink: 0; padding: 0 16px; border: 1px solid var(--line); border-radius: var(--r); background: var(--white); color: var(--purple-700); font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+.btnExportar:hover:not(:disabled) { background: var(--purple-50); border-color: var(--purple-400); }
+.btnExportar:disabled { opacity: 0.5; cursor: default; }
+
+/* Histórico do cliente (linhas de pedido no card expandido) */
+.histRow { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--surface); }
+.histRow:last-child { border-bottom: none; }
+.histData { font-size: 12px; color: var(--muted); min-width: 116px; flex-shrink: 0; }
+.histItens { flex: 1; font-size: 12.5px; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.histTotal { font-size: 13px; color: var(--ink); flex-shrink: 0; }
+
 /* Chips de filtro por status (Pedidos) */
 .chips { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
 .chip { display: inline-flex; align-items: center; gap: 7px; padding: 7px 14px; border: 1px solid var(--line); border-radius: 20px; background: var(--white); font: inherit; font-size: 13px; font-weight: 600; color: var(--muted); cursor: pointer; }

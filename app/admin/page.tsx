@@ -68,6 +68,7 @@ export default async function AdminPage() {
       id: p.id as string,
       data: p.created_at as string,
       pagoEm: (p.pago_em as string) || "",
+      clienteUserId: p.user_id as string,
       clienteNome: (perfil?.nome as string) || "—",
       clienteEmail: (perfil?.email as string) || "—",
       clienteTelefone: (perfil?.telefone as string) || "",
@@ -90,6 +91,7 @@ export default async function AdminPage() {
     porCliente.set(p.user_id as string, s);
   }
   const clientes = profiles.map((p) => ({
+    userId: p.id as string,
     nome: (p.nome as string) || "—",
     email: (p.email as string) || "—",
     cnpj: (p.cnpj as string) || "",
