@@ -28,6 +28,20 @@
 
 .blocoTitulo { font-size: 14px; font-weight: 700; color: var(--ink); margin: 8px 0 10px; }
 
+/* Financeiro — barras horizontais */
+.finList { display: grid; gap: 8px; margin-bottom: 22px; }
+.finRow { display: flex; align-items: center; gap: 12px; }
+.finLabel { flex: 0 0 96px; font-size: 13px; color: var(--ink); }
+.finBarWrap { flex: 1; height: 22px; background: var(--surface); border-radius: 6px; overflow: hidden; }
+.finBar { display: block; height: 100%; background: linear-gradient(90deg, var(--purple-600), var(--purple-400)); border-radius: 6px; }
+.finVal { flex: 0 0 auto; min-width: 128px; text-align: right; font-size: 13px; font-weight: 600; color: var(--ink); }
+.finVal em { color: var(--muted); font-weight: 400; font-style: normal; font-size: 12px; margin-left: 2px; }
+@media (max-width: 640px) {
+  .finLabel { flex-basis: 64px; font-size: 12px; }
+  .finVal { min-width: 92px; font-size: 12px; }
+  .finVal em { display: none; }
+}
+
 /* Busca / avisos */
 .search { width: 100%; padding: 10px 14px; margin-bottom: 12px; border: 1px solid var(--line); border-radius: var(--r); font-size: 14px; background: var(--white); color: var(--ink); }
 .search:focus { outline: 2px solid var(--purple-400); }

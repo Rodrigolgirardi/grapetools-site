@@ -14,6 +14,7 @@ type Item = { descricao: string; sku: string; quantidade: number; preco_unitario
 type Pedido = {
   id: string
   data: string
+  pagoEm: string
   clienteNome: string
   clienteEmail: string
   clienteTelefone: string
@@ -380,6 +381,117 @@ function ClientesView({ clientes }: { clientes: Cliente[] }) {
   )
 }
 
+const FORMA_LABEL: Record<string, string> = {
+  pix: 'Pix',
+  cartao: 'Cartão',
+  boleto: 'Boleto',
+  transferencia: 'Transferência',
+}
+const MESES_ABREV = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez']
+
+function mesLabel(ym: string): string {
+  const [y, m] = ym.split('-')
+  const idx = Number(m) - 1
+  if (!y || idx < 0 || idx > 11) return ym
+  return `${MESES_ABREV[idx]}/${y}`
+}
+
+// ---------- Aba: Financeiro ----------
+function FinanceiroView({ pedidos, noCap }: { pedidos: Pedido[]; noCap: boolean }) {
+  const fin = useMemo(() => {
+    const pagos = pedidos.filter((p) => p.pagamento_status === 'pago')
+    const faturamento = pagos.reduce((s, p) => s + p.total, 0)
+    const aReceber = pedidos
+      .filter((p) => p.pagamento_status === 'nao_pago')
+      .reduce((s, p) => s + p.total, 0)
+    const ticketMedio = pagos.length ? faturamento / pagos.length : 0
+
+    const formaMap = new Map<string, { total: number; n: number }>()
+    for (const p of pagos) {
+      const k = p.forma_pagamento || '—'
+      const cur = formaMap.get(k) || { total: 0, n: 0 }
+      cur.total += p.total
+      cur.n += 1
+      formaMap.set(k, cur)
+    }
+    const porForma = [...formaMap.entries()]
+      .map(([forma, v]) => ({ forma, ...v, pct: faturamento ? (v.total / faturamento) * 100 : 0 }))
+      .sort((a, b) => b.total - a.total)
+
+    const mesMap = new Map<string, number>()
+    for (const p of pagos) {
+      const iso = p.pagoEm || p.data
+      const mes = iso ? iso.slice(0, 7) : '—'
+      mesMap.set(mes, (mesMap.get(mes) || 0) + p.total)
+    }
+    const porMes = [...mesMap.entries()].sort((a, b) => a[0].localeCompare(b[0]))
+    const maxMes = Math.max(1, ...porMes.map(([, v]) => v))
+
+    return { qtdPagos: pagos.length, faturamento, aReceber, ticketMedio, porForma, porMes, maxMes }
+  }, [pedidos])
+
+  return (
+    <div>
+      <div className={styles.statsGrid}>
+        <div className={`${styles.stat} ${styles.statBig}`}>
+          <strong>{formatCurrency(fin.faturamento)}</strong>
+          <span>Faturamento (pago)</span>
+        </div>
+        <div className={`${styles.stat} ${fin.aReceber > 0 ? styles.statAlerta : ''}`}>
+          <strong>{formatCurrency(fin.aReceber)}</strong>
+          <span>A receber (pendente)</span>
+        </div>
+        <div className={styles.stat}>
+          <strong>{formatCurrency(fin.ticketMedio)}</strong>
+          <span>Ticket médio</span>
+        </div>
+        <div className={styles.stat}>
+          <strong>{fin.qtdPagos}</strong>
+          <span>Pedidos pagos</span>
+        </div>
+      </div>
+
+      {fin.qtdPagos === 0 ? (
+        <p className={styles.vazio}>Ainda não há pagamentos confirmados.</p>
+      ) : (
+        <>
+          <h3 className={styles.blocoTitulo}>Por forma de pagamento</h3>
+          <div className={styles.finList}>
+            {fin.porForma.map((f) => (
+              <div key={f.forma} className={styles.finRow}>
+                <span className={styles.finLabel}>{FORMA_LABEL[f.forma] || f.forma}</span>
+                <span className={styles.finBarWrap}>
+                  <span className={styles.finBar} style={{ width: `${Math.max(2, f.pct)}%` }} />
+                </span>
+                <span className={styles.finVal}>
+                  {formatCurrency(f.total)} <em>{f.pct.toFixed(0)}%</em>
+                </span>
+              </div>
+            ))}
+          </div>
+
+          <h3 className={styles.blocoTitulo}>Faturamento por mês</h3>
+          <div className={styles.finList}>
+            {fin.porMes.map(([mes, val]) => (
+              <div key={mes} className={styles.finRow}>
+                <span className={styles.finLabel}>{mesLabel(mes)}</span>
+                <span className={styles.finBarWrap}>
+                  <span className={styles.finBar} style={{ width: `${Math.max(2, (val / fin.maxMes) * 100)}%` }} />
+                </span>
+                <span className={styles.finVal}>{formatCurrency(val)}</span>
+              </div>
+            ))}
+          </div>
+
+          {noCap && (
+            <p className={styles.aviso}>Baseado nos 300 pedidos mais recentes.</p>
+          )}
+        </>
+      )}
+    </div>
+  )
+}
+
 function EmBreve({ nome }: { nome: string }) {
   return (
     <div className={styles.emBreve}>
@@ -436,7 +548,7 @@ export function AdminPanel({
         {tab === 'Pedidos' && <PedidosView pedidos={pedidos} noCap={stats.pedidosNoCap} />}
         {tab === 'Clientes' && <ClientesView clientes={clientes} />}
         {tab === 'Estoque' && <AdminEstoque pausadosIniciais={pausadosIniciais} />}
-        {tab === 'Financeiro' && <EmBreve nome="Financeiro" />}
+        {tab === 'Financeiro' && <FinanceiroView pedidos={pedidos} noCap={stats.pedidosNoCap} />}
         {tab === 'Relatórios' && <EmBreve nome="Relatórios" />}
       </section>
     </main>

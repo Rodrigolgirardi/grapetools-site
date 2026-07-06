@@ -67,6 +67,7 @@ export default async function AdminPage() {
     return {
       id: p.id as string,
       data: p.created_at as string,
+      pagoEm: (p.pago_em as string) || "",
       clienteNome: (perfil?.nome as string) || "—",
       clienteEmail: (perfil?.email as string) || "—",
       clienteTelefone: (perfil?.telefone as string) || "",
