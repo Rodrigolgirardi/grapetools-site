@@ -16,10 +16,12 @@ type Pedido = {
   data: string
   clienteNome: string
   clienteEmail: string
+  clienteTelefone: string
   total: number
   forma_pagamento: string
   pagamento_status: string
   status: string
+  rastreio: string
   pagarme_order_id: string | null
   itens: Item[]
 }
@@ -69,6 +71,16 @@ function BadgePagamento({ status }: { status: string }) {
   return <span className={`${styles.badge} ${styles[b.cls]}`}>{b.texto}</span>
 }
 
+// Opções do status do pedido (enum pedido_status)
+const STATUS_OPCOES: { valor: string; label: string }[] = [
+  { valor: 'pendente', label: 'Pendente' },
+  { valor: 'confirmado', label: 'Confirmado' },
+  { valor: 'em_separacao', label: 'Em separação' },
+  { valor: 'enviado', label: 'Enviado' },
+  { valor: 'entregue', label: 'Entregue' },
+  { valor: 'cancelado', label: 'Cancelado' },
+]
+
 // ---------- Aba: Início (números reais) ----------
 function Dashboard({ stats, pedidos }: { stats: Stats; pedidos: Pedido[] }) {
   const cards: { label: string; valor: string; tipo?: 'destaque' | 'alerta' }[] = [
@@ -117,6 +129,11 @@ function PedidosView({ pedidos, noCap }: { pedidos: Pedido[]; noCap: boolean }) 
   const [busca, setBusca] = useState('')
   const [aberto, setAberto] = useState<string | null>(null)
   const [statusFiltro, setStatusFiltro] = useState<'todos' | 'nao_pago' | 'pago'>('todos')
+  const [overrides, setOverrides] = useState<Record<string, { status?: string; rastreio?: string }>>({})
+  // Draft e "salvando" POR PEDIDO (não global): evita o rascunho de rastreio vazar
+  // entre pedidos e não trava os botões de todos ao salvar um.
+  const [rastreioDraft, setRastreioDraft] = useState<Record<string, string>>({})
+  const [salvando, setSalvando] = useState<Set<string>>(new Set())
 
   const counts = useMemo(
     () => ({
@@ -147,6 +164,49 @@ function PedidosView({ pedidos, noCap }: { pedidos: Pedido[]; noCap: boolean }) 
     { key: 'nao_pago', label: 'Pendentes', n: counts.nao_pago },
     { key: 'pago', label: 'Pagos', n: counts.pago },
   ]
+
+  const statusDe = (p: Pedido) => overrides[p.id]?.status ?? p.status
+  const rastreioDe = (p: Pedido) => overrides[p.id]?.rastreio ?? p.rastreio ?? ''
+
+  function abrirPedido(p: Pedido) {
+    setAberto((cur) => (cur === p.id ? null : p.id))
+  }
+
+  // Valor atual do input de rastreio de um pedido (rascunho > salvo).
+  const draftDe = (p: Pedido) => rastreioDraft[p.id] ?? rastreioDe(p)
+
+  async function salvar(id: string, patch: { status?: string; rastreio?: string }) {
+    setSalvando((prev) => new Set(prev).add(id))
+    try {
+      const res = await fetch('/api/admin/pedido', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pedido_id: id, ...patch }),
+      })
+      if (!res.ok) throw new Error()
+      setOverrides((prev) => ({ ...prev, [id]: { ...prev[id], ...patch } }))
+    } catch {
+      alert('Não foi possível salvar. Confira se a migração 006 foi rodada no Supabase e tente de novo.')
+    } finally {
+      setSalvando((prev) => {
+        const n = new Set(prev)
+        n.delete(id)
+        return n
+      })
+    }
+  }
+
+  function waLink(p: Pedido): string | null {
+    const tel = (p.clienteTelefone || '').replace(/\D/g, '')
+    if (tel.length < 10) return null
+    const num = tel.startsWith('55') ? tel : `55${tel}`
+    const codigo = p.id.slice(0, 8).toUpperCase()
+    const msg =
+      p.pagamento_status === 'pago'
+        ? `Olá ${p.clienteNome}! Sobre o seu pedido ${codigo} na Grape Tools:`
+        : `Olá ${p.clienteNome}! Passando sobre o seu pedido ${codigo} na Grape Tools — o pagamento ainda não foi confirmado. Posso te ajudar a finalizar? 😊`
+    return `https://wa.me/${num}?text=${encodeURIComponent(msg)}`
+  }
 
   return (
     <div>
@@ -181,7 +241,7 @@ function PedidosView({ pedidos, noCap }: { pedidos: Pedido[]; noCap: boolean }) 
             const exp = aberto === p.id
             return (
               <div key={p.id} className={styles.card}>
-                <button className={styles.cardHead} onClick={() => setAberto(exp ? null : p.id)} type="button">
+                <button className={styles.cardHead} onClick={() => abrirPedido(p)} type="button">
                   <span className={styles.pedInfo}>
                     <span className={styles.pedCliente}>{p.clienteNome}</span>
                     <span className={styles.pedMeta}>{dataBR(p.data)} · {p.forma_pagamento} · {p.itens.length} item(ns)</span>
@@ -196,7 +256,7 @@ function PedidosView({ pedidos, noCap }: { pedidos: Pedido[]; noCap: boolean }) 
                   <div className={styles.cardBody}>
                     <div className={styles.detGrid}>
                       <span><b>E-mail:</b> {p.clienteEmail}</span>
-                      <span><b>Status do pedido:</b> {p.status}</span>
+                      {p.clienteTelefone && <span><b>Telefone:</b> {p.clienteTelefone}</span>}
                       <span><b>Pedido:</b> {p.id.slice(0, 8).toUpperCase()}</span>
                       {p.pagarme_order_id && <span><b>Pagar.me:</b> {p.pagarme_order_id}</span>}
                     </div>
@@ -219,6 +279,51 @@ function PedidosView({ pedidos, noCap }: { pedidos: Pedido[]; noCap: boolean }) 
                         )}
                       </tbody>
                     </table>
+
+                    <div className={styles.acoes}>
+                      <div className={styles.acaoCampo}>
+                        <label>Status do pedido</label>
+                        <select
+                          value={statusDe(p)}
+                          disabled={salvando.has(p.id)}
+                          onChange={(e) => salvar(p.id, { status: e.target.value })}
+                        >
+                          {STATUS_OPCOES.map((o) => (
+                            <option key={o.valor} value={o.valor}>{o.label}</option>
+                          ))}
+                        </select>
+                      </div>
+                      <div className={styles.acaoCampo}>
+                        <label>Código de rastreio</label>
+                        <div className={styles.rastreioRow}>
+                          <input
+                            type="text"
+                            placeholder="Ex.: AA123456789BR"
+                            value={draftDe(p)}
+                            onChange={(e) =>
+                              setRastreioDraft((prev) => ({ ...prev, [p.id]: e.target.value }))
+                            }
+                          />
+                          <button
+                            type="button"
+                            disabled={salvando.has(p.id) || draftDe(p) === rastreioDe(p)}
+                            onClick={() => salvar(p.id, { rastreio: draftDe(p) })}
+                          >
+                            Salvar
+                          </button>
+                        </div>
+                      </div>
+                      {waLink(p) && (
+                        <a
+                          className={styles.waBtn}
+                          href={waLink(p) as string}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          {p.pagamento_status === 'pago' ? 'Falar no WhatsApp' : 'Cobrar no WhatsApp'}
+                        </a>
+                      )}
+                    </div>
                   </div>
                 )}
               </div>

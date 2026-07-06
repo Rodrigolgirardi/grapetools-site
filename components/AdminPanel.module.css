@@ -105,3 +105,25 @@
   .clienteRow { flex-direction: column; align-items: flex-start; }
   .cliStats { text-align: left; }
 }
+
+/* Ações no pedido (status / rastreio / WhatsApp) */
+.acoes { margin-top: 14px; padding-top: 12px; border-top: 1px dashed var(--line); display: flex; flex-wrap: wrap; gap: 14px; align-items: flex-end; }
+.acaoCampo { display: grid; gap: 4px; }
+.acaoCampo label { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.03em; }
+.acaoCampo select { padding: 8px 10px; border: 1px solid var(--line); border-radius: var(--r-sm); font-size: 13px; background: var(--white); color: var(--ink); cursor: pointer; min-width: 150px; }
+.acaoCampo select:focus { outline: 2px solid var(--purple-400); }
+.rastreioRow { display: flex; gap: 6px; }
+.rastreioRow input { padding: 8px 10px; border: 1px solid var(--line); border-radius: var(--r-sm); font-size: 13px; background: var(--white); color: var(--ink); min-width: 180px; }
+.rastreioRow input:focus { outline: 2px solid var(--purple-400); }
+.rastreioRow button { padding: 8px 14px; border: none; border-radius: var(--r-sm); background: var(--purple-700); color: #fff; font-size: 13px; font-weight: 600; cursor: pointer; }
+.rastreioRow button:disabled { background: #cbd5e1; cursor: default; }
+.waBtn { display: inline-flex; align-items: center; padding: 9px 16px; border-radius: var(--r-sm); background: #25d366; color: #fff; font-size: 13px; font-weight: 700; text-decoration: none; margin-left: auto; }
+.waBtn:hover { background: #1eb85a; }
+
+@media (max-width: 760px) {
+  .acoes { flex-direction: column; align-items: stretch; }
+  .acaoCampo select, .rastreioRow input { width: 100%; min-width: 0; }
+  .rastreioRow { flex: 1; }
+  .rastreioRow input { flex: 1; }
+  .waBtn { margin-left: 0; justify-content: center; }
+}

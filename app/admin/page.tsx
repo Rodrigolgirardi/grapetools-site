@@ -27,8 +27,10 @@ export default async function AdminPage() {
   const db = createAdminClient();
   const [pedidosRes, profilesRes, pausados] = await Promise.all([
     db
+      // "*" em vez de lista fixa: deploy-safe pra coluna `rastreio` (migração 006) —
+      // se ela ainda não existir, o select não quebra (só não vem o campo).
       .from("pedidos")
-      .select("id, user_id, status, total, forma_pagamento, pagamento_status, pago_em, created_at, pagarme_order_id")
+      .select("*")
       .order("created_at", { ascending: false })
       .limit(LIMITE_PEDIDOS),
     db.from("profiles").select("id, nome, email, cnpj, telefone, created_at"),
@@ -67,10 +69,12 @@ export default async function AdminPage() {
       data: p.created_at as string,
       clienteNome: (perfil?.nome as string) || "—",
       clienteEmail: (perfil?.email as string) || "—",
+      clienteTelefone: (perfil?.telefone as string) || "",
       total: Number(p.total) || 0,
       forma_pagamento: (p.forma_pagamento as string) || "—",
       pagamento_status: (p.pagamento_status as string) || "nao_pago",
       status: (p.status as string) || "pendente",
+      rastreio: (p.rastreio as string) || "",
       pagarme_order_id: (p.pagarme_order_id as string) || null,
       itens: itensPorPedido.get(p.id as string) || [],
     };
