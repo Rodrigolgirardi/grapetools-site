@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { withSentryConfig } from "@sentry/nextjs";
 
 // Content-Security-Policy: limita de onde scripts/conexões/imagens podem vir.
 // Libera só o que o site usa: Supabase (auth/db/realtime) e Pagar.me (tokenização
@@ -10,7 +11,7 @@ const csp = [
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob: https:",
   "font-src 'self' data:",
-  "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.pagar.me",
+  "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.pagar.me https://*.sentry.io",
   "frame-src 'self' https://accounts.google.com",
   "frame-ancestors 'none'",
   "base-uri 'self'",
@@ -51,4 +52,17 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+// Só aplica o Sentry (integração de build + upload de source maps) quando o DSN
+// público está configurado. Sem DSN: build normal e ZERO Sentry no bundle do
+// cliente (dormente de verdade). Com DSN + redeploy: monitor ativo.
+const sentryAtivo = !!process.env.NEXT_PUBLIC_SENTRY_DSN;
+
+export default sentryAtivo
+  ? withSentryConfig(nextConfig, {
+      org: process.env.SENTRY_ORG,
+      project: process.env.SENTRY_PROJECT,
+      silent: true,
+      widenClientFileUpload: true,
+      disableLogger: true,
+    })
+  : nextConfig;
