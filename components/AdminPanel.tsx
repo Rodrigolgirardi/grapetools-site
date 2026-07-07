@@ -4,7 +4,7 @@
 // Painel admin com abas. Dados reais do Supabase (espelho de segurança). A aba
 // Estoque reusa o AdminEstoque (pausar/ativar). Financeiro/Relatórios: em breve.
 
-import { useMemo, useState } from 'react'
+import { useMemo, useState, type CSSProperties } from 'react'
 import { Logo } from '@/components/Logo'
 import { AdminEstoque } from '@/components/AdminEstoque'
 import { formatCurrency, findVariation } from '@/lib/pricing'
@@ -47,8 +47,22 @@ type Stats = {
   aReceber: number
   pedidosNoCap: boolean
 }
+type Cupom = {
+  id: string
+  codigo: string
+  desconto_percent: number
+  vendedor: string
+  comissao_percent: number
+  ativo: boolean
+}
+type Comissao = {
+  vendedor: string
+  vendas: number
+  totalVendido: number
+  comissao: number
+}
 
-const TABS = ['Início', 'Pedidos', 'Clientes', 'Estoque', 'Financeiro', 'Relatórios'] as const
+const TABS = ['Início', 'Pedidos', 'Clientes', 'Estoque', 'Cupons', 'Financeiro', 'Relatórios'] as const
 type Tab = (typeof TABS)[number]
 
 function dataBR(iso: string): string {
@@ -690,17 +704,171 @@ function RelatoriosView({ pedidos, noCap }: { pedidos: Pedido[]; noCap: boolean 
   )
 }
 
+// ---------- Aba: Cupons ----------
+const cuCard: CSSProperties = { background: '#fff', border: '1px solid #eee', borderRadius: 12, padding: 18 }
+const cuTitle: CSSProperties = { margin: '0 0 14px', fontSize: 15, fontWeight: 700 }
+const cuLabel: CSSProperties = { display: 'flex', flexDirection: 'column', gap: 4, fontSize: 12, fontWeight: 600, color: '#374151' }
+const cuInp: CSSProperties = { height: 38, border: '1px solid #e5e0f0', borderRadius: 6, padding: '0 10px', fontSize: 14, fontWeight: 400 }
+const cuBtn: CSSProperties = { marginTop: 14, height: 40, padding: '0 18px', border: 'none', borderRadius: 8, background: '#5b21b6', color: '#fff', fontSize: 14, fontWeight: 700, cursor: 'pointer' }
+const cuTable: CSSProperties = { width: '100%', borderCollapse: 'collapse', fontSize: 13 }
+const cuTh: CSSProperties = { textAlign: 'left', padding: '8px 10px', borderBottom: '1px solid #eee', color: '#6b7280', fontWeight: 600, fontSize: 11.5, textTransform: 'uppercase', letterSpacing: '0.03em', whiteSpace: 'nowrap' }
+const cuTd: CSSProperties = { padding: '10px', borderBottom: '1px solid #f3f4f6', whiteSpace: 'nowrap' }
+const cuPill: CSSProperties = { border: 'none', borderRadius: 999, padding: '3px 12px', fontSize: 12, fontWeight: 600, cursor: 'pointer' }
+
+function CuponsView({ cupons, comissao }: { cupons: Cupom[]; comissao: Comissao[] }) {
+  const [codigo, setCodigo] = useState('')
+  const [desconto, setDesconto] = useState('5')
+  const [vendedor, setVendedor] = useState('')
+  const [comissaoPct, setComissaoPct] = useState('')
+  const [busy, setBusy] = useState(false)
+  const [erro, setErro] = useState<string | null>(null)
+
+  async function criar() {
+    setErro(null)
+    const cod = codigo.trim().toUpperCase()
+    if (!cod) { setErro('Digite o código do cupom.'); return }
+    setBusy(true)
+    try {
+      const res = await fetch('/api/admin/cupons', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          codigo: cod,
+          desconto_percent: Number(desconto) || 0,
+          vendedor: vendedor.trim(),
+          comissao_percent: Number(comissaoPct) || 0,
+        }),
+      })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok || data.error) { setErro(data.error || 'Erro ao criar cupom.'); setBusy(false); return }
+      window.location.reload()
+    } catch {
+      setErro('Falha de conexão.'); setBusy(false)
+    }
+  }
+
+  async function toggle(id: string, ativo: boolean) {
+    setBusy(true)
+    try {
+      await fetch('/api/admin/cupons', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id, ativo }) })
+    } finally { window.location.reload() }
+  }
+
+  async function remover(id: string, cod: string) {
+    if (!window.confirm(`Remover o cupom ${cod}? As comissões já registradas continuam no relatório.`)) return
+    setBusy(true)
+    try {
+      await fetch('/api/admin/cupons', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }) })
+    } finally { window.location.reload() }
+  }
+
+  const totalComissao = comissao.reduce((s, c) => s + c.comissao, 0)
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      {/* Criar cupom */}
+      <div style={cuCard}>
+        <h3 style={cuTitle}>Criar cupom</h3>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 12 }}>
+          <label style={cuLabel}>Código
+            <input value={codigo} onChange={(e) => setCodigo(e.target.value.toUpperCase())} placeholder="AMANDA5" style={cuInp} />
+          </label>
+          <label style={cuLabel}>Desconto (%)
+            <input value={desconto} inputMode="decimal" onChange={(e) => setDesconto(e.target.value.replace(/[^\d.,]/g, '').replace(',', '.'))} placeholder="5" style={cuInp} />
+          </label>
+          <label style={cuLabel}>Vendedor (vazio = empresa)
+            <input value={vendedor} onChange={(e) => setVendedor(e.target.value)} placeholder="Amanda" style={cuInp} />
+          </label>
+          <label style={cuLabel}>Comissão (%)
+            <input value={comissaoPct} inputMode="decimal" onChange={(e) => setComissaoPct(e.target.value.replace(/[^\d.,]/g, '').replace(',', '.'))} placeholder="8" style={cuInp} />
+          </label>
+        </div>
+        {erro && <p style={{ color: '#dc2626', fontSize: 13, margin: '10px 0 0' }}>{erro}</p>}
+        <button type="button" onClick={criar} disabled={busy} style={cuBtn}>{busy ? 'Salvando…' : 'Criar cupom'}</button>
+      </div>
+
+      {/* Lista de cupons */}
+      <div style={cuCard}>
+        <h3 style={cuTitle}>Cupons ({cupons.length})</h3>
+        {cupons.length === 0 ? (
+          <p style={{ color: '#6b7280', fontSize: 13, margin: 0 }}>Nenhum cupom ainda. Rodou a migração 007 no Supabase?</p>
+        ) : (
+          <div style={{ overflowX: 'auto' }}>
+            <table style={cuTable}>
+              <thead><tr>{['Código', 'Desconto', 'Vendedor', 'Comissão', 'Status', ''].map((h) => <th key={h} style={cuTh}>{h}</th>)}</tr></thead>
+              <tbody>
+                {cupons.map((c) => (
+                  <tr key={c.id}>
+                    <td style={cuTd}><strong>{c.codigo}</strong></td>
+                    <td style={cuTd}>{c.desconto_percent}%</td>
+                    <td style={cuTd}>{c.vendedor || <span style={{ color: '#9ca3af' }}>Empresa</span>}</td>
+                    <td style={cuTd}>{c.comissao_percent > 0 ? `${c.comissao_percent}%` : '—'}</td>
+                    <td style={cuTd}>
+                      <button type="button" onClick={() => toggle(c.id, !c.ativo)} disabled={busy} style={{ ...cuPill, background: c.ativo ? '#dcfce7' : '#f3f4f6', color: c.ativo ? '#15803d' : '#6b7280' }}>
+                        {c.ativo ? 'Ativo' : 'Inativo'}
+                      </button>
+                    </td>
+                    <td style={cuTd}>
+                      <button type="button" onClick={() => remover(c.id, c.codigo)} disabled={busy} style={{ background: 'none', border: 'none', color: '#dc2626', cursor: 'pointer', fontSize: 12 }}>Remover</button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+        <p style={{ color: '#9ca3af', fontSize: 11.5, margin: '10px 0 0' }}>Clique em Ativo/Inativo pra ligar ou desligar o cupom sem apagar.</p>
+      </div>
+
+      {/* Relatório de comissão */}
+      <div style={cuCard}>
+        <h3 style={cuTitle}>Comissão a pagar por vendedor</h3>
+        {comissao.length === 0 ? (
+          <p style={{ color: '#6b7280', fontSize: 13, margin: 0 }}>Ainda não há vendas PAGAS com cupom de vendedor.</p>
+        ) : (
+          <div style={{ overflowX: 'auto' }}>
+            <table style={cuTable}>
+              <thead><tr>{['Vendedor', 'Vendas pagas', 'Total vendido', 'Comissão a pagar'].map((h) => <th key={h} style={cuTh}>{h}</th>)}</tr></thead>
+              <tbody>
+                {comissao.map((c) => (
+                  <tr key={c.vendedor}>
+                    <td style={cuTd}><strong>{c.vendedor}</strong></td>
+                    <td style={cuTd}>{c.vendas}</td>
+                    <td style={cuTd}>{formatCurrency(c.totalVendido)}</td>
+                    <td style={{ ...cuTd, fontWeight: 700, color: '#5b21b6' }}>{formatCurrency(c.comissao)}</td>
+                  </tr>
+                ))}
+                <tr>
+                  <td style={{ ...cuTd, fontWeight: 700 }}>Total</td>
+                  <td style={cuTd} />
+                  <td style={cuTd} />
+                  <td style={{ ...cuTd, fontWeight: 800, color: '#5b21b6' }}>{formatCurrency(totalComissao)}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        )}
+        <p style={{ color: '#9ca3af', fontSize: 11.5, margin: '10px 0 0' }}>Conta só pedidos PAGOS, dos últimos 300 pedidos.</p>
+      </div>
+    </div>
+  )
+}
+
 // ---------- Painel ----------
 export function AdminPanel({
   pedidos,
   clientes,
   pausadosIniciais,
   stats,
+  cupons,
+  comissao,
 }: {
   pedidos: Pedido[]
   clientes: Cliente[]
   pausadosIniciais: string[]
   stats: Stats
+  cupons: Cupom[]
+  comissao: Comissao[]
 }) {
   const [tab, setTab] = useState<Tab>('Início')
 
@@ -737,6 +905,7 @@ export function AdminPanel({
         {tab === 'Pedidos' && <PedidosView pedidos={pedidos} noCap={stats.pedidosNoCap} />}
         {tab === 'Clientes' && <ClientesView clientes={clientes} pedidos={pedidos} />}
         {tab === 'Estoque' && <AdminEstoque pausadosIniciais={pausadosIniciais} />}
+        {tab === 'Cupons' && <CuponsView cupons={cupons} comissao={comissao} />}
         {tab === 'Financeiro' && <FinanceiroView pedidos={pedidos} noCap={stats.pedidosNoCap} />}
         {tab === 'Relatórios' && <RelatoriosView pedidos={pedidos} noCap={stats.pedidosNoCap} />}
       </section>

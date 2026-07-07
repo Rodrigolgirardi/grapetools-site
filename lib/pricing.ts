@@ -111,6 +111,8 @@ export type CalculoPedido = {
   itens: ItemAutoritativo[];
   subtotal: number;      // soma dos preços de atacado por quantidade, SEM desconto de carrinho
   descPercent: number;   // % de desconto por valor do carrinho (0..5)
+  cupomPercent: number;  // % de desconto do cupom (0 se não usou)
+  totalDescPercent: number; // desconto total aplicado (carrinho + cupom, somados)
   descValor: number;     // subtotal - total
   total: number;         // valor real da compra (com desconto), sem juros de cartão
   valorCobrar: number;   // total + juros do parcelamento (se cartão > PARCELAS_SEM_JUROS)
@@ -122,9 +124,9 @@ export type CalculoPedido = {
 // é a única fonte confiável: o cliente só informa sku + quantidade.
 export function calcularPedidoServidor(
   itensPedido: { sku: string; quantidade: number }[],
-  opts: { cartao: boolean; parcelas: number }
+  opts: { cartao: boolean; parcelas: number; cupomPercent?: number }
 ): CalculoPedido {
-  const vazio: CalculoPedido = { ok: false, itens: [], subtotal: 0, descPercent: 0, descValor: 0, total: 0, valorCobrar: 0 };
+  const vazio: CalculoPedido = { ok: false, itens: [], subtotal: 0, descPercent: 0, cupomPercent: 0, totalDescPercent: 0, descValor: 0, total: 0, valorCobrar: 0 };
 
   if (!Array.isArray(itensPedido) || itensPedido.length === 0) {
     return { ...vazio, erro: 'Pedido sem itens.' };
@@ -153,13 +155,16 @@ export function calcularPedidoServidor(
   // 2) Subtotal (preço de atacado por quantidade) e desconto por valor do carrinho
   const subtotal = linhas.reduce((s, l) => s + l.precoBase * l.quantidade, 0);
   const descPercent = descontoCarrinhoPercent(subtotal);
+  // Cupom SOMA com o desconto por valor do carrinho (decisão do dono). Teto de 90%.
+  const cupomPercent = Math.max(0, Math.min(90, Number(opts.cupomPercent) || 0));
+  const totalDescPercent = Math.min(90, descPercent + cupomPercent);
 
   // 3) Preço unitário final (com desconto aplicado por unidade — igual ao checkout)
   const itens: ItemAutoritativo[] = linhas.map((l) => ({
     sku: l.sku,
     descricao: l.descricao,
     quantidade: l.quantidade,
-    preco_unitario: r2((l.precoBase * (100 - descPercent)) / 100),
+    preco_unitario: r2((l.precoBase * (100 - totalDescPercent)) / 100),
   }));
 
   const total = r2(itens.reduce((s, i) => s + i.preco_unitario * i.quantidade, 0));
@@ -169,5 +174,5 @@ export function calcularPedidoServidor(
   const comJuros = opts.cartao && opts.parcelas > PARCELAS_SEM_JUROS;
   const valorCobrar = comJuros ? r2(total * (1 + JUROS_AO_MES * opts.parcelas)) : total;
 
-  return { ok: true, itens, subtotal, descPercent, descValor, total, valorCobrar };
+  return { ok: true, itens, subtotal, descPercent, cupomPercent, totalDescPercent, descValor, total, valorCobrar };
 }

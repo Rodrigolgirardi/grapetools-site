@@ -25,16 +25,19 @@ export default async function AdminPage() {
   }
 
   const db = createAdminClient();
-  const [pedidosRes, profilesRes, pausados] = await Promise.all([
+  const [pedidosRes, profilesRes, pausados, cuponsRes] = await Promise.all([
     db
-      // "*" em vez de lista fixa: deploy-safe pra coluna `rastreio` (migração 006) —
-      // se ela ainda não existir, o select não quebra (só não vem o campo).
+      // "*" em vez de lista fixa: deploy-safe pra colunas novas (rastreio, cupom…) —
+      // se ainda não existirem, o select não quebra (só não vem o campo).
       .from("pedidos")
       .select("*")
       .order("created_at", { ascending: false })
       .limit(LIMITE_PEDIDOS),
     db.from("profiles").select("id, nome, email, cnpj, telefone, created_at"),
     getPausados(),
+    // Se a migração 007 ainda não rodou, isto retorna { data:null, error } e o
+    // painel simplesmente mostra "nenhum cupom" (não quebra).
+    db.from("cupons").select("*").order("created_at", { ascending: false }),
   ]);
 
   const pedidosRaw = pedidosRes.data || [];
@@ -114,7 +117,37 @@ export default async function AdminPage() {
     pedidosNoCap: pedidosRaw.length >= LIMITE_PEDIDOS,
   };
 
+  // Cupons + relatório de comissão (agrupa pedidos PAGOS por vendedor).
+  const cupons = (cuponsRes.data || []).map((c) => ({
+    id: c.id as string,
+    codigo: c.codigo as string,
+    desconto_percent: Number(c.desconto_percent) || 0,
+    vendedor: (c.vendedor as string) || "",
+    comissao_percent: Number(c.comissao_percent) || 0,
+    ativo: !!c.ativo,
+  }));
+  const comissaoMap = new Map<string, { vendas: number; totalVendido: number; comissao: number }>();
+  for (const p of pedidosRaw) {
+    const vend = (p.vendedor as string) || "";
+    if (!vend || p.pagamento_status !== "pago") continue;
+    const s = comissaoMap.get(vend) || { vendas: 0, totalVendido: 0, comissao: 0 };
+    s.vendas += 1;
+    s.totalVendido += Number(p.total) || 0;
+    s.comissao += Number(p.comissao_valor) || 0;
+    comissaoMap.set(vend, s);
+  }
+  const comissao = [...comissaoMap.entries()]
+    .map(([vendedor, v]) => ({ vendedor, ...v }))
+    .sort((a, b) => b.comissao - a.comissao);
+
   return (
-    <AdminPanel pedidos={pedidos} clientes={clientes} pausadosIniciais={pausados} stats={stats} />
+    <AdminPanel
+      pedidos={pedidos}
+      clientes={clientes}
+      pausadosIniciais={pausados}
+      stats={stats}
+      cupons={cupons}
+      comissao={comissao}
+    />
   );
 }

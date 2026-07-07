@@ -67,6 +67,11 @@ export default function CheckoutPage() {
   const [documento, setDocumento] = useState('')
   const [mostrarErros, setMostrarErros] = useState(false)
   const [mounted, setMounted] = useState(false)
+  // Cupom de desconto
+  const [cupomInput, setCupomInput] = useState('')
+  const [cupomAplicado, setCupomAplicado] = useState<{ codigo: string; desconto_percent: number } | null>(null)
+  const [cupomErro, setCupomErro] = useState<string | null>(null)
+  const [cupomLoading, setCupomLoading] = useState(false)
 
   useEffect(() => { setMounted(true) }, [])
   const [pagamentoResult, setPagamentoResult] = useState<{
@@ -87,7 +92,10 @@ export default function CheckoutPage() {
   const totalQty = lines.reduce((s, l) => s + l.quantity, 0)
   // Desconto por valor total do carrinho (2% a 5%), aplicado no preço unitário
   const descPercent = descontoCarrinhoPercent(subtotal)
-  const precoComDesc = (preco: number) => Math.round(preco * (100 - descPercent)) / 100
+  // Cupom SOMA com o desconto por valor do carrinho (teto 90%) — igual ao servidor.
+  const cupomPercent = cupomAplicado?.desconto_percent || 0
+  const descTotalPercent = Math.min(90, descPercent + cupomPercent)
+  const precoComDesc = (preco: number) => Math.round(preco * (100 - descTotalPercent)) / 100
   const totalComDesc = lines.reduce((s, l) => s + precoComDesc(l.tier.price) * l.quantity, 0)
   const descValor = subtotal - totalComDesc
 
@@ -179,6 +187,38 @@ export default function CheckoutPage() {
     }
   }
 
+  async function aplicarCupom() {
+    const codigo = cupomInput.trim()
+    if (!codigo) return
+    setCupomLoading(true)
+    setCupomErro(null)
+    try {
+      const res = await fetch('/api/cupom/validar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ codigo }),
+      })
+      const data = await res.json().catch(() => ({}))
+      if (data?.valido) {
+        setCupomAplicado({ codigo: data.codigo, desconto_percent: data.desconto_percent })
+        setCupomErro(null)
+      } else {
+        setCupomAplicado(null)
+        setCupomErro('Cupom inválido ou inativo.')
+      }
+    } catch {
+      setCupomErro('Não foi possível validar o cupom agora.')
+    } finally {
+      setCupomLoading(false)
+    }
+  }
+
+  function removerCupom() {
+    setCupomAplicado(null)
+    setCupomInput('')
+    setCupomErro(null)
+  }
+
   async function finalizarPedido() {
     if (!user) return
     setSubmitting(true)
@@ -196,7 +236,7 @@ export default function CheckoutPage() {
         status: 'pendente',
         total: totalComDesc,
         forma_pagamento: formaPagamento,
-        observacao: `Entrega: ${entregaLabel}${descPercent > 0 ? ` | Desconto ${descPercent}%` : ''}${obs ? ' | Obs: ' + obs : ''}`,
+        observacao: `Entrega: ${entregaLabel}${descTotalPercent > 0 ? ` | Desconto ${descTotalPercent}%` : ''}${cupomAplicado ? ` | Cupom ${cupomAplicado.codigo}` : ''}${obs ? ' | Obs: ' + obs : ''}`,
       })
       .select('id')
       .single()
@@ -290,6 +330,7 @@ export default function CheckoutPage() {
           endereco: enderecoEnvio,
           card_token: cardToken,
           parcelas,
+          cupom: cupomAplicado?.codigo || undefined,
         }),
       })
 
@@ -720,9 +761,37 @@ export default function CheckoutPage() {
                 ))}
               </div>
               <div className="checkoutSidebarDivider" />
-              {descPercent > 0 && (
+
+              {/* Cupom de desconto */}
+              <div style={{ margin: '4px 0 10px' }}>
+                {cupomAplicado ? (
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 8, padding: '8px 10px', fontSize: 12.5 }}>
+                    <span>Cupom <strong>{cupomAplicado.codigo}</strong> · {cupomAplicado.desconto_percent}% OFF</span>
+                    <button type="button" onClick={removerCupom} aria-label="Remover cupom" style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#6b7280', fontSize: 14, lineHeight: 1 }}>✕</button>
+                  </div>
+                ) : (
+                  <>
+                    <div style={{ display: 'flex', gap: 8 }}>
+                      <input
+                        type="text"
+                        placeholder="Cupom de desconto"
+                        value={cupomInput}
+                        onChange={(e) => { setCupomInput(e.target.value.toUpperCase()); setCupomErro(null) }}
+                        onKeyDown={(e) => e.key === 'Enter' && aplicarCupom()}
+                        style={{ flex: 1, minWidth: 0, height: 38, border: '1px solid var(--line, #e5e0f0)', borderRadius: 6, padding: '0 10px', fontSize: 13 }}
+                      />
+                      <button type="button" onClick={aplicarCupom} disabled={cupomLoading || !cupomInput.trim()} style={{ height: 38, padding: '0 14px', borderRadius: 6, border: '1px solid var(--line, #e5e0f0)', background: '#f3f4f6', color: '#374151', fontSize: 13, fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap' }}>
+                        {cupomLoading ? '...' : 'Aplicar'}
+                      </button>
+                    </div>
+                    {cupomErro && <span style={{ color: '#dc2626', fontSize: 12, marginTop: 4, display: 'block' }}>{cupomErro}</span>}
+                  </>
+                )}
+              </div>
+
+              {descTotalPercent > 0 && (
                 <div className="checkoutSidebarTotal" style={{ color: '#16a34a', fontWeight: 500 }}>
-                  <span>Desconto ({descPercent}%)</span>
+                  <span>Desconto ({descTotalPercent}%)</span>
                   <strong>− {formatCurrency(descValor)}</strong>
                 </div>
               )}

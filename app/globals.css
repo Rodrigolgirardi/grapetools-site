@@ -53,13 +53,41 @@ h1, h2, h3, h4 { font-family: var(--font-syne), sans-serif; margin: 0; }
   background: #140b1c;
 }
 
+/* Barra de informações no topo (em cima da busca) — deixa o topbar ~35% maior */
+.headerInfoBar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+  min-height: 36px;
+  padding: 6px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 12.5px;
+  color: #d9d2e8;
+}
+.headerInfoItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+.headerInfoItem svg { opacity: 0.8; flex-shrink: 0; }
+.headerInfoLink { color: #fff; font-weight: 600; text-decoration: none; }
+.headerInfoLink:hover { text-decoration: underline; }
+.headerInfoSep { color: rgba(255, 255, 255, 0.22); }
+@media (max-width: 768px) {
+  .headerInfoBar { font-size: 11px; gap: 4px 12px; padding: 6px 10px; }
+  .headerInfoSep { display: none; }
+}
+
 .headerShell {
   display: grid;
   grid-template-columns: auto 1fr auto;
   align-items: center;
   gap: 12px;
   width: min(1400px, calc(100% - 32px));
-  min-height: 104px;
+  min-height: 120px;
   margin: 0 auto;
 }
 
@@ -68,6 +96,18 @@ h1, h2, h3, h4 { font-family: var(--font-syne), sans-serif; margin: 0; }
   height: 100px;
   object-fit: contain;
   flex-shrink: 0;
+}
+/* Logo horizontal (nova) — usada no header. Dimensiona pela altura. */
+.logoImgWide {
+  height: 84px;
+  width: auto;
+  max-width: 320px;
+  object-fit: contain;
+  flex-shrink: 0;
+  display: block;
+}
+@media (max-width: 768px) {
+  .logoImgWide { height: 44px; max-width: 150px; }
 }
 
 /* LOGO */
@@ -2172,10 +2212,10 @@ h1, h2, h3, h4 { font-family: var(--font-syne), sans-serif; margin: 0; }
   width: 100%;
   max-width: 100%;
   margin: 0;
-  border-bottom: 1px solid #e5e7eb;
-  background: #ffffff;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: #140b1c;
   position: sticky;
-  top: 104px;
+  top: 156px;
   z-index: 90;
   display: flex;
   align-items: center;
@@ -2198,9 +2238,9 @@ h1, h2, h3, h4 { font-family: var(--font-syne), sans-serif; margin: 0; }
   border: none;
   border-radius: 0;
   background: transparent;
-  font-size: 13px;
+  font-size: 18px;
   font-weight: 500;
-  color: #1a1a2e;
+  color: #ffffff;
   cursor: pointer;
   white-space: nowrap;
   flex-shrink: 0;
@@ -2212,14 +2252,14 @@ h1, h2, h3, h4 { font-family: var(--font-syne), sans-serif; margin: 0; }
 }
 
 .categoryPill:hover {
-  color: #1e0a3c;
-  background: rgba(91, 33, 182, 0.12);
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.08);
 }
 
 .categoryPill.active {
-  color: #1e0a3c;
+  color: #ffffff;
   font-weight: 700;
-  border-bottom-color: #5b21b6;
+  border-bottom-color: #8b5cf6;
   background: transparent;
 }
 
@@ -2235,13 +2275,13 @@ h1, h2, h3, h4 { font-family: var(--font-syne), sans-serif; margin: 0; }
 }
 
 .catDropdownBtn:hover {
-  background: rgba(91, 33, 182, 0.12) !important;
-  color: #1e0a3c !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: #ffffff !important;
 }
 
 .catDropdownBtn.active {
-  background: rgba(91, 33, 182, 0.12) !important;
-  color: #1e0a3c !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: #ffffff !important;
   border-bottom-color: transparent !important;
 }
 
@@ -2249,9 +2289,11 @@ h1, h2, h3, h4 { font-family: var(--font-syne), sans-serif; margin: 0; }
   display: flex;
   align-items: center;
   flex-shrink: 0;
-  color: var(--purple-700);
+  color: var(--purple-400);
   opacity: 1;
 }
+/* Ícones das categorias acompanham a fonte maior (15px -> 21px, +40%) */
+.categoryPillIcon svg { width: 21px; height: 21px; }
 
 .categoryPill.active .categoryPillIcon,
 .categoryPill:hover .categoryPillIcon {
@@ -2269,21 +2311,21 @@ h1, h2, h3, h4 { font-family: var(--font-syne), sans-serif; margin: 0; }
 .headerActions {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   flex-shrink: 0;
 }
 
 .headerLogin {
   display: inline-flex;
   align-items: center;
-  gap: 7px;
-  padding: 0 16px;
-  height: 42px;
+  gap: 8px;
+  padding: 0 20px;
+  height: 50px;
   border: 1.5px solid rgba(255,255,255,0.25);
   border-radius: var(--r-sm);
   background: transparent;
   color: rgba(255,255,255,0.85);
-  font-size: 13px;
+  font-size: 14.5px;
   font-weight: 600;
   text-decoration: none;
   white-space: nowrap;
@@ -2299,13 +2341,13 @@ h1, h2, h3, h4 { font-family: var(--font-syne), sans-serif; margin: 0; }
 .headerCart {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 0 20px;
-  height: 42px;
+  gap: 9px;
+  padding: 0 24px;
+  height: 50px;
   background: var(--purple-700);
   border-radius: var(--r-sm);
   color: white;
-  font-size: 13px;
+  font-size: 14.5px;
   font-weight: 700;
   text-decoration: none;
   position: relative;
@@ -3951,6 +3993,7 @@ h1, h2, h3, h4 { font-family: var(--font-syne), sans-serif; margin: 0; }
 .grapePill {
   background: transparent;
   border: none;
+  order: 98; /* entre Utilidades e "Minha profissão" (order:99) */
 }
 /* indicador de aba ativa: linha embaixo (sem caixa em volta) */
 .grapePill.active {
@@ -4095,14 +4138,14 @@ h1, h2, h3, h4 { font-family: var(--font-syne), sans-serif; margin: 0; }
 .headerFavBtn {
   display: inline-flex;
   align-items: center;
-  gap: 7px;
-  padding: 0 14px;
-  height: 42px;
+  gap: 8px;
+  padding: 0 18px;
+  height: 50px;
   border: 1.5px solid rgba(255,255,255,0.25);
   border-radius: var(--r-sm);
   background: transparent;
   color: rgba(255,255,255,0.85);
-  font-size: 13px;
+  font-size: 14.5px;
   font-weight: 600;
   cursor: pointer;
   position: relative;

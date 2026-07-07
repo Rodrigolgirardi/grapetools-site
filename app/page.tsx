@@ -391,7 +391,7 @@ export default function HomePage() {
   const [fornecedorAberto, setFornecedorAberto] = useState(true);
   const [outrosAberto, setOutrosAberto] = useState(false);
   const [grapeOnly, setGrapeOnly] = useState(false);
-  const [grapeLogoSrc, setGrapeLogoSrc] = useState("/grape-tools-logo.png");
+  const [grapeLogoSrc, setGrapeLogoSrc] = useState("/logo-h-branca.png");
   const [grapeLogoErro, setGrapeLogoErro] = useState(false);
   const [sort, setSort] = useState<SortOption>("best");
   const [sideOpen, setSideOpen] = useState(false);

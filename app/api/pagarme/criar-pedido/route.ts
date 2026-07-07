@@ -9,6 +9,7 @@ import { documentoValido } from '@/lib/documento'
 import { getEstoqueMap, confirmarPedidoPago } from '@/lib/estoque'
 import { composicaoDoSku } from '@/lib/data'
 import { calcularPedidoServidor } from '@/lib/pricing'
+import { buscarCupomAtivo } from '@/lib/cupom'
 
 const PAGARME_API = 'https://api.pagar.me/core/v5'
 const SECRET_KEY = process.env.PAGARME_SECRET_KEY!
@@ -44,6 +45,7 @@ interface CriarPedidoPayload {
   endereco: EnderecoPayload
   card_token?: string     // token do cartão (gerado no navegador, nunca o cartão cru)
   parcelas?: number       // número de parcelas (cartão de crédito)
+  cupom?: string          // código do cupom (opcional) — validado no servidor
 }
 
 function toAmountCents(reais: number): number {
@@ -89,7 +91,7 @@ export async function POST(request: NextRequest) {
     const body: CriarPedidoPayload = await request.json()
     // Obs.: `total` e `itens[].preco_unitario` do corpo NÃO são confiáveis — o preço
     // é recalculado no servidor (0f). Só usamos sku + quantidade do cliente.
-    const { pedido_id, forma_pagamento, itens, cliente, endereco, card_token, parcelas } = body
+    const { pedido_id, forma_pagamento, itens, cliente, endereco, card_token, parcelas, cupom: cupomCodigo } = body
 
     // 0b) Confere que o pedido existe E pertence a quem está logado
     //     (impede criar cobranças para pedidos de outras pessoas)
@@ -147,24 +149,60 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // 0f-cupom) Se veio um cupom, valida no servidor (o cliente não forja desconto).
+    //     Código inválido/inativo => barra (o cliente viu um desconto que não vale).
+    let cupom = null
+    if (cupomCodigo && String(cupomCodigo).trim()) {
+      cupom = await buscarCupomAtivo(String(cupomCodigo))
+      if (!cupom) {
+        return NextResponse.json(
+          { error: 'Cupom inválido ou expirado. Remova o cupom e tente de novo.' },
+          { status: 400 }
+        )
+      }
+    }
+
     // 0f) FONTE DE VERDADE DO PREÇO: recalcula preço/desconto/juros no servidor a
     //     partir do catálogo, IGNORANDO total/preço enviados pelo cliente
     //     (impede adulteração de preço — pagar R$0,01). O cliente só informa sku+qtd.
+    //     O desconto do cupom SOMA com o desconto por valor do carrinho.
     const calc = calcularPedidoServidor(
       (itens || []).map((i) => ({ sku: i.sku, quantidade: i.quantidade })),
-      { cartao: forma_pagamento === 'cartao', parcelas: parcelas && parcelas > 0 ? parcelas : 1 }
+      {
+        cartao: forma_pagamento === 'cartao',
+        parcelas: parcelas && parcelas > 0 ? parcelas : 1,
+        cupomPercent: cupom?.desconto_percent || 0,
+      }
     )
     if (!calc.ok) {
       return NextResponse.json({ error: calc.erro || 'Itens do pedido inválidos.' }, { status: 400 })
     }
 
+    // Comissão = % do cupom × total que o cliente pagou (decisão do dono). Só há
+    // comissão se o cupom tem vendedor + % > 0. Conta de verdade só quando o pedido
+    // for PAGO (o relatório no /admin filtra por pago).
+    const comissaoValor =
+      cupom && cupom.comissao_percent > 0 && cupom.vendedor
+        ? Math.round(calc.total * cupom.comissao_percent) / 100
+        : 0
+
     // Grava o total + os itens autoritativos ANTES de cobrar (o cliente só criou o
     // pedido; os itens são criados aqui). Se qualquer gravação falhar, ABORTA sem
     // cobrar — fecha o buraco de "pedido órfão" (cobrança de pedido sem itens).
     {
+      // Só inclui os campos de cupom se um cupom foi usado — assim pedidos SEM cupom
+      // não tocam as colunas novas (funciona mesmo se a migração 007 ainda não rodou).
+      const pedidoPatch: Record<string, unknown> = { total: calc.total }
+      if (cupom) {
+        pedidoPatch.cupom_codigo = cupom.codigo
+        pedidoPatch.cupom_desconto_percent = cupom.desconto_percent
+        pedidoPatch.vendedor = cupom.vendedor || null
+        pedidoPatch.comissao_percent = cupom.comissao_percent
+        pedidoPatch.comissao_valor = comissaoValor
+      }
       const { error: errTotal } = await admin
         .from('pedidos')
-        .update({ total: calc.total })
+        .update(pedidoPatch)
         .eq('id', pedido_id)
       const { error: errDel } = await admin
         .from('pedido_itens')

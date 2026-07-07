@@ -1,6 +1,6 @@
 "use client";
 
-import { Heart, Search, ShoppingCart, UserRound, X } from "lucide-react";
+import { CreditCard, Heart, Phone, Search, ShoppingCart, Truck, UserRound, X } from "lucide-react";
 import { useMemo, useRef, useState, useEffect } from "react";
 import { products } from "@/lib/data";
 import { Logo } from "./Logo";
@@ -113,6 +113,16 @@ export function Header({ cartCount, onSearch, onCartOpen }: HeaderProps) {
 
   return (
     <header className="siteHeader">
+      {/* Barra de informações — em cima da busca */}
+      <div className="headerInfoBar">
+        <span className="headerInfoItem"><Truck size={14} /> Frete Grátis acima de R$199 para Grande SP</span>
+        <span className="headerInfoSep" aria-hidden="true">|</span>
+        <span className="headerInfoItem"><CreditCard size={14} /> Parcele em até 12x no cartão</span>
+        <span className="headerInfoSep" aria-hidden="true">|</span>
+        <a className="headerInfoItem headerInfoLink" href="https://wa.me/5511999999999" target="_blank" rel="noopener noreferrer">
+          <Phone size={14} /> Fale com nossos Vendedores (11) 99999-9999
+        </a>
+      </div>
       <div className="headerShell">
         <Logo white />
 
@@ -169,7 +179,13 @@ export function Header({ cartCount, onSearch, onCartOpen }: HeaderProps) {
               </>
             ) : (
               <a href="/login" className="headerLogin">
-                <UserRound size={16} />
+                {/* Ícone de construção (capacete + rostinho) no lugar do bonequinho comum */}
+                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M6 12v-1a6 6 0 0 1 12 0v1" />
+                  <path d="M6 12h12" />
+                  <path d="M9.2 12v1a2.8 2.8 0 0 0 5.6 0v-1" />
+                  <path d="M18 21a6 6 0 0 0-12 0" />
+                </svg>
                 <span>Entrar</span>
               </a>
             )}
@@ -183,7 +199,7 @@ export function Header({ cartCount, onSearch, onCartOpen }: HeaderProps) {
               onClick={() => { positionFavDropdown(); setFavOpen(!favOpen); }}
               aria-label="Favoritos"
             >
-              <Heart size={16} />
+              <Heart size={19} />
               <span>Favoritos</span>
               {favIds.length > 0 && <span className="headerCartBadge">{favIds.length}</span>}
             </button>
