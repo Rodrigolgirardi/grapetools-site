@@ -50,7 +50,7 @@ h1, h2, h3, h4 { font-family: var(--font-syne), sans-serif; margin: 0; }
   top: 0;
   z-index: 100;
   border-bottom: none;
-  background: #1e0a3c;
+  background: #140b1c;
 }
 
 .headerShell {
@@ -131,13 +131,13 @@ h1, h2, h3, h4 { font-family: var(--font-syne), sans-serif; margin: 0; }
   gap: 8px;
   height: 38px;
   padding: 0 12px;
-  border: 1px solid var(--line);
+  border: 1px solid #140b1c;
   border-radius: var(--r-sm);
   background: var(--white);
   transition: border-color 0.15s;
 }
 
-.searchBox:focus-within { border-color: var(--purple-400); }
+.searchBox:focus-within { border-color: #140b1c; }
 
 .searchBox input {
   width: 100%;
@@ -681,7 +681,7 @@ h1, h2, h3, h4 { font-family: var(--font-syne), sans-serif; margin: 0; }
   cursor: pointer;
   font: inherit;
   text-transform: uppercase;
-  color: var(--purple-600);
+  color: var(--muted);
 }
 .detailVoltar:hover {
   text-decoration: underline;
@@ -748,7 +748,7 @@ h1, h2, h3, h4 { font-family: var(--font-syne), sans-serif; margin: 0; }
   min-height: 120px;
   place-items: center;
   overflow: hidden;
-  background: linear-gradient(145deg, var(--purple-50), var(--white));
+  background: linear-gradient(145deg, #f3f4f6, #ffffff);
   border-radius: 16px 16px 0 0;
 }
 
@@ -1734,7 +1734,7 @@ h1, h2, h3, h4 { font-family: var(--font-syne), sans-serif; margin: 0; }
 }
 
 .simTitleAccent {
-  color: var(--purple-700, #5b21b6);
+  color: #1a1a2e;
 }
 
 .simNavRow {
@@ -1800,7 +1800,7 @@ h1, h2, h3, h4 { font-family: var(--font-syne), sans-serif; margin: 0; }
 .simCardImg {
   position: relative;
   aspect-ratio: 1/1;
-  background: #f5f3ff;
+  background: #f3f4f6;
   overflow: hidden;
 }
 
@@ -2200,7 +2200,7 @@ h1, h2, h3, h4 { font-family: var(--font-syne), sans-serif; margin: 0; }
   background: transparent;
   font-size: 13px;
   font-weight: 500;
-  color: #3b1f7a;
+  color: #1a1a2e;
   cursor: pointer;
   white-space: nowrap;
   flex-shrink: 0;
@@ -2249,7 +2249,8 @@ h1, h2, h3, h4 { font-family: var(--font-syne), sans-serif; margin: 0; }
   display: flex;
   align-items: center;
   flex-shrink: 0;
-  opacity: 0.6;
+  color: var(--purple-700);
+  opacity: 1;
 }
 
 .categoryPill.active .categoryPillIcon,
@@ -3197,6 +3198,94 @@ h1, h2, h3, h4 { font-family: var(--font-syne), sans-serif; margin: 0; }
   color: var(--muted);
 }
 
+/* ── Tabela de faixas (estilo Alibaba) + preço real da quantidade escolhida ── */
+.tierLadder {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line);
+}
+.tierLadderTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.tierLadderTitle {
+  font-size: 11px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 700;
+}
+.tierLadderGrid {
+  display: grid;
+  gap: 5px;
+}
+.tierCell {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  padding: 7px 6px;
+  background: #f3f4f6;
+  border: 1.5px solid transparent;
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
+}
+.tierCell:hover { border-color: var(--purple-400); }
+.tierCellActive,
+.tierCellActive:hover {
+  background: #f3f4f6;
+  border-color: var(--purple-600);
+  box-shadow: 0 0 0 1px var(--purple-600) inset;
+}
+.tierCellRange {
+  font-size: 10px;
+  line-height: 1.2;
+  font-weight: 600;
+  color: var(--muted);
+}
+.tierCellPrice {
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: #161616;
+  font-family: var(--font-dm-sans), sans-serif;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  white-space: nowrap;
+}
+/* preço vira roxo só na faixa que corresponde à quantidade escolhida */
+.tierCellActive .tierCellPrice { color: var(--purple-700); }
+
+.detailNowPrice {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 9px 14px;
+  background: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  border-radius: var(--r);
+}
+.detailNowLabel {
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 600;
+}
+.detailNowTotal {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--purple-700);
+  font-family: var(--font-dm-sans), sans-serif;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
 .detailQtyRow {
   display: flex;
   flex-direction: column;
@@ -3313,17 +3402,17 @@ h1, h2, h3, h4 { font-family: var(--font-syne), sans-serif; margin: 0; }
   width: 100%;
   height: 48px;
   box-sizing: border-box;
-  background: var(--purple-100);
+  background: var(--white);
   color: var(--purple-700);
-  border: 1.5px solid var(--purple-400);
+  border: 1.5px solid var(--line);
   border-radius: var(--r);
   font-size: 14px;
   font-weight: 700;
   cursor: pointer;
-  transition: background 0.15s;
+  transition: background 0.15s, border-color 0.15s;
 }
 
-.detailBtnSecondary:hover { background: #ddd6fe; }
+.detailBtnSecondary:hover { background: #f3f4f6; border-color: #d1d5db; }
 
 .detailTrustRow {
   display: flex;
@@ -3781,7 +3870,7 @@ h1, h2, h3, h4 { font-family: var(--font-syne), sans-serif; margin: 0; }
 .cardBest {
   display: block;
   font-size: 11.5px;
-  color: var(--purple-600);
+  color: var(--muted);
   font-weight: 600;
 }
 
@@ -3901,7 +3990,7 @@ h1, h2, h3, h4 { font-family: var(--font-syne), sans-serif; margin: 0; }
 }
 
 .productDetailDesc strong {
-  color: var(--purple-700);
+  color: var(--ink);
   font-weight: 600;
 }
 
@@ -3955,7 +4044,7 @@ h1, h2, h3, h4 { font-family: var(--font-syne), sans-serif; margin: 0; }
 }
 
 .detailGuaranteeLink {
-  color: var(--purple-700);
+  color: var(--ink);
   font-weight: 700;
   text-decoration: none;
 }
@@ -4523,7 +4612,7 @@ h1, h2, h3, h4 { font-family: var(--font-syne), sans-serif; margin: 0; }
   border: 1px solid var(--line);
   border-radius: var(--r);
   overflow: hidden;
-  background: linear-gradient(145deg, var(--purple-50), var(--white));
+  background: linear-gradient(145deg, #f3f4f6, #ffffff);
   aspect-ratio: 1 / 1;
 }
 
@@ -5012,7 +5101,7 @@ h1, h2, h3, h4 { font-family: var(--font-syne), sans-serif; margin: 0; }
   align-items: center;
   justify-content: center;
   gap: 8px;
-  background: linear-gradient(145deg, var(--purple-100, #ede9fe), var(--purple-50, #f5f3ff));
+  background: linear-gradient(145deg, #f3f4f6, #ffffff);
   padding: 16px;
   text-align: center;
 }
@@ -5131,7 +5220,7 @@ h1, h2, h3, h4 { font-family: var(--font-syne), sans-serif; margin: 0; }
   color: #1a1a2e;
 }
 
-.freteCalcTitle svg { color: var(--purple-700, #5b21b6); flex-shrink: 0; }
+.freteCalcTitle svg { color: var(--muted); flex-shrink: 0; }
 
 .freteCalcRow {
   display: flex;
@@ -5155,8 +5244,8 @@ h1, h2, h3, h4 { font-family: var(--font-syne), sans-serif; margin: 0; }
   padding: 9px 18px;
   border: none;
   border-radius: var(--r-sm, 8px);
-  background: var(--purple-100, #ede9fe);
-  color: var(--purple-700, #5b21b6);
+  background: #f3f4f6;
+  color: #374151;
   font-size: 13px;
   font-weight: 700;
   cursor: pointer;
@@ -5164,12 +5253,12 @@ h1, h2, h3, h4 { font-family: var(--font-syne), sans-serif; margin: 0; }
   transition: background 0.15s;
 }
 
-.freteCalcBtn:hover { background: #ddd2f7; }
+.freteCalcBtn:hover { background: #e5e7eb; }
 .freteCalcBtn:disabled { opacity: 0.6; cursor: wait; }
 
 .freteCalcLink {
   font-size: 11.5px;
-  color: var(--purple-700, #5b21b6);
+  color: var(--muted);
   text-decoration: underline;
   width: fit-content;
 }
@@ -5246,7 +5335,7 @@ h1, h2, h3, h4 { font-family: var(--font-syne), sans-serif; margin: 0; }
 ════════════════════════════ */
 .backToSiteBar {
   width: 100%;
-  background: #1E0A3C;
+  background: #140b1c;
   padding: 0;
 }
 

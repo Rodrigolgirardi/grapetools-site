@@ -84,7 +84,7 @@ export function getMaxDiscount(tiers: Tier[]): number {
 export function getTierRangeLabel(tiers: Tier[], index: number): string {
   const current = tiers[index];
   const next = tiers[index + 1];
-  return next ? `${current.minQty}–${next.minQty - 1} un.` : `${current.minQty}+ un.`;
+  return next ? `${current.minQty}–${next.minQty - 1} Peças` : `${current.minQty}+ Peças`;
 }
 
 // ---- Cálculo AUTORITATIVO de pedido (fonte de verdade no servidor) ----

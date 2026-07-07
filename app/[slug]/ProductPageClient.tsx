@@ -12,7 +12,7 @@ import { products } from "@/lib/data";
 import { useCart } from "@/hooks/useCart";
 import { useEstoque } from "@/hooks/useEstoque";
 import { kitDisponivel } from "@/lib/kit";
-import { formatCurrency } from "@/lib/pricing";
+import { formatCurrency, getTierForQuantity, getTierRangeLabel } from "@/lib/pricing";
 import { productJsonLd } from "@/lib/seo";
 import { FreteCalc } from "@/components/FreteCalc";
 
@@ -21,11 +21,11 @@ function calcInstallment(price: number, n: number): number {
   return (price * (1 + 0.02 * n)) / n;
 }
 
-function PaymentBlock({ basePrice }: { basePrice: number }) {
+function PaymentBlock({ total }: { total: number }) {
   const [open, setOpen] = useState(false);
   const installments = Array.from({ length: 12 }, (_, i) => {
     const n = i + 1;
-    const monthly = calcInstallment(basePrice, n);
+    const monthly = calcInstallment(total, n);
     return { n, monthly, total: monthly * n, hasInterest: n > 3 };
   });
 
@@ -34,7 +34,7 @@ function PaymentBlock({ basePrice }: { basePrice: number }) {
       <div className="pixRow">
         <Smartphone size={16} style={{ color: "#16a34a", flexShrink: 0 }} />
         <span className="pixLabel">Pix</span>
-        <strong className="pixPrice">{formatCurrency(basePrice)}</strong>
+        <strong className="pixPrice">{formatCurrency(total)}</strong>
         <span className="pixNote">à vista</span>
       </div>
       <div className="paymentDivider" />
@@ -43,7 +43,7 @@ function PaymentBlock({ basePrice }: { basePrice: number }) {
           <CreditCard size={16} style={{ color: "var(--muted)", flexShrink: 0 }} />
           <div>
             <span className="cardLabel">Cartão de crédito</span>
-            <span className="cardBest">em até 3x de {formatCurrency(basePrice / 3)} sem juros</span>
+            <span className="cardBest">em até 3x de {formatCurrency(total / 3)} sem juros</span>
           </div>
         </div>
         {open ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
@@ -113,7 +113,12 @@ export default function ProductPageClient({ slug }: { slug: string }) {
   const [qty, setQty] = useState(1);
   const [isFav, setIsFav] = useState(false);
   const variation = product.variations[selectedIdx];
-  const basePrice = variation.tiers[0].price;
+  // Faixa que corresponde à quantidade escolhida = preço REAL que o cliente paga.
+  const tiers = variation.tiers;
+  const activeTier = getTierForQuantity(tiers, qty);
+  const activeIdx = tiers.indexOf(activeTier);
+  const unitPrice = activeTier.price;
+  const orderTotal = unitPrice * qty;
   const rating = getRating(product.prefix);
   const estoque = useEstoque();
   const qtdEstoque = variation.composicao
@@ -205,7 +210,7 @@ export default function ProductPageClient({ slug }: { slug: string }) {
               </div>
             )}
 
-            <PaymentBlock basePrice={basePrice} />
+            <PaymentBlock total={orderTotal} />
 
             <div className="fichaAccordion">
               <button className="fichaAccordionBtn" onClick={() => setFichaOpen(!fichaOpen)}>
@@ -226,10 +231,11 @@ export default function ProductPageClient({ slug }: { slug: string }) {
 
           {/* COL 3 — CTA */}
           <aside className="detailBuy">
-            <div className="detailPrice">
-              <span className="detailPriceFrom">A partir de</span>
-              <div className="detailPriceRow">
-                <strong className="detailPriceValue">{formatCurrency(variation.tiers[variation.tiers.length - 1].price)}</strong>
+            {/* Tabela de faixas (estilo Alibaba): mostra TODAS as quantidades e
+                destaca em roxo a faixa da quantidade escolhida. Clicar ajusta a qtd. */}
+            <div className="tierLadder">
+              <div className="tierLadderTop">
+                <span className="tierLadderTitle">Preço por quantidade</span>
                 <button
                   className={`detailFavBtn ${isFav ? "active" : ""}`}
                   onClick={toggleFav}
@@ -241,7 +247,23 @@ export default function ProductPageClient({ slug }: { slug: string }) {
                   </svg>
                 </button>
               </div>
-              <span className="detailPriceNote">em 500+ unidades</span>
+              <div
+                className="tierLadderGrid"
+                style={{ gridTemplateColumns: `repeat(${tiers.length}, minmax(0, 1fr))` }}
+              >
+                {tiers.map((t, i) => (
+                  <button
+                    type="button"
+                    key={t.minQty}
+                    className={`tierCell ${i === activeIdx ? "tierCellActive" : ""}`}
+                    onClick={() => setQty(t.minQty)}
+                    title={`Definir a quantidade para ${t.minQty} peças`}
+                  >
+                    <span className="tierCellRange">{getTierRangeLabel(tiers, i)}</span>
+                    <span className="tierCellPrice">{formatCurrency(t.price)}</span>
+                  </button>
+                ))}
+              </div>
             </div>
 
             <div className="detailQtyRow">
@@ -256,6 +278,13 @@ export default function ProductPageClient({ slug }: { slug: string }) {
                 />
                 <button onClick={() => setQty(q => q + 1)}>+</button>
               </div>
+            </div>
+
+            {/* Total REAL da quantidade escolhida — uma linha só, sem repetir o
+                preço por unidade (que já está destacado na tabela de faixas acima). */}
+            <div className="detailNowPrice">
+              <span className="detailNowLabel">Total · {qty} {qty === 1 ? "peça" : "peças"}</span>
+              <strong className="detailNowTotal">{formatCurrency(orderTotal)}</strong>
             </div>
 
             {esgotado ? (
@@ -285,7 +314,7 @@ export default function ProductPageClient({ slug }: { slug: string }) {
               </div>
             </div>
 
-            <FreteCalc subtotal={variation.tiers[variation.tiers.length - 1].price * qty} />
+            <FreteCalc subtotal={orderTotal} />
           </aside>
         </section>
 

@@ -114,7 +114,7 @@ export function Header({ cartCount, onSearch, onCartOpen }: HeaderProps) {
   return (
     <header className="siteHeader">
       <div className="headerShell">
-        <Logo />
+        <Logo white />
 
         <div className="searchBox">
           <Search size={18} style={{ color: "var(--muted)", flexShrink: 0 }} />

@@ -57,23 +57,23 @@ export const products: Product[] = [
     supplier:"Grape Tools",
     keywords:["conector duplo curto","emendas","grape tools","transparente"],
     variations:[
-      {sku:"CH.CONEC.DUP.TS",label:"Transparente",tiers:[{minQty:10,label:"10",price:1.12}, {minQty:50,label:"50",price:1.01}, {minQty:100,label:"100",price:0.92}, {minQty:500,label:"500",price:0.81}],weight:"3g",ncm:"85369090"}
+      {sku:"CH.CONEC.DUP.TS",label:"Transparente",tiers:[{minQty:1,label:"1",price:1.39}, {minQty:30,label:"30",price:1.19}, {minQty:100,label:"100",price:1.09}, {minQty:300,label:"300",price:0.99}],weight:"3g",ncm:"85369090"}
     ],
     stock:999,sold:0,isPromotion:false,isLaunch:false,
   },
   {
     prefix:"CH.CONEC.LONG",
     slug:"ch-conec-long",
-    name:"Conector Duplo Longo | Grape Tools",
-    description:"Conector Duplo Longo · Emendas · Grape Tools",
+    name:"Conector Duplo Longo | Até 4mm | Grape Tools",
+    description:"Conector Duplo Longo · Até 4mm · Emendas · Grape Tools",
     category:"Elétrica",
     subcategory:"Conectores",
     brand:"Grape Tools",
     supplier:"Grape Tools",
-    keywords:["conector duplo longo","emendas","grape tools","transparente","cinza"],
+    keywords:["conector duplo longo","até 4mm","4mm","emendas","grape tools","transparente","cinza"],
     variations:[
-      {sku:"CH.CONEC.LONG.TS",label:"Transparente",tiers:[{minQty:10,label:"10",price:1.65}, {minQty:50,label:"50",price:1.48}, {minQty:100,label:"100",price:1.35}, {minQty:500,label:"500",price:1.19}],weight:"A consultar",ncm:"85369090"},
-      {sku:"CH.CONEC.DUP.CZ",label:"Cinza",tiers:[{minQty:10,label:"10",price:1.93}, {minQty:50,label:"50",price:1.74}, {minQty:100,label:"100",price:1.58}, {minQty:500,label:"500",price:1.39}],weight:"7g",ncm:"85369090"}
+      {sku:"CH.CONEC.LONG.TS",label:"Transparente",tiers:[{minQty:1,label:"1",price:2.29}, {minQty:30,label:"30",price:1.99}, {minQty:100,label:"100",price:1.59}, {minQty:300,label:"300",price:1.39}],weight:"A consultar",ncm:"85369090"},
+      {sku:"CH.CONEC.DUP.CZ",label:"Cinza",tiers:[{minQty:1,label:"1",price:2.29}, {minQty:30,label:"30",price:1.99}, {minQty:100,label:"100",price:1.59}, {minQty:300,label:"300",price:1.39}],weight:"7g",ncm:"85369090"}
     ],
     stock:999,sold:0,isPromotion:false,isLaunch:false,
   },
@@ -88,18 +88,18 @@ export const products: Product[] = [
     supplier:"Grape Tools",
     keywords:["disco de lixa","pluma","branco","grape tools","grão 40","grão 60","grão 80","grão 100","grão 120","grão 600"],
     variations:[
-      {sku:"CH.DISC.125.BR.40",label:"Branco · Grão 40",tiers:[{minQty:10,label:"10",price:1.09}, {minQty:50,label:"50",price:0.98}, {minQty:100,label:"100",price:0.89}, {minQty:500,label:"500",price:0.78}],weight:"8g",ncm:"68053090"},
-      {sku:"CH.DISC.125.BR.60",label:"Branco · Grão 60",tiers:[{minQty:10,label:"10",price:1.09}, {minQty:50,label:"50",price:0.98}, {minQty:100,label:"100",price:0.89}, {minQty:500,label:"500",price:0.78}],weight:"8.00g",ncm:"68053090"},
-      {sku:"CH.DISC.125.BR.80",label:"Branco · Grão 80",tiers:[{minQty:10,label:"10",price:1.09}, {minQty:50,label:"50",price:0.98}, {minQty:100,label:"100",price:0.89}, {minQty:500,label:"500",price:0.78}],weight:"8.00g",ncm:"68053090"},
-      {sku:"CH.DISC.125.BR.100",label:"Branco · Grão 100",tiers:[{minQty:10,label:"10",price:1.04}, {minQty:50,label:"50",price:0.94}, {minQty:100,label:"100",price:0.85}, {minQty:500,label:"500",price:0.75}],weight:"8.00g",ncm:"68053090"},
-      {sku:"CH.DISC.125.BR.120",label:"Branco · Grão 120",tiers:[{minQty:10,label:"10",price:1.04}, {minQty:50,label:"50",price:0.94}, {minQty:100,label:"100",price:0.85}, {minQty:500,label:"500",price:0.75}],weight:"8.00g",ncm:"68053090"},
-      {sku:"CH.DISC.125.BR.600",label:"Branco · Grão 600",tiers:[{minQty:10,label:"10",price:1.04}, {minQty:50,label:"50",price:0.94}, {minQty:100,label:"100",price:0.85}, {minQty:500,label:"500",price:0.75}],weight:"8.00g",ncm:"68053090"},
-      {sku:"CH.DISC.125.BR.1000",label:"Branco · Grão 1000",tiers:[{minQty:10,label:"10",price:1.04}, {minQty:50,label:"50",price:0.94}, {minQty:100,label:"100",price:0.85}, {minQty:500,label:"500",price:0.75}],weight:"8.00g",ncm:"85444200"},
-      {sku:"CH.DISC.125.BR.400",label:"Branco · Grão 400",tiers:[{minQty:10,label:"10",price:1.04}, {minQty:50,label:"50",price:0.94}, {minQty:100,label:"100",price:0.85}, {minQty:500,label:"500",price:0.75}],weight:"8g",ncm:"68053090"},
-      {sku:"CH.DISC.125.BR.150",label:"Branco · Grão 150",tiers:[{minQty:10,label:"10",price:1.04}, {minQty:50,label:"50",price:0.94}, {minQty:100,label:"100",price:0.85}, {minQty:500,label:"500",price:0.75}],weight:"8.00g",ncm:"68053090"},
-      {sku:"CH.DISC.125.BR.180",label:"Branco · Grão 180",tiers:[{minQty:10,label:"10",price:1.04}, {minQty:50,label:"50",price:0.94}, {minQty:100,label:"100",price:0.85}, {minQty:500,label:"500",price:0.75}],weight:"8.00g",ncm:"68053090"},
-      {sku:"CH.DISC.125.BR.240",label:"Branco · Grão 240",tiers:[{minQty:10,label:"10",price:1.04}, {minQty:50,label:"50",price:0.94}, {minQty:100,label:"100",price:0.85}, {minQty:500,label:"500",price:0.75}],weight:"8.00g",ncm:"85444200"},
-      {sku:"CH.DISC.125.BR.320",label:"Branco · Grão 320",tiers:[{minQty:10,label:"10",price:1.04}, {minQty:50,label:"50",price:0.94}, {minQty:100,label:"100",price:0.85}, {minQty:500,label:"500",price:0.75}],weight:"8.00g",ncm:"68053090"}
+      {sku:"CH.DISC.125.BR.40",label:"Branco · Grão 40",tiers:[{minQty:1,label:"1",price:1.59}, {minQty:30,label:"30",price:1.29}, {minQty:100,label:"100",price:0.99}, {minQty:500,label:"500",price:0.89}],weight:"8g",ncm:"68053090"},
+      {sku:"CH.DISC.125.BR.60",label:"Branco · Grão 60",tiers:[{minQty:1,label:"1",price:1.59}, {minQty:30,label:"30",price:1.29}, {minQty:100,label:"100",price:0.99}, {minQty:500,label:"500",price:0.89}],weight:"8.00g",ncm:"68053090"},
+      {sku:"CH.DISC.125.BR.80",label:"Branco · Grão 80",tiers:[{minQty:1,label:"1",price:1.59}, {minQty:30,label:"30",price:1.29}, {minQty:100,label:"100",price:0.99}, {minQty:500,label:"500",price:0.89}],weight:"8.00g",ncm:"68053090"},
+      {sku:"CH.DISC.125.BR.100",label:"Branco · Grão 100",tiers:[{minQty:1,label:"1",price:1.59}, {minQty:30,label:"30",price:1.29}, {minQty:100,label:"100",price:0.99}, {minQty:500,label:"500",price:0.89}],weight:"8.00g",ncm:"68053090"},
+      {sku:"CH.DISC.125.BR.120",label:"Branco · Grão 120",tiers:[{minQty:1,label:"1",price:1.59}, {minQty:30,label:"30",price:1.29}, {minQty:100,label:"100",price:0.99}, {minQty:500,label:"500",price:0.89}],weight:"8.00g",ncm:"68053090"},
+      {sku:"CH.DISC.125.BR.600",label:"Branco · Grão 600",tiers:[{minQty:1,label:"1",price:1.59}, {minQty:30,label:"30",price:1.29}, {minQty:100,label:"100",price:0.99}, {minQty:500,label:"500",price:0.89}],weight:"8.00g",ncm:"68053090"},
+      {sku:"CH.DISC.125.BR.1000",label:"Branco · Grão 1000",tiers:[{minQty:1,label:"1",price:1.59}, {minQty:30,label:"30",price:1.29}, {minQty:100,label:"100",price:0.99}, {minQty:500,label:"500",price:0.89}],weight:"8.00g",ncm:"85444200"},
+      {sku:"CH.DISC.125.BR.400",label:"Branco · Grão 400",tiers:[{minQty:1,label:"1",price:1.59}, {minQty:30,label:"30",price:1.29}, {minQty:100,label:"100",price:0.99}, {minQty:500,label:"500",price:0.89}],weight:"8g",ncm:"68053090"},
+      {sku:"CH.DISC.125.BR.150",label:"Branco · Grão 150",tiers:[{minQty:1,label:"1",price:1.59}, {minQty:30,label:"30",price:1.29}, {minQty:100,label:"100",price:0.99}, {minQty:500,label:"500",price:0.89}],weight:"8.00g",ncm:"68053090"},
+      {sku:"CH.DISC.125.BR.180",label:"Branco · Grão 180",tiers:[{minQty:1,label:"1",price:1.59}, {minQty:30,label:"30",price:1.29}, {minQty:100,label:"100",price:0.99}, {minQty:500,label:"500",price:0.89}],weight:"8.00g",ncm:"68053090"},
+      {sku:"CH.DISC.125.BR.240",label:"Branco · Grão 240",tiers:[{minQty:1,label:"1",price:1.59}, {minQty:30,label:"30",price:1.29}, {minQty:100,label:"100",price:0.99}, {minQty:500,label:"500",price:0.89}],weight:"8.00g",ncm:"85444200"},
+      {sku:"CH.DISC.125.BR.320",label:"Branco · Grão 320",tiers:[{minQty:1,label:"1",price:1.59}, {minQty:30,label:"30",price:1.29}, {minQty:100,label:"100",price:0.99}, {minQty:500,label:"500",price:0.89}],weight:"8.00g",ncm:"68053090"}
     ],
     stock:999,sold:0,isPromotion:false,isLaunch:false,
     descricaoLonga:`Resumo rápido dos grãos de lixa para disco pluma:
@@ -122,24 +122,24 @@ Regra simples: quanto menor o número do grão, mais agressiva é a lixa; quanto
   {
     prefix:"CH.DISC.LIX.125",
     slug:"ch-disc-lix-125",
-    name:"Disco de Lixa Com Furos | Grape Tools",
-    description:"Disco de Lixa Com Furos Grape Tools · 125mm · Grão 150",
+    name:"Disco de Lixa Velcro Vermelho | 125mm | Grape Tools",
+    description:"Disco de Lixa Velcro Vermelho · 125mm · Com Furos · Grape Tools",
     category:"Abrasivos",
     subcategory:"Discos com Furos",
     brand:"Grape Tools",
     supplier:"Grape Tools",
-    keywords:["disco de lixa com furos grape tools","125mm","grão 150","grão 180","grão 40","grão 120","grão 400","grão 60","grão 80","grão 100"],
+    keywords:["disco de lixa velcro vermelho","disco de lixa com furos","velcro","vermelho","125mm","grão 150","grão 180","grão 40","grão 120","grão 400","grão 60","grão 80","grão 100"],
     variations:[
-      {sku:"CH.DISC.LIX.125.150",label:"125mm · Grão 150",tiers:[{minQty:10,label:"10",price:0.7}, {minQty:50,label:"50",price:0.63}, {minQty:100,label:"100",price:0.57}, {minQty:500,label:"500",price:0.5}],weight:"6.00g",ncm:"68053090"},
-      {sku:"CH.DISC.LIX.125.180",label:"125mm · Grão 180",tiers:[{minQty:10,label:"10",price:0.7}, {minQty:50,label:"50",price:0.63}, {minQty:100,label:"100",price:0.57}, {minQty:500,label:"500",price:0.5}],weight:"6.00g",ncm:"68053090"},
-      {sku:"CH.DISC.LIX.125.40",label:"125mm · Grão 40",tiers:[{minQty:10,label:"10",price:0.76}, {minQty:50,label:"50",price:0.68}, {minQty:100,label:"100",price:0.62}, {minQty:500,label:"500",price:0.55}],weight:"6.00g",ncm:"68053090"},
-      {sku:"CH.DISC.LIX.125.120",label:"125mm · Grão 120",tiers:[{minQty:10,label:"10",price:0.73}, {minQty:50,label:"50",price:0.66}, {minQty:100,label:"100",price:0.6}, {minQty:500,label:"500",price:0.53}],weight:"6.00g",ncm:"68053090"},
-      {sku:"CH.DISC.LIX.125.400",label:"125mm · Grão 400",tiers:[{minQty:10,label:"10",price:0.64}, {minQty:50,label:"50",price:0.58}, {minQty:100,label:"100",price:0.52}, {minQty:500,label:"500",price:0.46}],weight:"6.00g",ncm:"68053090"},
-      {sku:"CH.DISC.LIX.125.60",label:"125mm · Grão 60",tiers:[{minQty:10,label:"10",price:0.76}, {minQty:50,label:"50",price:0.68}, {minQty:100,label:"100",price:0.62}, {minQty:500,label:"500",price:0.55}],weight:"6.00g",ncm:"68053090"},
-      {sku:"CH.DISC.LIX.125.80",label:"125mm · Grão 80",tiers:[{minQty:10,label:"10",price:0.76}, {minQty:50,label:"50",price:0.68}, {minQty:100,label:"100",price:0.62}, {minQty:500,label:"500",price:0.55}],weight:"6.00g",ncm:"68053090"},
-      {sku:"CH.DISC.LIX.125.100",label:"125mm · Grão 100",tiers:[{minQty:10,label:"10",price:0.73}, {minQty:50,label:"50",price:0.66}, {minQty:100,label:"100",price:0.6}, {minQty:500,label:"500",price:0.53}],weight:"6.00g",ncm:"68053090"},
-      {sku:"CH.DISC.LIX.125.240",label:"125mm · Grão 240",tiers:[{minQty:10,label:"10",price:0.7}, {minQty:50,label:"50",price:0.63}, {minQty:100,label:"100",price:0.57}, {minQty:500,label:"500",price:0.5}],weight:"6.00g",ncm:"68053090"},
-      {sku:"CH.DISC.LIX.125.320",label:"125mm · Grão 320",tiers:[{minQty:10,label:"10",price:0.64}, {minQty:50,label:"50",price:0.58}, {minQty:100,label:"100",price:0.52}, {minQty:500,label:"500",price:0.46}],weight:"6.00g",ncm:"68053090"}
+      {sku:"CH.DISC.LIX.125.150",label:"125mm · Grão 150",tiers:[{minQty:1,label:"1",price:1.39}, {minQty:30,label:"30",price:1.09}, {minQty:100,label:"100",price:0.99}, {minQty:500,label:"500",price:0.79}],weight:"6.00g",ncm:"68053090"},
+      {sku:"CH.DISC.LIX.125.180",label:"125mm · Grão 180",tiers:[{minQty:1,label:"1",price:1.39}, {minQty:30,label:"30",price:1.09}, {minQty:100,label:"100",price:0.99}, {minQty:500,label:"500",price:0.79}],weight:"6.00g",ncm:"68053090"},
+      {sku:"CH.DISC.LIX.125.40",label:"125mm · Grão 40",tiers:[{minQty:1,label:"1",price:1.39}, {minQty:30,label:"30",price:1.09}, {minQty:100,label:"100",price:0.99}, {minQty:500,label:"500",price:0.79}],weight:"6.00g",ncm:"68053090"},
+      {sku:"CH.DISC.LIX.125.120",label:"125mm · Grão 120",tiers:[{minQty:1,label:"1",price:1.39}, {minQty:30,label:"30",price:1.09}, {minQty:100,label:"100",price:0.99}, {minQty:500,label:"500",price:0.79}],weight:"6.00g",ncm:"68053090"},
+      {sku:"CH.DISC.LIX.125.400",label:"125mm · Grão 400",tiers:[{minQty:1,label:"1",price:1.39}, {minQty:30,label:"30",price:1.09}, {minQty:100,label:"100",price:0.99}, {minQty:500,label:"500",price:0.79}],weight:"6.00g",ncm:"68053090"},
+      {sku:"CH.DISC.LIX.125.60",label:"125mm · Grão 60",tiers:[{minQty:1,label:"1",price:1.39}, {minQty:30,label:"30",price:1.09}, {minQty:100,label:"100",price:0.99}, {minQty:500,label:"500",price:0.79}],weight:"6.00g",ncm:"68053090"},
+      {sku:"CH.DISC.LIX.125.80",label:"125mm · Grão 80",tiers:[{minQty:1,label:"1",price:1.39}, {minQty:30,label:"30",price:1.09}, {minQty:100,label:"100",price:0.99}, {minQty:500,label:"500",price:0.79}],weight:"6.00g",ncm:"68053090"},
+      {sku:"CH.DISC.LIX.125.100",label:"125mm · Grão 100",tiers:[{minQty:1,label:"1",price:1.39}, {minQty:30,label:"30",price:1.09}, {minQty:100,label:"100",price:0.99}, {minQty:500,label:"500",price:0.79}],weight:"6.00g",ncm:"68053090"},
+      {sku:"CH.DISC.LIX.125.240",label:"125mm · Grão 240",tiers:[{minQty:1,label:"1",price:1.39}, {minQty:30,label:"30",price:1.09}, {minQty:100,label:"100",price:0.99}, {minQty:500,label:"500",price:0.79}],weight:"6.00g",ncm:"68053090"},
+      {sku:"CH.DISC.LIX.125.320",label:"125mm · Grão 320",tiers:[{minQty:1,label:"1",price:1.39}, {minQty:30,label:"30",price:1.09}, {minQty:100,label:"100",price:0.99}, {minQty:500,label:"500",price:0.79}],weight:"6.00g",ncm:"68053090"}
     ],
     stock:999,sold:0,isPromotion:false,isLaunch:false,
   },
@@ -154,8 +154,8 @@ Regra simples: quanto menor o número do grão, mais agressiva é a lixa; quanto
     supplier:"Grape Tools",
     keywords:["trava plástica com pistão","grape tools","branco","preto"],
     variations:[
-      {sku:"CH.TRAV.PIS.BR",label:"Branco",tiers:[{minQty:10,label:"10",price:1.54}, {minQty:50,label:"50",price:1.39}, {minQty:100,label:"100",price:1.26}, {minQty:500,label:"500",price:1.11}],weight:"0.00g",ncm:"83014000"},
-      {sku:"CH.TRAV.PIS.PT",label:"Preto",tiers:[{minQty:10,label:"10",price:1.54}, {minQty:50,label:"50",price:1.39}, {minQty:100,label:"100",price:1.26}, {minQty:500,label:"500",price:1.11}],weight:"0.00g",ncm:"83014000"}
+      {sku:"CH.TRAV.PIS.BR",label:"Branco",tiers:[{minQty:1,label:"1",price:2.39}, {minQty:20,label:"20",price:1.59}, {minQty:50,label:"50",price:1.39}, {minQty:100,label:"100",price:1.19}],weight:"0.00g",ncm:"83014000"},
+      {sku:"CH.TRAV.PIS.PT",label:"Preto",tiers:[{minQty:1,label:"1",price:2.39}, {minQty:20,label:"20",price:1.59}, {minQty:50,label:"50",price:1.39}, {minQty:100,label:"100",price:1.19}],weight:"0.00g",ncm:"83014000"}
     ],
     stock:999,sold:0,isPromotion:false,isLaunch:false,
   },
@@ -170,8 +170,8 @@ Regra simples: quanto menor o número do grão, mais agressiva é a lixa; quanto
     supplier:"Grape Tools",
     keywords:["lâmina de estilete","18mm","grape tools","0,5mm espessura (10un)","25mm","0,7mm espessura (10un)"],
     variations:[
-      {sku:"CH.LA.18",label:"18mm · 0,5mm Espessura (10un)",tiers:[{minQty:10,label:"10",price:2.83}, {minQty:50,label:"50",price:2.55}, {minQty:100,label:"100",price:2.32}, {minQty:500,label:"500",price:2.04}],weight:"0.00g",ncm:"82119400"},
-      {sku:"CH.LA.25",label:"25mm · 0,7mm Espessura (10un)",tiers:[{minQty:10,label:"10",price:13.44}, {minQty:50,label:"50",price:12.1}, {minQty:100,label:"100",price:11.02}, {minQty:500,label:"500",price:9.68}],weight:"0.00g",ncm:"82119400"}
+      {sku:"CH.LA.18",label:"18mm · 0,5mm Espessura (10un)",tiers:[{minQty:1,label:"1",price:3.99}, {minQty:30,label:"30",price:2.99}, {minQty:100,label:"100",price:2.69}, {minQty:200,label:"200",price:2.39}],weight:"0.00g",ncm:"82119400"},
+      {sku:"CH.LA.25",label:"25mm · 0,7mm Espessura (10un)",tiers:[{minQty:1,label:"1",price:13.99}, {minQty:30,label:"30",price:11.99}, {minQty:100,label:"100",price:9.99}, {minQty:200,label:"200",price:8.99}],weight:"0.00g",ncm:"82119400"}
     ],
     stock:999,sold:0,isPromotion:false,isLaunch:false,
   },
@@ -186,7 +186,7 @@ Regra simples: quanto menor o número do grão, mais agressiva é a lixa; quanto
     supplier:"Grape Tools",
     keywords:["suporte para esponja","5 x 5","grape tools","aço escovado"],
     variations:[
-      {sku:"CH.SUP.QUAD.5.5",label:"5 x 5 · Aço Escovado",tiers:[{minQty:10,label:"10",price:3.47}, {minQty:50,label:"50",price:3.12}, {minQty:100,label:"100",price:2.85}, {minQty:500,label:"500",price:2.5}],weight:"0.00g",ncm:"73239300"}
+      {sku:"CH.SUP.QUAD.5.5",label:"5 x 5 · Aço Escovado",tiers:[{minQty:1,label:"1",price:4.99}, {minQty:20,label:"20",price:3.99}, {minQty:50,label:"50",price:2.99}, {minQty:100,label:"100",price:2.39}],weight:"0.00g",ncm:"73239300"}
     ],
     stock:999,sold:0,isPromotion:false,isLaunch:false,
   },
@@ -201,7 +201,7 @@ Regra simples: quanto menor o número do grão, mais agressiva é a lixa; quanto
     supplier:"Grape Tools",
     keywords:["fio macho para macho","grape tools","20cm"],
     variations:[
-      {sku:"CH.MAC.MAC.20",label:"20cm",tiers:[{minQty:10,label:"10",price:6.69}, {minQty:50,label:"50",price:6.02}, {minQty:100,label:"100",price:5.49}, {minQty:500,label:"500",price:4.82}],weight:"0.00g",ncm:"85444200"}
+      {sku:"CH.MAC.MAC.20",label:"20cm",tiers:[{minQty:1,label:"1",price:6.49}, {minQty:10,label:"10",price:5.49}, {minQty:30,label:"30",price:4.99}, {minQty:50,label:"50",price:4.49}],weight:"0.00g",ncm:"85444200"}
     ],
     stock:999,sold:0,isPromotion:false,isLaunch:false,
   },
@@ -216,8 +216,8 @@ Regra simples: quanto menor o número do grão, mais agressiva é a lixa; quanto
     supplier:"Grape Tools",
     keywords:["fecho rolete","grape tools","dourado","zincado"],
     variations:[
-      {sku:"CH.ROLET.DO",label:"Dourado",tiers:[{minQty:10,label:"10",price:1.65}, {minQty:50,label:"50",price:1.48}, {minQty:100,label:"100",price:1.35}, {minQty:500,label:"500",price:1.19}],weight:"14g",ncm:"83013000"},
-      {sku:"CH.ROLET.PR",label:"Zincado",tiers:[{minQty:10,label:"10",price:1.82}, {minQty:50,label:"50",price:1.64}, {minQty:100,label:"100",price:1.49}, {minQty:500,label:"500",price:1.31}],weight:"14g",ncm:"83013000"}
+      {sku:"CH.ROLET.DO",label:"Dourado",tiers:[{minQty:1,label:"1",price:2.49}, {minQty:50,label:"50",price:1.79}, {minQty:100,label:"100",price:1.39}, {minQty:500,label:"500",price:1.19}],weight:"14g",ncm:"83013000"},
+      {sku:"CH.ROLET.PR",label:"Zincado",tiers:[{minQty:1,label:"1",price:2.49}, {minQty:50,label:"50",price:1.79}, {minQty:100,label:"100",price:1.39}, {minQty:500,label:"500",price:1.19}],weight:"14g",ncm:"83013000"}
     ],
     stock:999,sold:0,isPromotion:false,isLaunch:false,
   },
@@ -232,7 +232,7 @@ Regra simples: quanto menor o número do grão, mais agressiva é a lixa; quanto
     supplier:"Grape Tools",
     keywords:["mascara 3d para olhos","grape tools","preto"],
     variations:[
-      {sku:"CH.MASC.PT",label:"Preto",tiers:[{minQty:10,label:"10",price:25.87}, {minQty:50,label:"50",price:23.28}, {minQty:100,label:"100",price:21.21}, {minQty:500,label:"500",price:18.63}],weight:"35.00g",ncm:"CH.MASC.PT"}
+      {sku:"CH.MASC.PT",label:"Preto",tiers:[{minQty:1,label:"1",price:27.99}, {minQty:5,label:"5",price:25.99}, {minQty:10,label:"10",price:23.99}, {minQty:30,label:"30",price:22.99}],weight:"35.00g",ncm:"CH.MASC.PT"}
     ],
     stock:999,sold:0,isPromotion:false,isLaunch:false,
   },
@@ -247,7 +247,7 @@ Regra simples: quanto menor o número do grão, mais agressiva é a lixa; quanto
     supplier:"Grape Tools",
     keywords:["fio macho para fêmea","grape tools","20cm"],
     variations:[
-      {sku:"CH.MAC.FEM.20",label:"20cm",tiers:[{minQty:10,label:"10",price:5.71}, {minQty:50,label:"50",price:5.14}, {minQty:100,label:"100",price:4.68}, {minQty:500,label:"500",price:4.11}],weight:"0.00g",ncm:"85444200"}
+      {sku:"CH.MAC.FEM.20",label:"20cm",tiers:[{minQty:1,label:"1",price:6.49}, {minQty:10,label:"10",price:5.49}, {minQty:30,label:"30",price:4.99}, {minQty:50,label:"50",price:4.49}],weight:"0.00g",ncm:"85444200"}
     ],
     stock:999,sold:0,isPromotion:false,isLaunch:false,
   },
@@ -262,7 +262,7 @@ Regra simples: quanto menor o número do grão, mais agressiva é a lixa; quanto
     supplier:"Grape Tools",
     keywords:["fio fêmea para fêmea","grape tools","20cm"],
     variations:[
-      {sku:"CH.FEM.FEM.20",label:"20cm",tiers:[{minQty:10,label:"10",price:9.77}, {minQty:50,label:"50",price:8.79}, {minQty:100,label:"100",price:8.01}, {minQty:500,label:"500",price:7.03}],weight:"0.00g",ncm:"85369090"}
+      {sku:"CH.FEM.FEM.20",label:"20cm",tiers:[{minQty:1,label:"1",price:6.49}, {minQty:10,label:"10",price:5.49}, {minQty:30,label:"30",price:4.99}, {minQty:50,label:"50",price:4.49}],weight:"0.00g",ncm:"85369090"}
     ],
     stock:999,sold:0,isPromotion:false,isLaunch:false,
   },
@@ -277,7 +277,7 @@ Regra simples: quanto menor o número do grão, mais agressiva é a lixa; quanto
     supplier:"Grape Tools",
     keywords:["suporte de vassoura","inox","grape tools","4 clipes + 5 ganchos"],
     variations:[
-      {sku:"CH.SUP.INX.VASS.5GAN",label:"Inox · 4 Clipes + 5 Ganchos",tiers:[{minQty:10,label:"10",price:49.76}, {minQty:50,label:"50",price:44.78}, {minQty:100,label:"100",price:40.8}, {minQty:500,label:"500",price:35.83}],weight:"300.00g",ncm:"73181300"}
+      {sku:"CH.SUP.INX.VASS.5GAN",label:"Inox · 4 Clipes + 5 Ganchos",tiers:[{minQty:1,label:"1",price:46.99}, {minQty:3,label:"3",price:43.99}, {minQty:5,label:"5",price:39.99}, {minQty:10,label:"10",price:37.99}],weight:"300.00g",ncm:"73181300"}
     ],
     stock:999,sold:0,isPromotion:false,isLaunch:false,
   },
@@ -292,7 +292,7 @@ Regra simples: quanto menor o número do grão, mais agressiva é a lixa; quanto
     supplier:"Grape Tools",
     keywords:["trava porta","longo","grape tools","prateado"],
     variations:[
-      {sku:"CH.TRAV.PR.LONG",label:"Longo · Prateado",tiers:[{minQty:10,label:"10",price:24.61}, {minQty:50,label:"50",price:22.15}, {minQty:100,label:"100",price:20.18}, {minQty:500,label:"500",price:17.72}],weight:"160g",ncm:"83013000"}
+      {sku:"CH.TRAV.PR.LONG",label:"Longo · Prateado",tiers:[{minQty:1,label:"1",price:24.99}, {minQty:5,label:"5",price:22.99}, {minQty:10,label:"10",price:20.99}, {minQty:20,label:"20",price:19.99}],weight:"160g",ncm:"83013000"}
     ],
     stock:999,sold:0,isPromotion:false,isLaunch:false,
   },
@@ -307,7 +307,7 @@ Regra simples: quanto menor o número do grão, mais agressiva é a lixa; quanto
     supplier:"Grape Tools",
     keywords:["trava porta magnético","grape tools |slim"],
     variations:[
-      {sku:"CH.TPOR.SLIM",label:"Grape Tools |Slim",tiers:[{minQty:10,label:"10",price:24.61}, {minQty:50,label:"50",price:22.15}, {minQty:100,label:"100",price:20.18}, {minQty:500,label:"500",price:17.72}],weight:"80g",ncm:"83024200"}
+      {sku:"CH.TPOR.SLIM",label:"Grape Tools |Slim",tiers:[{minQty:1,label:"1",price:19.99}, {minQty:5,label:"5",price:18.99}, {minQty:10,label:"10",price:17.99}, {minQty:20,label:"20",price:16.99}],weight:"80g",ncm:"83024200"}
     ],
     stock:999,sold:0,isPromotion:false,isLaunch:false,
   },
@@ -322,7 +322,7 @@ Regra simples: quanto menor o número do grão, mais agressiva é a lixa; quanto
     supplier:"Grape Tools",
     keywords:["trava porta magnético bola","grape tools","preto"],
     variations:[
-      {sku:"CH.TRAV.BOL.PT",label:"Preto",tiers:[{minQty:10,label:"10",price:14.17}, {minQty:50,label:"50",price:12.75}, {minQty:100,label:"100",price:11.62}, {minQty:500,label:"500",price:10.2}],weight:"79g",ncm:"83024200"}
+      {sku:"CH.TRAV.BOL.PT",label:"Preto",tiers:[{minQty:1,label:"1",price:14.99}, {minQty:5,label:"5",price:13.99}, {minQty:10,label:"10",price:12.99}, {minQty:20,label:"20",price:9.99}],weight:"79g",ncm:"83024200"}
     ],
     stock:999,sold:0,isPromotion:false,isLaunch:false,
   },
@@ -337,7 +337,7 @@ Regra simples: quanto menor o número do grão, mais agressiva é a lixa; quanto
     supplier:"Grape Tools",
     keywords:["fecho magnético invisível","grape tools","prata"],
     variations:[
-      {sku:"CH.FEC.MAGNET",label:"Prata",tiers:[{minQty:10,label:"10",price:2.44}, {minQty:50,label:"50",price:2.2}, {minQty:100,label:"100",price:2.0}, {minQty:500,label:"500",price:1.76}],weight:"A consultar",ncm:"83015000"}
+      {sku:"CH.FEC.MAGNET",label:"Prata",tiers:[{minQty:1,label:"1",price:2.49}, {minQty:20,label:"20",price:2.29}, {minQty:50,label:"50",price:1.99}, {minQty:100,label:"100",price:1.79}],weight:"A consultar",ncm:"83015000"}
     ],
     stock:999,sold:0,isPromotion:false,isLaunch:false,
   },
@@ -352,7 +352,7 @@ Regra simples: quanto menor o número do grão, mais agressiva é a lixa; quanto
     supplier:"Grape Tools",
     keywords:["limitador de janela","grape tools trava amarelo"],
     variations:[
-      {sku:"CH.LIMIT.TRAV",label:"Grape Tools Trava Amarelo",tiers:[{minQty:10,label:"10",price:8.04}, {minQty:50,label:"50",price:7.24}, {minQty:100,label:"100",price:6.59}, {minQty:500,label:"500",price:5.79}],weight:"A consultar",ncm:"83024200"}
+      {sku:"CH.LIMIT.TRAV",label:"Grape Tools Trava Amarelo",tiers:[{minQty:1,label:"1",price:6.99}, {minQty:10,label:"10",price:6.69}, {minQty:30,label:"30",price:6.39}, {minQty:50,label:"50",price:5.99}],weight:"A consultar",ncm:"83024200"}
     ],
     stock:999,sold:0,isPromotion:false,isLaunch:false,
   },
@@ -367,13 +367,13 @@ Regra simples: quanto menor o número do grão, mais agressiva é a lixa; quanto
     supplier:"Cobrirel",
     keywords:["açucareiro","prático","azul","branco","cinza","preto","verde","vermelho","amarelo"],
     variations:[
-      {sku:"1.AÇUC.AZ",label:"Prático · Azul",tiers:[{minQty:10,label:"10",price:18.9}, {minQty:50,label:"50",price:17.01}, {minQty:100,label:"100",price:15.5}, {minQty:500,label:"500",price:13.61}],weight:"A consultar",ncm:"39241000"},
-      {sku:"1.AÇUC.BR",label:"Prático · Branco",tiers:[{minQty:10,label:"10",price:18.9}, {minQty:50,label:"50",price:17.01}, {minQty:100,label:"100",price:15.5}, {minQty:500,label:"500",price:13.61}],weight:"A consultar",ncm:"39241000"},
-      {sku:"1.AÇUC.CZ",label:"Prático · Cinza",tiers:[{minQty:10,label:"10",price:18.9}, {minQty:50,label:"50",price:17.01}, {minQty:100,label:"100",price:15.5}, {minQty:500,label:"500",price:13.61}],weight:"A consultar",ncm:"39241000"},
-      {sku:"1.AÇUC.PT",label:"Prático · Preto",tiers:[{minQty:10,label:"10",price:18.9}, {minQty:50,label:"50",price:17.01}, {minQty:100,label:"100",price:15.5}, {minQty:500,label:"500",price:13.61}],weight:"A consultar",ncm:"39241000"},
-      {sku:"1.AÇUC.VD",label:"Prático · Verde",tiers:[{minQty:10,label:"10",price:18.9}, {minQty:50,label:"50",price:17.01}, {minQty:100,label:"100",price:15.5}, {minQty:500,label:"500",price:13.61}],weight:"A consultar",ncm:"39241000"},
-      {sku:"1.AÇUC.VM",label:"Prático · Vermelho",tiers:[{minQty:10,label:"10",price:18.9}, {minQty:50,label:"50",price:17.01}, {minQty:100,label:"100",price:15.5}, {minQty:500,label:"500",price:13.61}],weight:"A consultar",ncm:"39241000"},
-      {sku:"1.AÇUC.AM",label:"Prático · Amarelo",tiers:[{minQty:10,label:"10",price:18.9}, {minQty:50,label:"50",price:17.01}, {minQty:100,label:"100",price:15.5}, {minQty:500,label:"500",price:13.61}],weight:"A consultar",ncm:"39241000"}
+      {sku:"1.AÇUC.AZ",label:"Prático · Azul",tiers:[{minQty:1,label:"1",price:16.99}, {minQty:3,label:"3",price:15.99}, {minQty:5,label:"5",price:14.99}, {minQty:10,label:"10",price:13.99}],weight:"A consultar",ncm:"39241000"},
+      {sku:"1.AÇUC.BR",label:"Prático · Branco",tiers:[{minQty:1,label:"1",price:16.99}, {minQty:3,label:"3",price:15.99}, {minQty:5,label:"5",price:14.99}, {minQty:10,label:"10",price:13.99}],weight:"A consultar",ncm:"39241000"},
+      {sku:"1.AÇUC.CZ",label:"Prático · Cinza",tiers:[{minQty:1,label:"1",price:16.99}, {minQty:3,label:"3",price:15.99}, {minQty:5,label:"5",price:14.99}, {minQty:10,label:"10",price:13.99}],weight:"A consultar",ncm:"39241000"},
+      {sku:"1.AÇUC.PT",label:"Prático · Preto",tiers:[{minQty:1,label:"1",price:16.99}, {minQty:3,label:"3",price:15.99}, {minQty:5,label:"5",price:14.99}, {minQty:10,label:"10",price:13.99}],weight:"A consultar",ncm:"39241000"},
+      {sku:"1.AÇUC.VD",label:"Prático · Verde",tiers:[{minQty:1,label:"1",price:16.99}, {minQty:3,label:"3",price:15.99}, {minQty:5,label:"5",price:14.99}, {minQty:10,label:"10",price:13.99}],weight:"A consultar",ncm:"39241000"},
+      {sku:"1.AÇUC.VM",label:"Prático · Vermelho",tiers:[{minQty:1,label:"1",price:16.99}, {minQty:3,label:"3",price:15.99}, {minQty:5,label:"5",price:14.99}, {minQty:10,label:"10",price:13.99}],weight:"A consultar",ncm:"39241000"},
+      {sku:"1.AÇUC.AM",label:"Prático · Amarelo",tiers:[{minQty:1,label:"1",price:16.99}, {minQty:3,label:"3",price:15.99}, {minQty:5,label:"5",price:14.99}, {minQty:10,label:"10",price:13.99}],weight:"A consultar",ncm:"39241000"}
     ],
     stock:999,sold:0,isPromotion:false,isLaunch:false,
   },
@@ -388,7 +388,7 @@ Regra simples: quanto menor o número do grão, mais agressiva é a lixa; quanto
     supplier:"Cobrirel",
     keywords:["suporte para vassoura branco"],
     variations:[
-      {sku:"1.SUP.VAS",label:"VAS",tiers:[{minQty:10,label:"10",price:10.05}, {minQty:50,label:"50",price:9.05}, {minQty:100,label:"100",price:8.24}, {minQty:500,label:"500",price:7.24}],weight:"A consultar",ncm:"39252000"}
+      {sku:"1.SUP.VAS",label:"VAS",tiers:[{minQty:1,label:"1",price:9.99}, {minQty:3,label:"3",price:8.99}, {minQty:5,label:"5",price:8.39}, {minQty:10,label:"10",price:7.99}],weight:"A consultar",ncm:"39252000"}
     ],
     stock:999,sold:0,isPromotion:false,isLaunch:false,
   },
@@ -403,10 +403,10 @@ Regra simples: quanto menor o número do grão, mais agressiva é a lixa; quanto
     supplier:"Cobrirel",
     keywords:["trava porta |prático","branco","cinza","marrom","preto"],
     variations:[
-      {sku:"1.TPOR.BR",label:"Branco",tiers:[{minQty:10,label:"10",price:8.74}, {minQty:50,label:"50",price:7.87}, {minQty:100,label:"100",price:7.17}, {minQty:500,label:"500",price:6.29}],weight:"A consultar",ncm:"39252000"},
-      {sku:"1.TPOR.CZ",label:"Cinza",tiers:[{minQty:10,label:"10",price:8.74}, {minQty:50,label:"50",price:7.87}, {minQty:100,label:"100",price:7.17}, {minQty:500,label:"500",price:6.29}],weight:"A consultar",ncm:"39252000"},
-      {sku:"1.TPOR.MR",label:"Marrom",tiers:[{minQty:10,label:"10",price:8.74}, {minQty:50,label:"50",price:7.87}, {minQty:100,label:"100",price:7.17}, {minQty:500,label:"500",price:6.29}],weight:"A consultar",ncm:"39252000"},
-      {sku:"1.TPOR.PT",label:"Preto",tiers:[{minQty:10,label:"10",price:8.74}, {minQty:50,label:"50",price:7.87}, {minQty:100,label:"100",price:7.17}, {minQty:500,label:"500",price:6.29}],weight:"A consultar",ncm:"39252000"}
+      {sku:"1.TPOR.BR",label:"Branco",tiers:[{minQty:1,label:"1",price:8.39}, {minQty:3,label:"3",price:7.99}, {minQty:5,label:"5",price:7.39}, {minQty:10,label:"10",price:6.99}],weight:"A consultar",ncm:"39252000"},
+      {sku:"1.TPOR.CZ",label:"Cinza",tiers:[{minQty:1,label:"1",price:8.39}, {minQty:3,label:"3",price:7.99}, {minQty:5,label:"5",price:7.39}, {minQty:10,label:"10",price:6.99}],weight:"A consultar",ncm:"39252000"},
+      {sku:"1.TPOR.MR",label:"Marrom",tiers:[{minQty:1,label:"1",price:8.39}, {minQty:3,label:"3",price:7.99}, {minQty:5,label:"5",price:7.39}, {minQty:10,label:"10",price:6.99}],weight:"A consultar",ncm:"39252000"},
+      {sku:"1.TPOR.PT",label:"Preto",tiers:[{minQty:1,label:"1",price:8.39}, {minQty:3,label:"3",price:7.99}, {minQty:5,label:"5",price:7.39}, {minQty:10,label:"10",price:6.99}],weight:"A consultar",ncm:"39252000"}
     ],
     stock:999,sold:0,isPromotion:false,isLaunch:false,
   },
@@ -421,10 +421,10 @@ Regra simples: quanto menor o número do grão, mais agressiva é a lixa; quanto
     supplier:"Cobrirel",
     keywords:["rodízio","multiuso","com bucha","25kg","30mm","38mm","preto","branco"],
     variations:[
-      {sku:"1.ROD.PIN.30.PT",label:"30mm · Preto",tiers:[{minQty:10,label:"10",price:6.72}, {minQty:50,label:"50",price:6.05}, {minQty:100,label:"100",price:5.51}, {minQty:500,label:"500",price:4.84}],weight:"A consultar",ncm:"83022000"},
-      {sku:"1.ROD.PIN.38.PT",label:"38mm · Preto",tiers:[{minQty:10,label:"10",price:8.29}, {minQty:50,label:"50",price:7.46}, {minQty:100,label:"100",price:6.8}, {minQty:500,label:"500",price:5.97}],weight:"A consultar",ncm:"83022000"},
-      {sku:"1.ROD.PIN.30.BR",label:"30mm · Branco",tiers:[{minQty:10,label:"10",price:6.72}, {minQty:50,label:"50",price:6.05}, {minQty:100,label:"100",price:5.51}, {minQty:500,label:"500",price:4.84}],weight:"A consultar",ncm:"83022000"},
-      {sku:"1.ROD.PIN.38.BR",label:"38mm · Branco",tiers:[{minQty:10,label:"10",price:8.29}, {minQty:50,label:"50",price:7.46}, {minQty:100,label:"100",price:6.8}, {minQty:500,label:"500",price:5.97}],weight:"A consultar",ncm:"83022000"}
+      {sku:"1.ROD.PIN.30.PT",label:"30mm · Preto",tiers:[{minQty:1,label:"1",price:6.39}, {minQty:30,label:"30",price:5.99}, {minQty:50,label:"50",price:5.79}, {minQty:100,label:"100",price:5.49}],weight:"A consultar",ncm:"83022000"},
+      {sku:"1.ROD.PIN.38.PT",label:"38mm · Preto",tiers:[{minQty:1,label:"1",price:7.39}, {minQty:30,label:"30",price:6.99}, {minQty:50,label:"50",price:6.79}, {minQty:100,label:"100",price:6.49}],weight:"A consultar",ncm:"83022000"},
+      {sku:"1.ROD.PIN.30.BR",label:"30mm · Branco",tiers:[{minQty:1,label:"1",price:6.39}, {minQty:30,label:"30",price:5.99}, {minQty:50,label:"50",price:5.79}, {minQty:100,label:"100",price:5.49}],weight:"A consultar",ncm:"83022000"},
+      {sku:"1.ROD.PIN.38.BR",label:"38mm · Branco",tiers:[{minQty:1,label:"1",price:7.39}, {minQty:30,label:"30",price:6.99}, {minQty:50,label:"50",price:6.79}, {minQty:100,label:"100",price:6.49}],weight:"A consultar",ncm:"83022000"}
     ],
     stock:999,sold:0,isPromotion:false,isLaunch:false,
   },
@@ -439,15 +439,15 @@ Regra simples: quanto menor o número do grão, mais agressiva é a lixa; quanto
     supplier:"Papaiz",
     keywords:["cadeado |dourado","20mm","25mm","30mm","35mm","40mm","45mm","50mm","60mm","70mm"],
     variations:[
-      {sku:"2.CAD.20",label:"20mm",tiers:[{minQty:10,label:"10",price:0.03}, {minQty:50,label:"50",price:0.03}, {minQty:100,label:"100",price:0.02}, {minQty:500,label:"500",price:0.02}],weight:"A consultar",ncm:"83011000"},
-      {sku:"2.CAD.25",label:"25mm",tiers:[{minQty:10,label:"10",price:2.8}, {minQty:50,label:"50",price:2.52}, {minQty:100,label:"100",price:2.3}, {minQty:500,label:"500",price:2.02}],weight:"A consultar",ncm:"83011000"},
-      {sku:"2.CAD.30",label:"30mm",tiers:[{minQty:10,label:"10",price:2.8}, {minQty:50,label:"50",price:2.52}, {minQty:100,label:"100",price:2.3}, {minQty:500,label:"500",price:2.02}],weight:"A consultar",ncm:"83011000"},
-      {sku:"2.CAD.35",label:"35mm",tiers:[{minQty:10,label:"10",price:2.8}, {minQty:50,label:"50",price:2.52}, {minQty:100,label:"100",price:2.3}, {minQty:500,label:"500",price:2.02}],weight:"A consultar",ncm:"83011000"},
-      {sku:"2.CAD.40",label:"40mm",tiers:[{minQty:10,label:"10",price:2.8}, {minQty:50,label:"50",price:2.52}, {minQty:100,label:"100",price:2.3}, {minQty:500,label:"500",price:2.02}],weight:"A consultar",ncm:"83011000"},
-      {sku:"2.CAD.45",label:"45mm",tiers:[{minQty:10,label:"10",price:2.8}, {minQty:50,label:"50",price:2.52}, {minQty:100,label:"100",price:2.3}, {minQty:500,label:"500",price:2.02}],weight:"A consultar",ncm:"83011000"},
-      {sku:"2.CAD.50",label:"50mm",tiers:[{minQty:10,label:"10",price:79.44}, {minQty:50,label:"50",price:71.5}, {minQty:100,label:"100",price:65.14}, {minQty:500,label:"500",price:57.2}],weight:"A consultar",ncm:"83011000"},
-      {sku:"2.CAD.60",label:"60mm",tiers:[{minQty:10,label:"10",price:2.8}, {minQty:50,label:"50",price:2.52}, {minQty:100,label:"100",price:2.3}, {minQty:500,label:"500",price:2.02}],weight:"A consultar",ncm:"83011000"},
-      {sku:"2.CAD.70",label:"70mm",tiers:[{minQty:10,label:"10",price:2.8}, {minQty:50,label:"50",price:2.52}, {minQty:100,label:"100",price:2.3}, {minQty:500,label:"500",price:2.02}],weight:"A consultar",ncm:"83011000"}
+      {sku:"2.CAD.20",label:"20mm",tiers:[{minQty:1,label:"1",price:19.99}, {minQty:10,label:"10",price:18.99}, {minQty:50,label:"50",price:17.99}, {minQty:100,label:"100",price:16.99}],weight:"A consultar",ncm:"83011000"},
+      {sku:"2.CAD.25",label:"25mm",tiers:[{minQty:1,label:"1",price:21.99}, {minQty:10,label:"10",price:20.99}, {minQty:50,label:"50",price:19.99}, {minQty:100,label:"100",price:18.99}],weight:"A consultar",ncm:"83011000"},
+      {sku:"2.CAD.30",label:"30mm",tiers:[{minQty:1,label:"1",price:23.99}, {minQty:10,label:"10",price:22.99}, {minQty:50,label:"50",price:21.99}, {minQty:100,label:"100",price:20.99}],weight:"A consultar",ncm:"83011000"},
+      {sku:"2.CAD.35",label:"35mm",tiers:[{minQty:1,label:"1",price:27.99}, {minQty:10,label:"10",price:26.99}, {minQty:50,label:"50",price:25.99}, {minQty:100,label:"100",price:24.99}],weight:"A consultar",ncm:"83011000"},
+      {sku:"2.CAD.40",label:"40mm",tiers:[{minQty:1,label:"1",price:31.99}, {minQty:10,label:"10",price:30.99}, {minQty:50,label:"50",price:29.99}, {minQty:100,label:"100",price:28.99}],weight:"A consultar",ncm:"83011000"},
+      {sku:"2.CAD.45",label:"45mm",tiers:[{minQty:1,label:"1",price:33.99}, {minQty:10,label:"10",price:32.99}, {minQty:50,label:"50",price:31.99}, {minQty:100,label:"100",price:30.99}],weight:"A consultar",ncm:"83011000"},
+      {sku:"2.CAD.50",label:"50mm",tiers:[{minQty:1,label:"1",price:36.99}, {minQty:10,label:"10",price:35.99}, {minQty:50,label:"50",price:34.99}, {minQty:100,label:"100",price:33.99}],weight:"A consultar",ncm:"83011000"},
+      {sku:"2.CAD.60",label:"60mm",tiers:[{minQty:1,label:"1",price:49.99}, {minQty:10,label:"10",price:48.99}, {minQty:50,label:"50",price:47.99}, {minQty:100,label:"100",price:46.99}],weight:"A consultar",ncm:"83011000"},
+      {sku:"2.CAD.70",label:"70mm",tiers:[{minQty:1,label:"1",price:69.99}, {minQty:10,label:"10",price:68.99}, {minQty:50,label:"50",price:67.99}, {minQty:100,label:"100",price:66.99}],weight:"A consultar",ncm:"83011000"}
     ],
     stock:999,sold:0,isPromotion:false,isLaunch:false,
   },
@@ -462,7 +462,7 @@ Regra simples: quanto menor o número do grão, mais agressiva é a lixa; quanto
     supplier:"Renna",
     keywords:["trava porta magnético","longo","renna","trava porta"],
     variations:[
-      {sku:"3.TPOR.LONG",label:"Longo",tiers:[{minQty:10,label:"10",price:23.81}, {minQty:50,label:"50",price:21.43}, {minQty:100,label:"100",price:19.52}, {minQty:500,label:"500",price:17.14}],weight:"A consultar",ncm:"83024100"}
+      {sku:"3.TPOR.LONG",label:"Longo",tiers:[{minQty:1,label:"1",price:22.99}, {minQty:5,label:"5",price:21.99}, {minQty:10,label:"10",price:19.99}, {minQty:20,label:"20",price:18.99}],weight:"A consultar",ncm:"83024100"}
     ],
     stock:999,sold:0,isPromotion:false,isLaunch:false,
   },
@@ -477,7 +477,7 @@ Regra simples: quanto menor o número do grão, mais agressiva é a lixa; quanto
     supplier:"Renna",
     keywords:["trava porta magnético","slim","renna","trava porta"],
     variations:[
-      {sku:"3.TPOR.SLIM",label:"Slim",tiers:[{minQty:10,label:"10",price:18.99}, {minQty:50,label:"50",price:17.09}, {minQty:100,label:"100",price:15.57}, {minQty:500,label:"500",price:13.67}],weight:"A consultar",ncm:"83024100"}
+      {sku:"3.TPOR.SLIM",label:"Slim",tiers:[{minQty:1,label:"1",price:20.99}, {minQty:5,label:"5",price:19.99}, {minQty:10,label:"10",price:18.99}, {minQty:20,label:"20",price:17.99}],weight:"A consultar",ncm:"83024100"}
     ],
     stock:999,sold:0,isPromotion:false,isLaunch:false,
   },
@@ -492,7 +492,7 @@ Regra simples: quanto menor o número do grão, mais agressiva é a lixa; quanto
     supplier:"Renna",
     keywords:["trava porta magnético","clássico","piso","renna","trava porta"],
     variations:[
-      {sku:"3.TPOR.PISO",label:"Clássico",tiers:[{minQty:10,label:"10",price:13.86}, {minQty:50,label:"50",price:12.47}, {minQty:100,label:"100",price:11.37}, {minQty:500,label:"500",price:9.98}],weight:"A consultar",ncm:"83024100"}
+      {sku:"3.TPOR.PISO",label:"Clássico",tiers:[{minQty:1,label:"1",price:13.99}, {minQty:5,label:"5",price:12.99}, {minQty:20,label:"20",price:11.99}, {minQty:50,label:"50",price:10.99}],weight:"A consultar",ncm:"83024100"}
     ],
     stock:999,sold:0,isPromotion:false,isLaunch:false,
   },
@@ -507,7 +507,7 @@ Regra simples: quanto menor o número do grão, mais agressiva é a lixa; quanto
     supplier:"Renna",
     keywords:["metro sueco de madeira"],
     variations:[
-      {sku:"3.MET.SUECO",label:"SUECO",tiers:[{minQty:10,label:"10",price:37.91}, {minQty:50,label:"50",price:34.12}, {minQty:100,label:"100",price:31.09}, {minQty:500,label:"500",price:27.3}],weight:"A consultar",ncm:"90178010"}
+      {sku:"3.MET.SUECO",label:"SUECO",tiers:[{minQty:1,label:"1",price:32.99}, {minQty:3,label:"3",price:29.99}, {minQty:5,label:"5",price:27.99}, {minQty:10,label:"10",price:25.99}],weight:"A consultar",ncm:"90178010"}
     ],
     stock:999,sold:0,isPromotion:false,isLaunch:false,
   },
@@ -522,13 +522,13 @@ Regra simples: quanto menor o número do grão, mais agressiva é a lixa; quanto
     supplier:"Renna",
     keywords:["pistão fit","40n","branco","60n","80n","100n","120n","150n","180n"],
     variations:[
-      {sku:"3.PIS.BR.40",label:"40N · Branco",tiers:[{minQty:10,label:"10",price:6.57}, {minQty:50,label:"50",price:5.91}, {minQty:100,label:"100",price:5.39}, {minQty:500,label:"500",price:4.73}],weight:"A consultar",ncm:"83024200"},
-      {sku:"3.PIS.BR.60",label:"60N · Branco",tiers:[{minQty:10,label:"10",price:6.57}, {minQty:50,label:"50",price:5.91}, {minQty:100,label:"100",price:5.39}, {minQty:500,label:"500",price:4.73}],weight:"A consultar",ncm:"83024200"},
-      {sku:"3.PIS.BR.80",label:"80N · Branco",tiers:[{minQty:10,label:"10",price:7.3}, {minQty:50,label:"50",price:6.57}, {minQty:100,label:"100",price:5.99}, {minQty:500,label:"500",price:5.26}],weight:"A consultar",ncm:"83024200"},
-      {sku:"3.PIS.BR.100",label:"100N · Branco",tiers:[{minQty:10,label:"10",price:7.3}, {minQty:50,label:"50",price:6.57}, {minQty:100,label:"100",price:5.99}, {minQty:500,label:"500",price:5.26}],weight:"A consultar",ncm:"83024200"},
-      {sku:"3.PIS.BR.120",label:"120N · Branco",tiers:[{minQty:10,label:"10",price:7.3}, {minQty:50,label:"50",price:6.57}, {minQty:100,label:"100",price:5.99}, {minQty:500,label:"500",price:5.26}],weight:"A consultar",ncm:"83024200"},
-      {sku:"3.PIS.BR.150",label:"150N · Branco",tiers:[{minQty:10,label:"10",price:7.18}, {minQty:50,label:"50",price:6.46}, {minQty:100,label:"100",price:5.89}, {minQty:500,label:"500",price:5.17}],weight:"A consultar",ncm:"83024200"},
-      {sku:"3.PIS.BR.180",label:"180N · Branco",tiers:[{minQty:10,label:"10",price:7.18}, {minQty:50,label:"50",price:6.46}, {minQty:100,label:"100",price:5.89}, {minQty:500,label:"500",price:5.17}],weight:"A consultar",ncm:"83024200"}
+      {sku:"3.PIS.BR.40",label:"40N · Branco",tiers:[{minQty:1,label:"1",price:6.99}, {minQty:20,label:"20",price:6.49}, {minQty:50,label:"50",price:5.99}, {minQty:100,label:"100",price:4.99}],weight:"A consultar",ncm:"83024200"},
+      {sku:"3.PIS.BR.60",label:"60N · Branco",tiers:[{minQty:1,label:"1",price:6.99}, {minQty:20,label:"20",price:6.49}, {minQty:50,label:"50",price:5.99}, {minQty:100,label:"100",price:4.99}],weight:"A consultar",ncm:"83024200"},
+      {sku:"3.PIS.BR.80",label:"80N · Branco",tiers:[{minQty:1,label:"1",price:6.99}, {minQty:20,label:"20",price:6.49}, {minQty:50,label:"50",price:5.99}, {minQty:100,label:"100",price:4.99}],weight:"A consultar",ncm:"83024200"},
+      {sku:"3.PIS.BR.100",label:"100N · Branco",tiers:[{minQty:1,label:"1",price:6.99}, {minQty:20,label:"20",price:6.49}, {minQty:50,label:"50",price:5.99}, {minQty:100,label:"100",price:4.99}],weight:"A consultar",ncm:"83024200"},
+      {sku:"3.PIS.BR.120",label:"120N · Branco",tiers:[{minQty:1,label:"1",price:6.99}, {minQty:20,label:"20",price:6.49}, {minQty:50,label:"50",price:5.99}, {minQty:100,label:"100",price:4.99}],weight:"A consultar",ncm:"83024200"},
+      {sku:"3.PIS.BR.150",label:"150N · Branco",tiers:[{minQty:1,label:"1",price:6.99}, {minQty:20,label:"20",price:6.49}, {minQty:50,label:"50",price:5.99}, {minQty:100,label:"100",price:4.99}],weight:"A consultar",ncm:"83024200"},
+      {sku:"3.PIS.BR.180",label:"180N · Branco",tiers:[{minQty:1,label:"1",price:6.99}, {minQty:20,label:"20",price:6.49}, {minQty:50,label:"50",price:5.99}, {minQty:100,label:"100",price:4.99}],weight:"A consultar",ncm:"83024200"}
     ],
     stock:999,sold:0,isPromotion:false,isLaunch:false,
   },
@@ -543,12 +543,12 @@ Regra simples: quanto menor o número do grão, mais agressiva é a lixa; quanto
     supplier:"Renna",
     keywords:["pistão fit","40n","cinza","60n","80n","100n","120n","150n"],
     variations:[
-      {sku:"3.PIS.CZ.40",label:"40N · Cinza",tiers:[{minQty:10,label:"10",price:6.57}, {minQty:50,label:"50",price:5.91}, {minQty:100,label:"100",price:5.39}, {minQty:500,label:"500",price:4.73}],weight:"A consultar",ncm:"83024200"},
-      {sku:"3.PIS.CZ.60",label:"60N · Cinza",tiers:[{minQty:10,label:"10",price:6.57}, {minQty:50,label:"50",price:5.91}, {minQty:100,label:"100",price:5.39}, {minQty:500,label:"500",price:4.73}],weight:"A consultar",ncm:"83024200"},
-      {sku:"3.PIS.CZ.80",label:"80N · Cinza",tiers:[{minQty:10,label:"10",price:7.3}, {minQty:50,label:"50",price:6.57}, {minQty:100,label:"100",price:5.99}, {minQty:500,label:"500",price:5.26}],weight:"A consultar",ncm:"83024200"},
-      {sku:"3.PIS.CZ.100",label:"100N · Cinza",tiers:[{minQty:10,label:"10",price:7.18}, {minQty:50,label:"50",price:6.46}, {minQty:100,label:"100",price:5.89}, {minQty:500,label:"500",price:5.17}],weight:"A consultar",ncm:"83024200"},
-      {sku:"3.PIS.CZ.120",label:"120N · Cinza",tiers:[{minQty:10,label:"10",price:6.57}, {minQty:50,label:"50",price:5.91}, {minQty:100,label:"100",price:5.39}, {minQty:500,label:"500",price:4.73}],weight:"A consultar",ncm:"83024200"},
-      {sku:"3.PIS.CZ.150",label:"150N · Cinza",tiers:[{minQty:10,label:"10",price:8.79}, {minQty:50,label:"50",price:7.91}, {minQty:100,label:"100",price:7.21}, {minQty:500,label:"500",price:6.33}],weight:"A consultar",ncm:"83024200"}
+      {sku:"3.PIS.CZ.40",label:"40N · Cinza",tiers:[{minQty:1,label:"1",price:6.99}, {minQty:20,label:"20",price:6.49}, {minQty:50,label:"50",price:5.99}, {minQty:100,label:"100",price:4.99}],weight:"A consultar",ncm:"83024200"},
+      {sku:"3.PIS.CZ.60",label:"60N · Cinza",tiers:[{minQty:1,label:"1",price:6.99}, {minQty:20,label:"20",price:6.49}, {minQty:50,label:"50",price:5.99}, {minQty:100,label:"100",price:4.99}],weight:"A consultar",ncm:"83024200"},
+      {sku:"3.PIS.CZ.80",label:"80N · Cinza",tiers:[{minQty:1,label:"1",price:6.99}, {minQty:20,label:"20",price:6.49}, {minQty:50,label:"50",price:5.99}, {minQty:100,label:"100",price:4.99}],weight:"A consultar",ncm:"83024200"},
+      {sku:"3.PIS.CZ.100",label:"100N · Cinza",tiers:[{minQty:1,label:"1",price:6.99}, {minQty:20,label:"20",price:6.49}, {minQty:50,label:"50",price:5.99}, {minQty:100,label:"100",price:4.99}],weight:"A consultar",ncm:"83024200"},
+      {sku:"3.PIS.CZ.120",label:"120N · Cinza",tiers:[{minQty:1,label:"1",price:6.99}, {minQty:20,label:"20",price:6.49}, {minQty:50,label:"50",price:5.99}, {minQty:100,label:"100",price:4.99}],weight:"A consultar",ncm:"83024200"},
+      {sku:"3.PIS.CZ.150",label:"150N · Cinza",tiers:[{minQty:1,label:"1",price:6.99}, {minQty:20,label:"20",price:6.49}, {minQty:50,label:"50",price:5.99}, {minQty:100,label:"100",price:4.99}],weight:"A consultar",ncm:"83024200"}
     ],
     stock:999,sold:0,isPromotion:false,isLaunch:false,
   },
@@ -563,8 +563,8 @@ Regra simples: quanto menor o número do grão, mais agressiva é a lixa; quanto
     supplier:"Renna",
     keywords:["dobradiça","amortecedor","35mm","curva","reta","móveis"],
     variations:[
-      {sku:"3.DOB.AMORT.CUR",label:"Curva com Amortecedor 35mm",tiers:[{minQty:10,label:"10",price:3.15}, {minQty:50,label:"50",price:2.83}, {minQty:100,label:"100",price:2.58}, {minQty:500,label:"500",price:2.27}],weight:"A consultar",ncm:"83021000"},
-      {sku:"3.DOB.AMORT.RET",label:"Reta com Amortecedor 35mm",tiers:[{minQty:10,label:"10",price:3.1}, {minQty:50,label:"50",price:2.79}, {minQty:100,label:"100",price:2.54}, {minQty:500,label:"500",price:2.23}],weight:"A consultar",ncm:"83021000"}
+      {sku:"3.DOB.AMORT.CUR",label:"Curva com Amortecedor 35mm",tiers:[{minQty:1,label:"1",price:2.99}, {minQty:50,label:"50",price:2.59}, {minQty:100,label:"100",price:2.39}, {minQty:200,label:"200",price:2.29}],weight:"A consultar",ncm:"83021000"},
+      {sku:"3.DOB.AMORT.RET",label:"Reta com Amortecedor 35mm",tiers:[{minQty:1,label:"1",price:2.99}, {minQty:50,label:"50",price:2.59}, {minQty:100,label:"100",price:2.39}, {minQty:200,label:"200",price:2.29}],weight:"A consultar",ncm:"83021000"}
     ],
     stock:999,sold:0,isPromotion:false,isLaunch:false,
   },
@@ -579,7 +579,7 @@ Regra simples: quanto menor o número do grão, mais agressiva é a lixa; quanto
     supplier:"Renna",
     keywords:["puxador","paris","96mm","aço escovado"],
     variations:[
-      {sku:"3.PUX.CONCH.AÇOESC",label:"96mm · Aço Escovado",tiers:[{minQty:10,label:"10",price:19.33}, {minQty:50,label:"50",price:17.4}, {minQty:100,label:"100",price:15.85}, {minQty:500,label:"500",price:13.92}],weight:"A consultar",ncm:""}
+      {sku:"3.PUX.CONCH.AÇOESC",label:"96mm · Aço Escovado",tiers:[{minQty:1,label:"1",price:26.99}, {minQty:20,label:"20",price:25.99}, {minQty:30,label:"30",price:24.99}, {minQty:50,label:"50",price:23.99}],weight:"A consultar",ncm:""}
     ],
     stock:999,sold:0,isPromotion:false,isLaunch:false,
   },
@@ -594,10 +594,10 @@ Regra simples: quanto menor o número do grão, mais agressiva é a lixa; quanto
     supplier:"Renna",
     keywords:["corrediça telescópica","45mm","25cm","30cm","35cm","40cm"],
     variations:[
-      {sku:"3.CORR.LARG.25CM",label:"45mm · 25cm",tiers:[{minQty:10,label:"10",price:12.64}, {minQty:50,label:"50",price:11.38}, {minQty:100,label:"100",price:10.36}, {minQty:500,label:"500",price:9.1}],weight:"A consultar",ncm:"83024200"},
-      {sku:"3.CORR.LARG.30CM",label:"45mm · 30cm",tiers:[{minQty:10,label:"10",price:15.79}, {minQty:50,label:"50",price:14.21}, {minQty:100,label:"100",price:12.95}, {minQty:500,label:"500",price:11.37}],weight:"A consultar",ncm:"83024200"},
-      {sku:"3.CORR.LARG.35CM",label:"45mm · 35cm",tiers:[{minQty:10,label:"10",price:18.11}, {minQty:50,label:"50",price:16.3}, {minQty:100,label:"100",price:14.85}, {minQty:500,label:"500",price:13.04}],weight:"A consultar",ncm:"83024200"},
-      {sku:"3.CORR.LARG.40CM",label:"45mm · 40cm",tiers:[{minQty:10,label:"10",price:19.82}, {minQty:50,label:"50",price:17.84}, {minQty:100,label:"100",price:16.25}, {minQty:500,label:"500",price:14.27}],weight:"A consultar",ncm:"83024200"}
+      {sku:"3.CORR.LARG.25CM",label:"45mm · 25cm",tiers:[{minQty:1,label:"1",price:12.99}, {minQty:30,label:"30",price:11.99}, {minQty:50,label:"50",price:10.99}, {minQty:100,label:"100",price:9.99}],weight:"A consultar",ncm:"83024200"},
+      {sku:"3.CORR.LARG.30CM",label:"45mm · 30cm",tiers:[{minQty:1,label:"1",price:14.99}, {minQty:30,label:"30",price:13.99}, {minQty:50,label:"50",price:12.99}, {minQty:100,label:"100",price:12.69}],weight:"A consultar",ncm:"83024200"},
+      {sku:"3.CORR.LARG.35CM",label:"45mm · 35cm",tiers:[{minQty:1,label:"1",price:17.99}, {minQty:30,label:"30",price:16.99}, {minQty:50,label:"50",price:15.99}, {minQty:100,label:"100",price:14.99}],weight:"A consultar",ncm:"83024200"},
+      {sku:"3.CORR.LARG.40CM",label:"45mm · 40cm",tiers:[{minQty:1,label:"1",price:19.99}, {minQty:50,label:"50",price:18.99}, {minQty:100,label:"100",price:17.99}, {minQty:500,label:"500",price:16.99}],weight:"A consultar",ncm:"83024200"}
     ],
     stock:999,sold:0,isPromotion:false,isLaunch:false,
   },
@@ -612,10 +612,10 @@ Regra simples: quanto menor o número do grão, mais agressiva é a lixa; quanto
     supplier:"Renna",
     keywords:["puxador pux","redondo 31,5mm| cromado","redondo 31,5mm| dourado","redondo 31,5mm| preto fosco","redondo 31,5mm| escovado"],
     variations:[
-      {sku:"3.PUX.31.CRO",label:"Redondo 31,5mm| Cromado",tiers:[{minQty:10,label:"10",price:10.11}, {minQty:50,label:"50",price:9.1}, {minQty:100,label:"100",price:8.29}, {minQty:500,label:"500",price:7.28}],weight:"A consultar",ncm:""},
-      {sku:"3.PUX.31.DO",label:"Redondo 31,5mm| Dourado",tiers:[{minQty:10,label:"10",price:10.08}, {minQty:50,label:"50",price:9.07}, {minQty:100,label:"100",price:8.27}, {minQty:500,label:"500",price:7.26}],weight:"A consultar",ncm:""},
-      {sku:"3.PUX.31.PT",label:"Redondo 31,5mm| Preto Fosco",tiers:[{minQty:10,label:"10",price:9.48}, {minQty:50,label:"50",price:8.53}, {minQty:100,label:"100",price:7.77}, {minQty:500,label:"500",price:6.83}],weight:"A consultar",ncm:""},
-      {sku:"3.PUX.31.ESC",label:"Redondo 31,5mm| Escovado",tiers:[{minQty:10,label:"10",price:10.1}, {minQty:50,label:"50",price:9.09}, {minQty:100,label:"100",price:8.28}, {minQty:500,label:"500",price:7.27}],weight:"A consultar",ncm:""}
+      {sku:"3.PUX.31.CRO",label:"Redondo 31,5mm| Cromado",tiers:[{minQty:1,label:"1",price:9.99}, {minQty:50,label:"50",price:9.39}, {minQty:100,label:"100",price:8.99}, {minQty:200,label:"200",price:7.99}],weight:"A consultar",ncm:""},
+      {sku:"3.PUX.31.DO",label:"Redondo 31,5mm| Dourado",tiers:[{minQty:1,label:"1",price:9.99}, {minQty:50,label:"50",price:9.39}, {minQty:100,label:"100",price:8.99}, {minQty:200,label:"200",price:7.99}],weight:"A consultar",ncm:""},
+      {sku:"3.PUX.31.PT",label:"Redondo 31,5mm| Preto Fosco",tiers:[{minQty:1,label:"1",price:9.99}, {minQty:50,label:"50",price:9.39}, {minQty:100,label:"100",price:8.99}, {minQty:200,label:"200",price:7.99}],weight:"A consultar",ncm:""},
+      {sku:"3.PUX.31.ESC",label:"Redondo 31,5mm| Escovado",tiers:[{minQty:1,label:"1",price:9.99}, {minQty:50,label:"50",price:9.39}, {minQty:100,label:"100",price:8.99}, {minQty:200,label:"200",price:7.99}],weight:"A consultar",ncm:""}
     ],
     stock:999,sold:0,isPromotion:false,isLaunch:false,
   },
@@ -630,7 +630,7 @@ Regra simples: quanto menor o número do grão, mais agressiva é a lixa; quanto
     supplier:"Renna",
     keywords:["spot lumini","quadrado","1w 6000k","cromado"],
     variations:[
-      {sku:"3.SPOT.QUAD.CROM",label:"1w 6000k · Cromado",tiers:[{minQty:10,label:"10",price:8.98}, {minQty:50,label:"50",price:8.08}, {minQty:100,label:"100",price:7.36}, {minQty:500,label:"500",price:6.47}],weight:"A consultar",ncm:""}
+      {sku:"3.SPOT.QUAD.CROM",label:"1w 6000k · Cromado",tiers:[{minQty:1,label:"1",price:9.99}, {minQty:50,label:"50",price:9.39}, {minQty:100,label:"100",price:8.99}, {minQty:200,label:"200",price:7.99}],weight:"A consultar",ncm:""}
     ],
     stock:999,sold:0,isPromotion:false,isLaunch:false,
   },
@@ -645,14 +645,14 @@ Regra simples: quanto menor o número do grão, mais agressiva é a lixa; quanto
     supplier:"Renna",
     keywords:["puxador","longo","redondo","inox","escovado","haste inox","96mm","128mm","160mm","192mm","224mm","256mm","288mm","320mm"],
     variations:[
-      {sku:"3.PUX.LONG.96.AÇOESC",label:"96mm · 15cm",tiers:[{minQty:10,label:"10",price:4.35}, {minQty:50,label:"50",price:3.91}, {minQty:100,label:"100",price:3.57}, {minQty:500,label:"500",price:3.13}],weight:"A consultar",ncm:""},
-      {sku:"3.PUX.LONG.128.AÇOESC",label:"128mm · 20cm",tiers:[{minQty:10,label:"10",price:5.08}, {minQty:50,label:"50",price:4.57}, {minQty:100,label:"100",price:4.17}, {minQty:500,label:"500",price:3.66}],weight:"A consultar",ncm:"83024200"},
-      {sku:"3.PUX.LONG.160.AÇOESC",label:"160mm · 25cm",tiers:[{minQty:10,label:"10",price:5.85}, {minQty:50,label:"50",price:5.26}, {minQty:100,label:"100",price:4.8}, {minQty:500,label:"500",price:4.21}],weight:"A consultar",ncm:""},
-      {sku:"3.PUX.LONG.192.AÇOESC",label:"192mm · 30cm",tiers:[{minQty:10,label:"10",price:6.48}, {minQty:50,label:"50",price:5.83}, {minQty:100,label:"100",price:5.31}, {minQty:500,label:"500",price:4.67}],weight:"A consultar",ncm:""},
-      {sku:"3.PUX.LONG.224.AÇOESC",label:"224mm · 35cm",tiers:[{minQty:10,label:"10",price:7.19}, {minQty:50,label:"50",price:6.47}, {minQty:100,label:"100",price:5.9}, {minQty:500,label:"500",price:5.18}],weight:"A consultar",ncm:""},
-      {sku:"3.PUX.LONG.256.AÇOESC",label:"256mm · 40cm",tiers:[{minQty:10,label:"10",price:7.9}, {minQty:50,label:"50",price:7.11}, {minQty:100,label:"100",price:6.48}, {minQty:500,label:"500",price:5.69}],weight:"A consultar",ncm:""},
-      {sku:"3.PUX.LONG.288.AÇOESC",label:"288mm · 45cm",tiers:[{minQty:10,label:"10",price:8.61}, {minQty:50,label:"50",price:7.75}, {minQty:100,label:"100",price:7.06}, {minQty:500,label:"500",price:6.2}],weight:"A consultar",ncm:""},
-      {sku:"3.PUX.LONG.320.AÇOESC",label:"320mm · 50cm",tiers:[{minQty:10,label:"10",price:9.32}, {minQty:50,label:"50",price:8.39}, {minQty:100,label:"100",price:7.64}, {minQty:500,label:"500",price:6.71}],weight:"A consultar",ncm:""}
+      {sku:"3.PUX.LONG.96.AÇOESC",label:"96mm · 15cm",tiers:[{minQty:1,label:"1",price:4.39}, {minQty:10,label:"10",price:3.99}, {minQty:30,label:"30",price:3.69}, {minQty:100,label:"100",price:3.49}],weight:"A consultar",ncm:""},
+      {sku:"3.PUX.LONG.128.AÇOESC",label:"128mm · 20cm",tiers:[{minQty:1,label:"1",price:4.99}, {minQty:10,label:"10",price:4.49}, {minQty:30,label:"30",price:4.19}, {minQty:100,label:"100",price:3.99}],weight:"A consultar",ncm:"83024200"},
+      {sku:"3.PUX.LONG.160.AÇOESC",label:"160mm · 25cm",tiers:[{minQty:1,label:"1",price:5.69}, {minQty:10,label:"10",price:4.99}, {minQty:30,label:"30",price:4.59}, {minQty:100,label:"100",price:4.39}],weight:"A consultar",ncm:""},
+      {sku:"3.PUX.LONG.192.AÇOESC",label:"192mm · 30cm",tiers:[{minQty:1,label:"1",price:6.39}, {minQty:10,label:"10",price:5.99}, {minQty:30,label:"30",price:5.69}, {minQty:100,label:"100",price:5.49}],weight:"A consultar",ncm:""},
+      {sku:"3.PUX.LONG.224.AÇOESC",label:"224mm · 35cm",tiers:[{minQty:1,label:"1",price:6.99}, {minQty:10,label:"10",price:6.49}, {minQty:30,label:"30",price:6.19}, {minQty:100,label:"100",price:5.99}],weight:"A consultar",ncm:""},
+      {sku:"3.PUX.LONG.256.AÇOESC",label:"256mm · 40cm",tiers:[{minQty:1,label:"1",price:7.69}, {minQty:10,label:"10",price:6.99}, {minQty:30,label:"30",price:6.59}, {minQty:100,label:"100",price:6.39}],weight:"A consultar",ncm:""},
+      {sku:"3.PUX.LONG.288.AÇOESC",label:"288mm · 45cm",tiers:[{minQty:1,label:"1",price:8.39}, {minQty:10,label:"10",price:7.99}, {minQty:30,label:"30",price:7.69}, {minQty:100,label:"100",price:7.49}],weight:"A consultar",ncm:""},
+      {sku:"3.PUX.LONG.320.AÇOESC",label:"320mm · 50cm",tiers:[{minQty:1,label:"1",price:9.99}, {minQty:10,label:"10",price:9.49}, {minQty:30,label:"30",price:8.99}, {minQty:100,label:"100",price:8.49}],weight:"A consultar",ncm:""}
     ],
     stock:999,sold:0,isPromotion:false,isLaunch:false,
   },
@@ -667,7 +667,7 @@ Regra simples: quanto menor o número do grão, mais agressiva é a lixa; quanto
     supplier:"Starfer",
     keywords:["boina de lã","125mm (compel)"],
     variations:[
-      {sku:"4.LA.125",label:"125mm (Compel)",tiers:[{minQty:10,label:"10",price:19.18}, {minQty:50,label:"50",price:17.26}, {minQty:100,label:"100",price:15.73}, {minQty:500,label:"500",price:13.81}],weight:"A consultar",ncm:"96039000"}
+      {sku:"4.LA.125",label:"125mm (Compel)",tiers:[{minQty:1,label:"1",price:14.99}, {minQty:5,label:"5",price:13.99}, {minQty:10,label:"10",price:12.99}, {minQty:20,label:"20",price:12.69}],weight:"A consultar",ncm:"96039000"}
     ],
     stock:999,sold:0,isPromotion:false,isLaunch:false,
   },
@@ -682,7 +682,7 @@ Regra simples: quanto menor o número do grão, mais agressiva é a lixa; quanto
     supplier:"Starfer",
     keywords:["disco de lixa","m14","125mm"],
     variations:[
-      {sku:"4.M14.125",label:"M14 · 125mm",tiers:[{minQty:10,label:"10",price:19.63}, {minQty:50,label:"50",price:17.67}, {minQty:100,label:"100",price:16.1}, {minQty:500,label:"500",price:14.13}],weight:"A consultar",ncm:"84679200"}
+      {sku:"4.M14.125",label:"M14 · 125mm",tiers:[{minQty:1,label:"1",price:15.99}, {minQty:5,label:"5",price:14.99}, {minQty:10,label:"10",price:13.99}, {minQty:20,label:"20",price:13.69}],weight:"A consultar",ncm:"84679200"}
     ],
     stock:999,sold:0,isPromotion:false,isLaunch:false,
   },
