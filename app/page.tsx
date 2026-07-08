@@ -1,7 +1,7 @@
 "use client";
 
 import { BadgePercent, ChevronDown, ChevronRight, SlidersHorizontal, X, Menu } from "lucide-react";
-import { useEffect, useRef, useMemo, useState } from "react";
+import { useEffect, useRef, useMemo, useState, type ReactNode } from "react";
 import { CartDrawer } from "@/components/CartDrawer";
 import { FloatingWhatsApp } from "@/components/FloatingWhatsApp";
 import { ProductVisual } from "@/components/ProductVisual";
@@ -177,34 +177,116 @@ const PERFIS = [
   },
 ];
 
+// Ícones "3D minimalistas" em duotom roxo (SVG inline, sem dependência externa)
+// — um por profissão, no estilo da identidade Grape.
+const PERFIL_ICONS: Record<string, ReactNode> = {
+  eletricista: (
+    <svg viewBox="0 0 48 48" fill="none">
+      <path d="M28 4 L11 27 h9.5 l-3 17 L37 19 h-9.5 l5 -15 z" fill="#8B5CF6" />
+      <path d="M28 4 L11 27 h5 L30 6 z" fill="#C4B5FD" />
+    </svg>
+  ),
+  marceneiro: (
+    <svg viewBox="0 0 48 48" fill="none">
+      <rect x="5" y="31" width="38" height="6" rx="3" fill="#DDD6FE" />
+      <path d="M8 22 h22 l7 6 v3 a2 2 0 0 1 -2 2 H10 a2 2 0 0 1 -2 -2 z" fill="#8B5CF6" />
+      <path d="M8 22 h22 l2.5 2.2 H10 a2 2 0 0 0 -2 2 z" fill="#A78BFA" />
+      <rect x="12" y="14.5" width="7" height="9" rx="3.5" fill="#6D28D9" />
+      <path d="M27 27 l6.5 6.5" stroke="#DDD6FE" strokeWidth="2.6" strokeLinecap="round" />
+    </svg>
+  ),
+  instalador: (
+    <svg viewBox="0 0 48 48" fill="none">
+      <path d="M14 25 l-3.5 12.5 a3 3 0 0 0 5.6 1 l3.4 -9.5 z" fill="#6D28D9" />
+      <rect x="8" y="13" width="21" height="13" rx="4.5" fill="#8B5CF6" />
+      <rect x="11" y="15.5" width="13" height="3.6" rx="1.8" fill="#C4B5FD" />
+      <rect x="28.5" y="16.5" width="5.5" height="6" rx="1.5" fill="#6D28D9" />
+      <rect x="33.5" y="18.4" width="9" height="2.4" rx="1.2" fill="#A78BFA" />
+    </svg>
+  ),
+  pintor: (
+    <svg viewBox="0 0 48 48" fill="none">
+      <rect x="7" y="8" width="27" height="11" rx="3.5" fill="#8B5CF6" />
+      <rect x="9.5" y="10" width="21" height="3.4" rx="1.7" fill="#C4B5FD" />
+      <rect x="30" y="10.5" width="6.5" height="6" rx="1.6" fill="#6D28D9" />
+      <path d="M21 19 v4 h-3.5 v5" stroke="#6D28D9" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round" />
+      <rect x="14.5" y="28" width="6" height="14" rx="3" fill="#A78BFA" />
+    </svg>
+  ),
+  diy: (
+    <svg viewBox="0 0 48 48" fill="none">
+      <path d="M17 18 v-2.5 a5 5 0 0 1 10 0 V18" stroke="#6D28D9" strokeWidth="3" strokeLinecap="round" />
+      <rect x="6" y="19" width="36" height="19" rx="3.5" fill="#8B5CF6" />
+      <rect x="6" y="19" width="36" height="6.5" rx="3.5" fill="#6D28D9" />
+      <rect x="20" y="26.5" width="8" height="6" rx="1.6" fill="#DDD6FE" />
+    </svg>
+  ),
+  lojista: (
+    <svg viewBox="0 0 48 48" fill="none">
+      <rect x="15" y="7" width="17" height="12" rx="2.2" fill="#8B5CF6" />
+      <rect x="15" y="19.5" width="17" height="12" rx="2.2" fill="#A78BFA" />
+      <path d="M23.5 7 v12 M23.5 19.5 v12" stroke="#DDD6FE" strokeWidth="2.2" />
+      <path d="M12 6 v30" stroke="#6D28D9" strokeWidth="3.2" strokeLinecap="round" />
+      <path d="M12 35 h9" stroke="#6D28D9" strokeWidth="3.2" strokeLinecap="round" />
+      <circle cx="15" cy="39" r="3.6" fill="#6D28D9" />
+    </svg>
+  ),
+};
+
 function ProfissaoModal({ onSelect, onClose }: {
   onSelect: (perfil: typeof PERFIS[0]) => void;
   onClose: () => void;
 }) {
+  const [loading, setLoading] = useState<typeof PERFIS[0] | null>(null);
+
+  function handlePick(p: typeof PERFIS[0]) {
+    setLoading(p);
+    // ~650ms de "personalizando" antes de aplicar a vitrine filtrada.
+    setTimeout(() => { onSelect(p); onClose(); }, 650);
+  }
+
   return (
-    <div className="profissaoOverlay" onClick={onClose}>
+    <div className="profissaoOverlay" onClick={loading ? undefined : onClose}>
       <div className="profissaoModal" onClick={(e) => e.stopPropagation()}>
-        <div className="profissaoModalHead">
-          <div>
-            <span className="profissaoModalEyebrow">✨ Filtro inteligente</span>
-            <h2 className="profissaoModalTitle">Qual é a sua profissão?</h2>
-            <p className="profissaoModalSub">Vamos mostrar os produtos certos para você.</p>
+        {loading ? (
+          <div className="profissaoLoading">
+            <div className="profissaoSpinner" />
+            <strong>✨ Personalizando sua vitrine…</strong>
+            <span>Selecionando os melhores produtos para {loading.label}.</span>
           </div>
-          <button className="profissaoModalClose" onClick={onClose}>✕</button>
-        </div>
-        <div className="profissaoGrid">
-          {PERFIS.map((p) => (
-            <button
-              key={p.id}
-              className="profissaoCard"
-              onClick={() => { onSelect(p); onClose(); }}
-            >
-              <span className="profissaoEmoji">{p.emoji}</span>
-              <strong>{p.label}</strong>
-              <span>{p.desc}</span>
-            </button>
-          ))}
-        </div>
+        ) : (
+          <>
+            <button className="profissaoModalClose" onClick={onClose} aria-label="Fechar">✕</button>
+            <div className="profissaoModalHead">
+              <div className="profissaoHeadText">
+                <span className="profissaoModalEyebrow">✨ Assistente IA Grape</span>
+                <h2 className="profissaoModalTitle">Qual é a <span className="profissaoTitleAccent">sua profissão?</span></h2>
+                <p className="profissaoModalSub">Nossa IA personaliza sua vitrine para mostrar apenas os produtos mais relevantes para o seu trabalho.</p>
+                <div className="profissaoChecks">
+                  <span className="profissaoCheck">Produtos personalizados</span>
+                  <span className="profissaoCheck">Mais rápido para encontrar</span>
+                  <span className="profissaoCheck">Recomendado para você</span>
+                </div>
+              </div>
+              <span className="profissaoBadge">✨ IA</span>
+            </div>
+            <div className="profissaoGrid">
+              {PERFIS.map((p) => (
+                <button
+                  key={p.id}
+                  className="profissaoCard"
+                  onClick={() => handlePick(p)}
+                >
+                  <span className="profissaoIco">{PERFIL_ICONS[p.id]}</span>
+                  <strong>{p.label}</strong>
+                  <span className="profissaoCardDesc">{p.desc}</span>
+                  <span className="profissaoCardArrow" aria-hidden>→</span>
+                </button>
+              ))}
+            </div>
+            <p className="profissaoFoot">A seleção ajuda nossa IA a recomendar produtos mais relevantes.</p>
+          </>
+        )}
       </div>
     </div>
   );
@@ -500,10 +582,9 @@ export default function HomePage() {
             onClick={() => setProfissaoOpen(true)}
             title="Filtrar por profissão"
           >
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-            </svg>
-            {perfilAtivo ? perfilAtivo.emoji + " " + perfilAtivo.label : "Minha profissão"}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/iconeia2.png" alt="" className="profissaoIcone" />
+            <span className="profissaoTxt">{perfilAtivo ? perfilAtivo.emoji + " " + perfilAtivo.label : "Minha profissão"}</span>
             {perfilAtivo && (
               <span
                 className="profissaoClear"

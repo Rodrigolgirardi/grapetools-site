@@ -62,6 +62,9 @@ const nextConfig: NextConfig = {
       { source: "/25-ts-100", destination: "/trilho-simples", permanent: true },
       // Trava Porta Magnético separada em 3 produtos -> o antigo vai pro Longo.
       { source: "/3-tpor", destination: "/3-tpor-long", permanent: true },
+      // Mão Francesa Leve branca + preta unificadas numa página só.
+      { source: "/6-maof-br", destination: "/6-maof", permanent: true },
+      { source: "/6-maof-pt", destination: "/6-maof", permanent: true },
     ];
   },
 };
