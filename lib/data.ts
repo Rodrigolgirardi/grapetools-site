@@ -984,32 +984,18 @@ Regra simples: quanto menor o número do grão, mais agressiva é a lixa; quanto
     stock:999,sold:0,isPromotion:false,isLaunch:false,
   },
   {
-    prefix:"13.BLT.3",
-    slug:"13-blt-3",
-    name:"Bucha Bolt |3/16x2.1/2",
-    description:"Bucha Bolt |3/16x2.1/2",
+    prefix:"13.BLT",
+    slug:"13-blt",
+    name:"Bucha para Gesso/Drywall com Parafuso",
+    description:"Bucha para Gesso/Drywall com Parafuso · 3/16 e 1/4 · 2.1/2",
     category:"Fixação",
     subcategory:"Buchas",
     brand:"Sfor",
     supplier:"Sfor",
-    keywords:["bucha bolt |3/16x2.1/2"],
+    keywords:["bucha bolt","bucha para gesso","gesso","drywall","com parafuso","3/16","1/4","2.1/2","fixação drywall"],
     variations:[
-      {sku:"13.BLT.3.16",label:"16",tiers:[{minQty:1,label:"1",price:6.69}, {minQty:50,label:"50",price:5.99}, {minQty:100,label:"100",price:5.39}, {minQty:500,label:"500",price:4.99}],weight:"A consultar",ncm:"73181500"}
-    ],
-    stock:999,sold:0,isPromotion:false,isLaunch:false,
-  },
-  {
-    prefix:"13.BLT.1",
-    slug:"13-blt-1",
-    name:"Bucha Bolt",
-    description:"Bucha Bolt · 1/4X2.1/2",
-    category:"Fixação",
-    subcategory:"Buchas",
-    brand:"Sfor",
-    supplier:"Sfor",
-    keywords:["bucha bolt","1/4x2.1/2"],
-    variations:[
-      {sku:"13.BLT.1.4",label:"1/4X2.1/2",tiers:[{minQty:1,label:"1",price:6.69}, {minQty:50,label:"50",price:5.99}, {minQty:100,label:"100",price:5.39}, {minQty:500,label:"500",price:4.99}],weight:"A consultar",ncm:"73181500"}
+      {sku:"13.BLT.3.16",label:"3/16 x 2.1/2",tiers:[{minQty:1,label:"1",price:6.69}, {minQty:50,label:"50",price:5.99}, {minQty:100,label:"100",price:5.39}, {minQty:500,label:"500",price:4.99}],weight:"A consultar",ncm:"73181500"},
+      {sku:"13.BLT.1.4",label:"1/4 x 2.1/2",tiers:[{minQty:1,label:"1",price:6.69}, {minQty:50,label:"50",price:5.99}, {minQty:100,label:"100",price:5.39}, {minQty:500,label:"500",price:4.99}],weight:"A consultar",ncm:"73181500"}
     ],
     stock:999,sold:0,isPromotion:false,isLaunch:false,
   },

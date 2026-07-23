@@ -65,6 +65,9 @@ const nextConfig: NextConfig = {
       // Mão Francesa Leve branca + preta unificadas numa página só.
       { source: "/6-maof-br", destination: "/6-maof", permanent: true },
       { source: "/6-maof-pt", destination: "/6-maof", permanent: true },
+      // Bucha Bolt 3/16 + 1/4 unificadas -> "Bucha para Gesso/Drywall com Parafuso".
+      { source: "/13-blt-3", destination: "/13-blt", permanent: true },
+      { source: "/13-blt-1", destination: "/13-blt", permanent: true },
     ];
   },
 };

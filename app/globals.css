@@ -2955,6 +2955,13 @@ h1, h2, h3, h4 { font-family: var(--font-syne), sans-serif; margin: 0; }
   white-space: nowrap;
 }
 
+/* Ícone "AI" colorido dentro do selo IA (no lugar do ✨). */
+.profissaoBadgeIco {
+  height: 16px;
+  width: auto;
+  flex-shrink: 0;
+}
+
 .profissaoChecks {
   display: flex;
   flex-wrap: wrap;

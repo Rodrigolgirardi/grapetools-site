@@ -268,7 +268,11 @@ function ProfissaoModal({ onSelect, onClose }: {
                   <span className="profissaoCheck">Recomendado para você</span>
                 </div>
               </div>
-              <span className="profissaoBadge">✨ IA</span>
+              <span className="profissaoBadge">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/iconeia2.png" alt="" className="profissaoBadgeIco" />
+                IA
+              </span>
             </div>
             <div className="profissaoGrid">
               {PERFIS.map((p) => (
