@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Fustat } from "next/font/google";
 import "./globals.css";
 import { Analytics } from "@/components/Analytics";
+import { MetaPixel } from "@/components/MetaPixel";
 import { organizationJsonLd, websiteJsonLd } from "@/lib/seo";
 
 // Fonte única do site (igual abacatepay.com). As variáveis --font-syne e
@@ -51,6 +52,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         />
         {children}
         <Analytics />
+        <MetaPixel />
       </body>
     </html>
   );

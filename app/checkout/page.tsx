@@ -10,6 +10,7 @@ import { productImageSrc, handleProductImageError } from '@/lib/product-image'
 import { documentoValido } from '@/lib/documento'
 import { formatCurrency, getCartLines, descontoCarrinhoPercent } from '@/lib/pricing'
 import { trackBeginCheckout, trackPurchase, type GaItem } from '@/lib/analytics'
+import { metaBeginCheckout, metaPurchase } from '@/lib/meta-pixel'
 import { BackToSite } from '@/components/BackToSite'
 
 interface Endereco {
@@ -115,6 +116,11 @@ export default function CheckoutPage() {
     if (beganCheckout.current || lines.length === 0) return
     beganCheckout.current = true
     trackBeginCheckout(buildGaItems(), totalComDesc)
+    metaBeginCheckout({
+      ids: lines.map((l) => l.variation.sku),
+      value: totalComDesc,
+      numItems: lines.reduce((s, l) => s + l.quantity, 0),
+    })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lines.length])
 
@@ -341,8 +347,9 @@ export default function CheckoutPage() {
         return
       }
 
-      // Conversão! Registra a compra no GA antes de limpar o carrinho.
+      // Conversão! Registra a compra no GA e na Meta antes de limpar o carrinho.
       trackPurchase({ transactionId: pedido.id, value: totalComDesc, items: buildGaItems() })
+      metaPurchase({ orderId: pedido.id, value: totalComDesc, ids: lines.map((l) => l.variation.sku) })
       setPagamentoResult(pagarmeData)
       clearCart()
       setPedidoId(pedido.id)

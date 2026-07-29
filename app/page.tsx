@@ -40,7 +40,7 @@ function BannerCarousel({ setCategory }: { setCategory: (v: string) => void }) {
       content: (
         <a href="#produtos" className="bannerImageLink" aria-label="Ver catálogo">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/banner-home.png" alt="Grape Tools" className="bannerImage" style={{ height: "220px", objectFit: "fill" }} />
+          <img src="/banner-home.png" alt="Grape Tools" className="bannerImage" fetchPriority="high" style={{ height: "220px", objectFit: "fill" }} />
         </a>
       ),
     },

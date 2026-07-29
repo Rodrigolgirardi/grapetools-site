@@ -2,16 +2,25 @@ import type { NextConfig } from "next";
 import { withSentryConfig } from "@sentry/nextjs";
 
 // Content-Security-Policy: limita de onde scripts/conexões/imagens podem vir.
-// Libera só o que o site usa: Supabase (auth/db/realtime) e Pagar.me (tokenização
-// do cartão). 'unsafe-inline'/'unsafe-eval' são exigidos pelo Next (sem nonce); o
-// ganho real aqui é bloquear script EXTERNO, exfiltração (connect-src) e clickjacking.
+// Libera só o que o site usa: Supabase (auth/db/realtime), Pagar.me (tokenização
+// do cartão) e as tags de medição (Google Analytics + Meta Pixel). 'unsafe-inline'/
+// 'unsafe-eval' são exigidos pelo Next (sem nonce); o ganho real aqui é bloquear
+// script EXTERNO, exfiltração (connect-src) e clickjacking.
+//
+// ATENÇÃO: toda tag de medição precisa constar em script-src E connect-src — o
+// script carrega de um host e envia os eventos para outro. Faltando qualquer um
+// dos dois, o navegador bloqueia em silêncio e a medição não acontece.
+const medicaoScript = "https://www.googletagmanager.com https://connect.facebook.net";
+const medicaoConnect =
+  "https://www.googletagmanager.com https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://connect.facebook.net https://www.facebook.com";
+
 const csp = [
   "default-src 'self'",
-  "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
+  `script-src 'self' 'unsafe-inline' 'unsafe-eval' ${medicaoScript}`,
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob: https:",
   "font-src 'self' data:",
-  "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.pagar.me https://*.sentry.io",
+  `connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.pagar.me https://*.sentry.io ${medicaoConnect}`,
   "frame-src 'self' https://accounts.google.com",
   "frame-ancestors 'none'",
   "base-uri 'self'",
