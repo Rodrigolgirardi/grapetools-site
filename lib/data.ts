@@ -1223,13 +1223,13 @@ Regra simples: quanto menor o número do grão, mais agressiva é a lixa; quanto
   {
     prefix:"16.MOLA",
     slug:"16-mola",
-    name:"Mola Aerea",
-    description:"Mola Aerea · Coimbra · Branca",
+    name:"Mola Leve Aérea para Portas | Até 25kg | Coimbra",
+    description:"Mola Leve Aérea para Portas · Até 25kg · Coimbra · Branca / Preta / Ouro / Cinza / Zincado",
     category:"Ferragens",
     subcategory:"Molas Aéreas",
     brand:"Coimbra",
     supplier:"Coimbra",
-    keywords:["mola aerea","coimbra","branca","preta","ouro","cinza","zincado"],
+    keywords:["mola aerea","mola leve aérea","mola para portas","até 25kg","coimbra","branca","preta","ouro","cinza","zincado"],
     variations:[
       {sku:"16.MOLA.BR",label:"Branca",tiers:[{minQty:1,label:"1",price:76.99}, {minQty:3,label:"3",price:73.99}, {minQty:5,label:"5",price:69.99}, {minQty:10,label:"10",price:65.99}],weight:"A consultar",ncm:"83026000"},
       {sku:"16.MOLA.PT",label:"Preta",tiers:[{minQty:1,label:"1",price:76.99}, {minQty:3,label:"3",price:73.99}, {minQty:5,label:"5",price:69.99}, {minQty:10,label:"10",price:65.99}],weight:"A consultar",ncm:"83026000"},
@@ -1614,13 +1614,13 @@ Regra simples: quanto menor o número do grão, mais agressiva é a lixa; quanto
   {
     prefix:"4.MOLA",
     slug:"4-mola",
-    name:"Mola Leve Aérea para Portas | Até 25kg | Coimbra",
-    description:"Mola Leve Aérea para Portas · Até 25kg · Coimbra · Ouro / Prata",
+    name:"Mola Leve Aérea para Portas | Até 25kg | Starfer",
+    description:"Mola Leve Aérea para Portas · Até 25kg · Starfer · Ouro / Prata",
     category:"Ferragens",
     subcategory:"Molas Aéreas",
-    brand:"Coimbra",
-    supplier:"Coimbra",
-    keywords:["mola aérea","mola leve aérea","mola para portas","até 25kg","25kg","coimbra","ouro","prata"],
+    brand:"Starfer",
+    supplier:"Starfer",
+    keywords:["mola aérea","mola leve aérea","mola para portas","até 25kg","25kg","starfer","ouro","prata"],
     variations:[
       {sku:"4.MOLA.OU",label:"Ouro",tiers:[{minQty:1,label:"1",price:69.99}, {minQty:5,label:"5",price:68.99}, {minQty:10,label:"10",price:67.99}, {minQty:20,label:"20",price:65.99}],weight:"A consultar",ncm:"83026000"},
       {sku:"4.MOLA.PR",label:"Prata",tiers:[{minQty:1,label:"1",price:69.99}, {minQty:5,label:"5",price:68.99}, {minQty:10,label:"10",price:67.99}, {minQty:20,label:"20",price:65.99}],weight:"A consultar",ncm:"83026000"}
