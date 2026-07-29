@@ -46,3 +46,22 @@ export function documentoValido(doc: string): boolean {
   if (d.length === 14) return validarCNPJ(d);
   return false;
 }
+
+// Máscara do campo: descarta tudo que não é dígito, trava em 14 dígitos (o
+// tamanho de um CNPJ) e pontua conforme o usuário digita — até 11 dígitos
+// formata como CPF (000.000.000-00); do 12º em diante, como CNPJ
+// (00.000.000/0000-00).
+export function formatarDocumento(valor: string): string {
+  const d = (valor || "").replace(/\D/g, "").slice(0, 14);
+  if (d.length <= 11) {
+    return d
+      .replace(/^(\d{3})(\d)/, "$1.$2")
+      .replace(/^(\d{3})\.(\d{3})(\d)/, "$1.$2.$3")
+      .replace(/^(\d{3})\.(\d{3})\.(\d{3})(\d)/, "$1.$2.$3-$4");
+  }
+  return d
+    .replace(/^(\d{2})(\d)/, "$1.$2")
+    .replace(/^(\d{2})\.(\d{3})(\d)/, "$1.$2.$3")
+    .replace(/^(\d{2})\.(\d{3})\.(\d{3})(\d)/, "$1.$2.$3/$4")
+    .replace(/^(\d{2})\.(\d{3})\.(\d{3})\/(\d{4})(\d)/, "$1.$2.$3/$4-$5");
+}

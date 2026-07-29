@@ -7,7 +7,7 @@ import { createClient } from '@/lib/supabase-client'
 import { useAuth } from '@/hooks/useAuth'
 import { useCart } from '@/hooks/useCart'
 import { productImageSrc, handleProductImageError } from '@/lib/product-image'
-import { documentoValido } from '@/lib/documento'
+import { documentoValido, formatarDocumento } from '@/lib/documento'
 import { formatCurrency, getCartLines, descontoCarrinhoPercent, parcelasMaximas, PARCELAS_MAX, PARCELAS_SEM_JUROS, PARCELA_VALOR_MIN } from '@/lib/pricing'
 import { trackBeginCheckout, trackPurchase, type GaItem } from '@/lib/analytics'
 import { metaBeginCheckout, metaPurchase } from '@/lib/meta-pixel'
@@ -50,7 +50,7 @@ const LOJA = {
 
 export default function CheckoutPage() {
   const { user, loading } = useAuth()
-  const { cart, clearCart } = useCart()
+  const { cart, clearCart, updateQuantity } = useCart()
   const router = useRouter()
 
   const [step, setStep] = useState<'resumo' | 'entrega' | 'pagamento' | 'confirmado'>('resumo')
@@ -483,7 +483,8 @@ export default function CheckoutPage() {
             {/* ─── STEP 1: RESUMO ─── */}
             {step === 'resumo' && (
               <div className="checkoutSection">
-                <h2 className="checkoutSectionTitle">Itens do pedido</h2>
+                <h2 className="checkoutSectionTitle">Revise seus itens</h2>
+                <p className="checkoutSectionSub">Veja os produtos que você escolheu e faça ajustes se necessário.</p>
                 <div className="checkoutItems">
                   {lines.map(({ product, variation, quantity, tier, total }) => (
                     <div key={variation.sku} className="checkoutItem">
@@ -500,16 +501,52 @@ export default function CheckoutPage() {
                         {variation.label !== product.name && (
                           <p className="checkoutItemVar">{variation.label}</p>
                         )}
-                        <p className="checkoutItemSku">{variation.sku}</p>
+                        <span className="checkoutItemSku">{variation.sku}</span>
+                        <button
+                          type="button"
+                          className="checkoutItemRemove"
+                          onClick={() => updateQuantity(variation.sku, 0)}
+                        >
+                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                            <path d="M3 6h18" /><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" /><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                          </svg>
+                          Remover
+                        </button>
                       </div>
-                      <div className="checkoutItemRight">
-                        <p className="checkoutItemQty">{quantity} un.</p>
-                        <p className="checkoutItemPrice">{formatCurrency(tier.price)}/un.</p>
-                        <p className="checkoutItemTotal">{formatCurrency(total)}</p>
+                      <div className="checkoutItemMeio">
+                        <div className="checkoutItemStepper">
+                          <button
+                            type="button"
+                            aria-label="Diminuir quantidade"
+                            onClick={() => updateQuantity(variation.sku, quantity - 1)}
+                            disabled={quantity <= 1}
+                          >−</button>
+                          <span>{quantity}</span>
+                          <button
+                            type="button"
+                            aria-label="Aumentar quantidade"
+                            onClick={() => updateQuantity(variation.sku, quantity + 1)}
+                          >+</button>
+                        </div>
+                        <p className="checkoutItemPrice">{formatCurrency(tier.price)} / un.</p>
                       </div>
+                      <p className="checkoutItemTotal">{formatCurrency(total)}</p>
                     </div>
                   ))}
                 </div>
+
+                {/* Convite pra voltar ao catálogo sem perder o checkout */}
+                <a href="/#produtos" className="checkoutContinueBanner">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--purple-700, #5b21b6)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <path d="M12 2l2.4 4.9 5.4.8-3.9 3.8.9 5.4-4.8-2.5-4.8 2.5.9-5.4L4.2 7.7l5.4-.8L12 2z" />
+                  </svg>
+                  <span className="checkoutContinueBannerTexto">
+                    <strong>Precisa de mais alguma coisa?</strong>
+                    Continue comprando e aproveite o frete!
+                  </span>
+                  <span className="checkoutContinueBannerLink">Continuar comprando →</span>
+                </a>
+
                 <button className="checkoutBtnPrimary checkoutBtnFull" onClick={() => setStep('entrega')}>
                   Continuar para entrega →
                 </button>
@@ -527,23 +564,25 @@ export default function CheckoutPage() {
                     className={`checkoutPayOption ${entregaTipo === 'entrega' ? 'active' : ''}`}
                     onClick={() => setEntregaTipo('entrega')}
                   >
-                    <span className="checkoutPayIcon">📦</span>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src="/receber-em-casa.png" alt="" aria-hidden="true" className="checkoutPayIcon" />
                     <div>
                       <strong>Receber em casa</strong>
                       <span>Entrega no seu endereço</span>
                     </div>
-                    <span className="checkoutPayCheck">{entregaTipo === 'entrega' ? '●' : '○'}</span>
+                    <span className={`checkoutPayCheck ${entregaTipo === 'entrega' ? 'checked' : ''}`} aria-hidden="true" />
                   </button>
                   <button
                     className={`checkoutPayOption ${entregaTipo === 'retirada' ? 'active' : ''}`}
                     onClick={() => setEntregaTipo('retirada')}
                   >
-                    <span className="checkoutPayIcon">🏪</span>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src="/retirada-na-loja.png" alt="" aria-hidden="true" className="checkoutPayIcon" />
                     <div>
                       <strong>Retirar na loja</strong>
                       <span>Frete grátis · retire no balcão</span>
                     </div>
-                    <span className="checkoutPayCheck">{entregaTipo === 'retirada' ? '●' : '○'}</span>
+                    <span className={`checkoutPayCheck ${entregaTipo === 'retirada' ? 'checked' : ''}`} aria-hidden="true" />
                   </button>
                 </div>
 
@@ -564,8 +603,9 @@ export default function CheckoutPage() {
                       inputMode="numeric"
                       className={mostrarErros && !documentoValido(documento) ? 'campoErro' : undefined}
                       value={documento}
-                      onChange={e => setDocumento(e.target.value)}
+                      onChange={e => setDocumento(formatarDocumento(e.target.value))}
                       placeholder="Obrigatório para o pagamento"
+                      maxLength={18} /* CNPJ formatado: 00.000.000/0000-00 */
                     />
                     {documento.replace(/\D/g, '').length > 0 && !documentoValido(documento) && (
                       <span style={{ color: '#dc2626', fontSize: '12px', marginTop: 4 }}>
@@ -591,12 +631,12 @@ export default function CheckoutPage() {
                         </div>
                       </div>
                       <div className="checkoutField">
-                        <label>Número</label>
-                        <input type="text" className={mostrarErros && !endereco.numero ? 'campoErro' : undefined} value={endereco.numero || ''} onChange={e => setEndereco(v => ({ ...v, numero: e.target.value }))} placeholder="123" />
-                      </div>
-                      <div className="checkoutField checkoutFieldFull">
                         <label>Rua / Avenida</label>
                         <input type="text" className={mostrarErros && !endereco.rua ? 'campoErro' : undefined} value={endereco.rua || ''} onChange={e => setEndereco(v => ({ ...v, rua: e.target.value }))} placeholder="Nome da rua" />
+                      </div>
+                      <div className="checkoutField">
+                        <label>Número</label>
+                        <input type="text" className={mostrarErros && !endereco.numero ? 'campoErro' : undefined} value={endereco.numero || ''} onChange={e => setEndereco(v => ({ ...v, numero: e.target.value }))} placeholder="123" />
                       </div>
                       <div className="checkoutField">
                         <label>Complemento <span className="checkoutOptional">opcional</span></label>
@@ -622,8 +662,8 @@ export default function CheckoutPage() {
                 </div>
 
                 {entregaTipo === 'retirada' && (
-                  <div className="checkoutPixInfo">
-                    <p><strong>🏪 Retirada na loja — frete grátis</strong></p>
+                  <div className="checkoutPixInfo checkoutPixInfoBranco">
+                    <p><strong>Retirada na loja</strong> — frete grátis</p>
                     <p>{LOJA.rua}, {LOJA.numero} — {LOJA.bairro}, {LOJA.cidade}/{LOJA.estado} · CEP {LOJA.cep}</p>
                     <p>Avisaremos por WhatsApp quando seu pedido estiver pronto para retirada.</p>
                   </div>
@@ -635,7 +675,7 @@ export default function CheckoutPage() {
                     value={obs}
                     onChange={e => setObs(e.target.value)}
                     placeholder="Instruções especiais, horário de entrega, referência…"
-                    rows={3}
+                    rows={2}
                     className="checkoutTextarea"
                   />
                 </div>
@@ -680,7 +720,7 @@ export default function CheckoutPage() {
                         <strong>{opt.label}</strong>
                         <span>{opt.desc}</span>
                       </div>
-                      <span className="checkoutPayCheck">{formaPagamento === opt.id ? '●' : '○'}</span>
+                      <span className={`checkoutPayCheck ${formaPagamento === opt.id ? 'checked' : ''}`} aria-hidden="true" />
                     </button>
                   ))}
                 </div>
@@ -697,11 +737,17 @@ export default function CheckoutPage() {
                     Pagamento processado com segurança pela <strong>Pagar.me</strong> <em>— uma empresa Stone</em>.
                     Seus dados de cartão são criptografados e não passam pelos nossos servidores.
                   </span>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src="/pagarme-stone.png" alt="Pagar.me — uma empresa Stone" className="checkoutTrustLogo" />
                 </div>
 
                 {formaPagamento === 'pix' && (
-                  <div className="checkoutPixInfo">
-                    <p>Após confirmar o pedido, a chave Pix será enviada para o seu WhatsApp ou e-mail.</p>
+                  <div className="checkoutPixInfo checkoutPixInfoNeutro">
+                    <p>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src="/whatsapp-icon.png" alt="" aria-hidden="true" className="checkoutZapIcon" />
+                      Após confirmar o pedido, a chave Pix será enviada para o seu <span className="checkoutZap">WhatsApp</span> ou e-mail.
+                    </p>
                   </div>
                 )}
 
@@ -786,16 +832,58 @@ export default function CheckoutPage() {
           {/* ─── COLUNA DIREITA: RESUMO FIXO ─── */}
           <aside className="checkoutSidebar">
             <div className="checkoutSidebarCard">
-              <h3 className="checkoutSidebarTitle">Resumo</h3>
+              <h3 className="checkoutSidebarTitle">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <circle cx="9" cy="21" r="1" /><circle cx="20" cy="21" r="1" />
+                  <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
+                </svg>
+                Seu pedido <em className="checkoutSidebarQtdTotal">({totalQty} {totalQty === 1 ? 'item' : 'itens'})</em>
+              </h3>
               <div className="checkoutSidebarLines">
                 {lines.map(({ product, variation, quantity, total }) => (
-                  <div key={variation.sku} className="checkoutSidebarLine">
-                    <span>{product.name} <em>×{quantity}</em></span>
-                    <strong>{formatCurrency(total)}</strong>
+                  <div key={variation.sku} className="checkoutSidebarItem">
+                    <div className="checkoutSidebarThumb">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={productImageSrc(variation.sku)}
+                        alt={product.name}
+                        loading="lazy"
+                        onError={handleProductImageError(variation.sku)}
+                      />
+                    </div>
+                    <div className="checkoutSidebarItemInfo">
+                      <span className="checkoutSidebarItemNome">{product.name}</span>
+                      <span className="checkoutSidebarItemQtd">Quantidade: {quantity}</span>
+                    </div>
+                    <strong className="checkoutSidebarItemPreco">{formatCurrency(total)}</strong>
                   </div>
                 ))}
               </div>
               <div className="checkoutSidebarDivider" />
+
+              <div className="checkoutSidebarTotal">
+                <span>Subtotal</span>
+                <strong className="checkoutSidebarSubtotal">{formatCurrency(subtotal)}</strong>
+              </div>
+              {descTotalPercent > 0 && (
+                <div className="checkoutSidebarTotal" style={{ color: '#16a34a', fontWeight: 500 }}>
+                  <span style={{ color: '#16a34a' }}>Desconto ({descTotalPercent}%)</span>
+                  <strong style={{ fontSize: '0.875rem', color: '#16a34a' }}>− {formatCurrency(descValor)}</strong>
+                </div>
+              )}
+              <div className="checkoutSidebarFrete">
+                <span>Frete</span>
+                <span className="checkoutSidebarFreteVal">
+                  {entregaTipo === 'retirada' ? 'Grátis · Retirar na loja' : 'A combinar'}
+                </span>
+              </div>
+
+              <div className="checkoutSidebarDivider" />
+
+              <div className="checkoutSidebarTotalFinal">
+                <span>TOTAL</span>
+                <strong>{formatCurrency(totalComDesc)}</strong>
+              </div>
 
               {/* Cupom de desconto */}
               <div style={{ margin: '4px 0 10px' }}>
@@ -824,21 +912,37 @@ export default function CheckoutPage() {
                 )}
               </div>
 
-              {descTotalPercent > 0 && (
-                <div className="checkoutSidebarTotal" style={{ color: '#16a34a', fontWeight: 500 }}>
-                  <span>Desconto ({descTotalPercent}%)</span>
-                  <strong>− {formatCurrency(descValor)}</strong>
+            </div>
+
+            {/* Selos de confiança abaixo do resumo */}
+            <div className="checkoutSidebarTrust">
+              <div className="checkoutSidebarTrustItem">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /><path d="m9 12 2 2 4-4" />
+                </svg>
+                <div>
+                  <strong>Compra 100% segura</strong>
+                  <span>Seus dados protegidos e criptografados</span>
                 </div>
-              )}
-              <div className="checkoutSidebarTotal">
-                <span>{totalQty} itens</span>
-                <strong>{formatCurrency(totalComDesc)}</strong>
               </div>
-              <div className="checkoutSidebarFrete">
-                <span>Frete</span>
-                <span className="checkoutSidebarFreteVal">
-                  {entregaTipo === 'retirada' ? 'Grátis · Retirar na loja' : 'A combinar'}
-                </span>
+              <div className="checkoutSidebarTrustItem">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#5b21b6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <rect x="1" y="3" width="15" height="13" rx="1" /><path d="M16 8h4l3 3v5h-7V8z" />
+                  <circle cx="5.5" cy="18.5" r="2.5" /><circle cx="18.5" cy="18.5" r="2.5" />
+                </svg>
+                <div>
+                  <strong>Postagem rápida</strong>
+                  <span>Seu pedido postado em até 1 dia útil</span>
+                </div>
+              </div>
+              <div className="checkoutSidebarTrustItem">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#5b21b6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M12 2l2.4 4.9 5.4.8-3.9 3.8.9 5.4-4.8-2.5-4.8 2.5.9-5.4L4.2 7.7l5.4-.8L12 2z" />
+                </svg>
+                <div>
+                  <strong>Garantia Grape Tools</strong>
+                  <span>Produtos de qualidade com garantia</span>
+                </div>
               </div>
             </div>
           </aside>
