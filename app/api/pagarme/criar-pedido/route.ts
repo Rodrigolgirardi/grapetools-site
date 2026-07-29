@@ -177,6 +177,10 @@ export async function POST(request: NextRequest) {
     if (!calc.ok) {
       return NextResponse.json({ error: calc.erro || 'Itens do pedido inválidos.' }, { status: 400 })
     }
+    // Parcelas EFETIVAS: o cliente pede, o servidor limita pelo valor mínimo por
+    // parcela (adquirente recusa parcela muito baixa). É este número que vai para
+    // o Pagar.me e que foi usado no cálculo dos juros.
+    const parcelasEfetivas = calc.parcelas ?? 1
 
     // Comissão = % do cupom × total que o cliente pagou (decisão do dono). Só há
     // comissão se o cupom tem vendedor + % > 0. Conta de verdade só quando o pedido
@@ -241,7 +245,7 @@ export async function POST(request: NextRequest) {
       pagamento = {
         payment_method: 'credit_card',
         credit_card: {
-          installments: parcelas && parcelas > 0 ? parcelas : 1,
+          installments: parcelasEfetivas,
           statement_descriptor: 'GRAPETOOLS',
           card_token,
           card: {
@@ -383,7 +387,7 @@ export async function POST(request: NextRequest) {
           tipo: 'cartao',
           pagarme_order_id: data.id,
           status: 'paid',
-          parcelas: parcelas && parcelas > 0 ? parcelas : 1,
+          parcelas: parcelasEfetivas,
         })
       }
       // Recusado

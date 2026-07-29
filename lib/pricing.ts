@@ -91,6 +91,19 @@ export function getTierRangeLabel(tiers: Tier[], index: number): string {
 // Regra de parcelamento: até N parcelas sem juros; acima disso, juros/parcela.
 export const PARCELAS_SEM_JUROS = 3;
 export const JUROS_AO_MES = 0.02;
+export const PARCELAS_MAX = 12;
+// Valor mínimo de cada parcela. As adquirentes recusam parcelas muito baixas, e a
+// recusa chega ao cliente como um "não autorizado" genérico — então é melhor nem
+// oferecer a opção do que deixar ele tentar e falhar sem entender o motivo.
+export const PARCELA_VALOR_MIN = 5;
+
+// Quantas parcelas cabem num total, respeitando o valor mínimo por parcela.
+// Sempre devolve pelo menos 1 (à vista existe em qualquer valor).
+export function parcelasMaximas(total: number): number {
+  if (!(total > 0)) return 1;
+  const cabe = Math.floor(total / PARCELA_VALOR_MIN);
+  return Math.min(PARCELAS_MAX, Math.max(1, cabe));
+}
 
 const r2 = (n: number) => Math.round(n * 100) / 100;
 
@@ -116,6 +129,7 @@ export type CalculoPedido = {
   descValor: number;     // subtotal - total
   total: number;         // valor real da compra (com desconto), sem juros de cartão
   valorCobrar: number;   // total + juros do parcelamento (se cartão > PARCELAS_SEM_JUROS)
+  parcelas?: number;     // parcelas EFETIVAS (pedido do cliente já limitado ao mínimo por parcela)
 };
 
 // Recalcula TODO o valor do pedido a partir do catálogo, IGNORANDO qualquer
@@ -170,9 +184,17 @@ export function calcularPedidoServidor(
   const total = r2(itens.reduce((s, i) => s + i.preco_unitario * i.quantidade, 0));
   const descValor = r2(subtotal - total);
 
-  // 4) Juros do parcelamento (só cartão acima de PARCELAS_SEM_JUROS)
-  const comJuros = opts.cartao && opts.parcelas > PARCELAS_SEM_JUROS;
-  const valorCobrar = comJuros ? r2(total * (1 + JUROS_AO_MES * opts.parcelas)) : total;
+  // 4) Parcelamento: o número vem do cliente, então é limitado aqui pelo valor
+  //    mínimo por parcela. O teto usa o total SEM juros (mesma base do checkout),
+  //    senão o cálculo ficaria circular — juros dependem das parcelas.
+  const parcelas = Math.min(
+    Math.max(1, Math.floor(Number(opts.parcelas) || 1)),
+    parcelasMaximas(total)
+  );
 
-  return { ok: true, itens, subtotal, descPercent, cupomPercent, totalDescPercent, descValor, total, valorCobrar };
+  // 5) Juros do parcelamento (só cartão acima de PARCELAS_SEM_JUROS)
+  const comJuros = opts.cartao && parcelas > PARCELAS_SEM_JUROS;
+  const valorCobrar = comJuros ? r2(total * (1 + JUROS_AO_MES * parcelas)) : total;
+
+  return { ok: true, itens, subtotal, descPercent, cupomPercent, totalDescPercent, descValor, total, valorCobrar, parcelas };
 }

@@ -11,13 +11,19 @@ export default function RedefinirSenhaPage() {
   const [success, setSuccess] = useState(false);
   const [temSessao, setTemSessao] = useState<boolean | null>(null);
 
-  // Ao chegar pelo link, o /auth/callback já criou a sessão. Confirma que existe.
+  // O link de recuperação chega com os tokens no fragmento da URL; ao instanciar
+  // o cliente do Supabase, ele lê o fragmento e abre a sessão. Aqui só conferimos
+  // que deu certo — e limpamos o fragmento, senão o access_token fica à vista na
+  // barra de endereço e no histórico do navegador.
   useEffect(() => {
     (async () => {
       const { createClient } = await import("@/lib/supabase-client");
       const supabase = createClient();
       const { data } = await supabase.auth.getSession();
       setTemSessao(!!data.session);
+      if (window.location.hash.includes("access_token")) {
+        window.history.replaceState(null, "", window.location.pathname);
+      }
     })();
   }, []);
 

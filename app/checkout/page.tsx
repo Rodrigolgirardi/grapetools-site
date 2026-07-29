@@ -8,7 +8,7 @@ import { useAuth } from '@/hooks/useAuth'
 import { useCart } from '@/hooks/useCart'
 import { productImageSrc, handleProductImageError } from '@/lib/product-image'
 import { documentoValido } from '@/lib/documento'
-import { formatCurrency, getCartLines, descontoCarrinhoPercent } from '@/lib/pricing'
+import { formatCurrency, getCartLines, descontoCarrinhoPercent, parcelasMaximas, PARCELAS_MAX, PARCELAS_SEM_JUROS, PARCELA_VALOR_MIN } from '@/lib/pricing'
 import { trackBeginCheckout, trackPurchase, type GaItem } from '@/lib/analytics'
 import { metaBeginCheckout, metaPurchase } from '@/lib/meta-pixel'
 import { BackToSite } from '@/components/BackToSite'
@@ -99,6 +99,14 @@ export default function CheckoutPage() {
   const precoComDesc = (preco: number) => Math.round(preco * (100 - descTotalPercent)) / 100
   const totalComDesc = lines.reduce((s, l) => s + precoComDesc(l.tier.price) * l.quantity, 0)
   const descValor = subtotal - totalComDesc
+
+  // Só oferece parcelas que respeitem o valor mínimo por parcela (ver pricing.ts).
+  const maxParcelas = parcelasMaximas(totalComDesc)
+  // Se o carrinho encolher depois de escolher (ex.: 6x e o cliente tira um item),
+  // a opção selecionada some do menu mas o estado continuaria em 6 — reancora.
+  useEffect(() => {
+    if (parcelas > maxParcelas) setParcelas(maxParcelas)
+  }, [maxParcelas, parcelas])
 
   // Itens no formato de e-commerce do Google Analytics (funil de venda)
   const buildGaItems = (): GaItem[] =>
@@ -657,16 +665,17 @@ export default function CheckoutPage() {
 
                 <div className="checkoutPayOptions">
                   {([
-                    { id: 'pix', label: 'Pix', desc: 'Aprovação imediata', icon: '⚡' },
-                    { id: 'cartao', label: 'Cartão de crédito', desc: 'Em até 12x', icon: '💳' },
-                    { id: 'boleto', label: 'Boleto bancário', desc: 'Prazo de 1–3 dias úteis', icon: '📄' },
+                    { id: 'pix', label: 'Pix', desc: 'Aprovação imediata', icon: '/pagamento-pix.png' },
+                    { id: 'cartao', label: 'Cartão de crédito', desc: 'Em até 12x', icon: '/pagamento-cartao.png' },
+                    { id: 'boleto', label: 'Boleto bancário', desc: 'Prazo de 1–3 dias úteis', icon: '/pagamento-boleto.png' },
                   ] as const).map(opt => (
                     <button
                       key={opt.id}
                       className={`checkoutPayOption ${formaPagamento === opt.id ? 'active' : ''}`}
                       onClick={() => setFormaPagamento(opt.id)}
                     >
-                      <span className="checkoutPayIcon">{opt.icon}</span>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={opt.icon} alt="" aria-hidden="true" className="checkoutPayIcon" />
                       <div>
                         <strong>{opt.label}</strong>
                         <span>{opt.desc}</span>
@@ -674,6 +683,20 @@ export default function CheckoutPage() {
                       <span className="checkoutPayCheck">{formaPagamento === opt.id ? '●' : '○'}</span>
                     </button>
                   ))}
+                </div>
+
+                {/* Selo de confiança: quem processa o pagamento não é a loja */}
+                <div className="checkoutTrust">
+                  <span className="checkoutTrustIcon" aria-hidden="true">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                      <path d="m9 12 2 2 4-4" />
+                    </svg>
+                  </span>
+                  <span className="checkoutTrustText">
+                    Pagamento processado com segurança pela <strong>Pagar.me</strong> <em>— uma empresa Stone</em>.
+                    Seus dados de cartão são criptografados e não passam pelos nossos servidores.
+                  </span>
                 </div>
 
                 {formaPagamento === 'pix' && (
@@ -726,7 +749,7 @@ export default function CheckoutPage() {
                     <div className="checkoutField checkoutFieldFull">
                       <label>Parcelas</label>
                       <select value={parcelas} onChange={e => setParcelas(Number(e.target.value))}>
-                        {Array.from({ length: 12 }, (_, i) => i + 1).map(n => {
+                        {Array.from({ length: maxParcelas }, (_, i) => i + 1).map(n => {
                           const comJuros = n > 3
                           const totalParc = comJuros ? totalComDesc * (1 + 0.02 * n) : totalComDesc
                           return (
@@ -737,6 +760,11 @@ export default function CheckoutPage() {
                           )
                         })}
                       </select>
+                      <p className="checkoutFieldHint">
+                        {maxParcelas < PARCELAS_MAX
+                          ? `Parcela mínima de ${formatCurrency(PARCELA_VALOR_MIN)} — por isso este pedido vai até ${maxParcelas}x.`
+                          : `Parcela mínima de ${formatCurrency(PARCELA_VALOR_MIN)}. Até ${PARCELAS_SEM_JUROS}x sem juros.`}
+                      </p>
                     </div>
                   </div>
                 )}

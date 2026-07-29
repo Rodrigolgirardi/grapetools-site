@@ -3,6 +3,7 @@ import { Fustat } from "next/font/google";
 import "./globals.css";
 import { Analytics } from "@/components/Analytics";
 import { MetaPixel } from "@/components/MetaPixel";
+import { RecoveryRedirect } from "@/components/RecoveryRedirect";
 import { organizationJsonLd, websiteJsonLd } from "@/lib/seo";
 
 // Fonte única do site (igual abacatepay.com). As variáveis --font-syne e
@@ -50,6 +51,9 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
             __html: JSON.stringify([organizationJsonLd(), websiteJsonLd()]).replace(/</g, "\\u003c"),
           }}
         />
+        {/* Link de "esqueci a senha" cai na home quando o redirect não está na
+            allowlist do Supabase — este componente resgata e leva pra troca. */}
+        <RecoveryRedirect />
         {children}
         <Analytics />
         <MetaPixel />

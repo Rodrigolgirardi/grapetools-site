@@ -6,12 +6,26 @@ import {
   calcularPedidoServidor,
   getCartLines,
   JUROS_AO_MES,
+  PARCELAS_SEM_JUROS,
+  PARCELAS_MAX,
+  PARCELA_VALOR_MIN,
+  parcelasMaximas,
 } from '@/lib/pricing'
 
 // Uma variação real do catálogo (não-kit) pra testar com dados verdadeiros.
 const prod = products.find((p) => p.category !== 'Kits' && p.variations.length > 0)!
 const v = prod.variations[0]
 const r2 = (n: number) => Math.round(n * 100) / 100
+
+// Menor quantidade cujo total do pedido alcança `alvo` — usado para montar um
+// carrinho grande o bastante para permitir N parcelas.
+function qtdParaTotalMinimo(alvo: number): number {
+  for (let q = 1; q <= 5000; q++) {
+    const r = calcularPedidoServidor([{ sku: v.sku, quantidade: q }], { cartao: false, parcelas: 1 })
+    if (r.ok && r.total >= alvo) return q
+  }
+  throw new Error('não foi possível montar um carrinho grande o suficiente')
+}
 
 describe('descontoCarrinhoPercent (desconto por valor do carrinho)', () => {
   it('aplica as faixas 2/3/4/5% nos limiares certos', () => {
@@ -90,12 +104,36 @@ describe('calcularPedidoServidor — PROTEÇÃO DE PREÇO (anti-adulteração)',
   })
 
   it('juros de parcelamento: até 3x sem juros, acima com juros', () => {
-    const semJuros = calcularPedidoServidor([{ sku: v.sku, quantidade: 2 }], { cartao: true, parcelas: 3 })
+    // Quantidade grande o bastante pra 6x caber no mínimo por parcela.
+    const q = qtdParaTotalMinimo(6 * PARCELA_VALOR_MIN)
+
+    const semJuros = calcularPedidoServidor([{ sku: v.sku, quantidade: q }], { cartao: true, parcelas: 3 })
     expect(semJuros.valorCobrar).toBeCloseTo(semJuros.total, 2)
 
-    const comJuros = calcularPedidoServidor([{ sku: v.sku, quantidade: 2 }], { cartao: true, parcelas: 6 })
+    const comJuros = calcularPedidoServidor([{ sku: v.sku, quantidade: q }], { cartao: true, parcelas: 6 })
+    expect(comJuros.parcelas).toBe(6)
     expect(comJuros.valorCobrar).toBeCloseTo(r2(comJuros.total * (1 + JUROS_AO_MES * 6)), 2)
     expect(comJuros.valorCobrar).toBeGreaterThan(comJuros.total)
+  })
+
+  it('limita as parcelas pelo valor mínimo por parcela (e ignora o pedido do cliente)', () => {
+    // Pedido pequeno: mesmo pedindo 12x, o servidor cobra à vista e sem juros.
+    const pequeno = calcularPedidoServidor([{ sku: v.sku, quantidade: 1 }], { cartao: true, parcelas: 12 })
+    expect(pequeno.parcelas).toBe(parcelasMaximas(pequeno.total))
+    expect(pequeno.parcelas! * PARCELA_VALOR_MIN).toBeLessThanOrEqual(
+      Math.max(pequeno.total, PARCELA_VALOR_MIN)
+    )
+    if (pequeno.parcelas! <= PARCELAS_SEM_JUROS) {
+      expect(pequeno.valorCobrar).toBeCloseTo(pequeno.total, 2)
+    }
+
+    // Nenhuma parcela oferecida pode ficar abaixo do mínimo.
+    for (const total of [3, 7.37, 25, 60, 500]) {
+      const n = parcelasMaximas(total)
+      expect(n).toBeGreaterThanOrEqual(1)
+      expect(n).toBeLessThanOrEqual(PARCELAS_MAX)
+      if (n > 1) expect(total / n).toBeGreaterThanOrEqual(PARCELA_VALOR_MIN)
+    }
   })
 
   it('Pix/boleto (não-cartão) nunca tem juros', () => {

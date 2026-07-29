@@ -154,6 +154,15 @@
   box-shadow: 0 0 0 3px rgba(91,33,182,0.08);
 }
 
+/* Texto de apoio abaixo de um campo (ex.: regra do parcelamento) */
+.checkoutFieldHint {
+  font-family: var(--font-dm-sans), sans-serif;
+  font-size: 0.75rem;
+  line-height: 1.35;
+  color: #6b7280;
+  margin-top: 2px;
+}
+
 .checkoutTextarea {
   width: 100%;
   border: 1.5px solid #e5e7eb;
@@ -201,7 +210,36 @@
 .checkoutPayOption.active { border-color: var(--purple-700, #5b21b6); background: rgba(91,33,182,0.03); }
 .checkoutPayOption strong { display: block; font-size: 0.9375rem; color: #1a1a2e; margin-bottom: 2px; }
 .checkoutPayOption span { font-size: 0.8125rem; color: #6b7280; }
-.checkoutPayIcon { font-size: 1.5rem; flex-shrink: 0; }
+/* Ícone da forma de pagamento (imagem). Altura fixa e largura livre para caber
+   tanto o quadrado do Pix quanto o retângulo do boleto sem distorcer. */
+.checkoutPayIcon {
+  height: 26px;
+  width: auto;
+  max-width: 42px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+/* Selo de segurança abaixo das formas de pagamento */
+.checkoutTrust {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin: -8px 0 18px;
+  padding: 10px 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #fafafa;
+}
+.checkoutTrustIcon { color: #16a34a; flex-shrink: 0; line-height: 0; }
+.checkoutTrustText {
+  font-family: var(--font-dm-sans), sans-serif;
+  font-size: 0.75rem;
+  line-height: 1.4;
+  color: #4b5563;
+}
+.checkoutTrustText strong { color: #1a1a2e; font-weight: 700; }
+.checkoutTrustText em { font-style: normal; color: #6b7280; }
 .checkoutPayCheck { margin-left: auto; color: var(--purple-700, #5b21b6); font-size: 1.1rem; flex-shrink: 0; }
 
 .checkoutPixInfo {

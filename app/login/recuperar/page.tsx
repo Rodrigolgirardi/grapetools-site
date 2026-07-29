@@ -17,8 +17,15 @@ export default function RecuperarSenhaPage() {
     try {
       const { createClient } = await import("@/lib/supabase-client");
       const supabase = createClient();
+      // Vai DIRETO para a página de redefinir, sem passar pelo /auth/callback.
+      // O link de recuperação devolve os tokens no fragmento da URL (#access_token=…),
+      // e fragmento não é enviado ao servidor — a rota de callback (que roda no
+      // servidor e espera um ?code=) nunca os enxergaria e mandaria pro erro de auth.
+      // Já a página de redefinir é client-side: o cliente do Supabase lê o fragmento
+      // e abre a sessão sozinho. (O login com Google segue pelo /auth/callback,
+      // porque ali o fluxo é PKCE e o code vem na query, que o servidor lê.)
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/auth/callback?next=/login/redefinir`,
+        redirectTo: `${window.location.origin}/login/redefinir`,
       });
       if (error) throw error;
       setSuccess(
