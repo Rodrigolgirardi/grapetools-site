@@ -771,6 +771,14 @@ h1, h2, h3, h4 { font-family: var(--font-syne), sans-serif; margin: 0; }
   overflow: hidden;
   box-shadow: 0 2px 12px rgba(0,0,0,0.04);
   transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+  /* O grid renderiza os 93 produtos de uma vez. Com content-visibility o
+     navegador pula o layout/pintura dos cards fora da tela e só os desenha
+     quando chegam perto da viewport — o custo de renderização passa a ser
+     proporcional ao que está visível, não ao catálogo inteiro. O
+     contain-intrinsic-size reserva a altura real medida (476px) para que a
+     barra de rolagem não pule enquanto o usuário desce. */
+  content-visibility: auto;
+  contain-intrinsic-size: auto 476px;
 }
 .productCard:hover {
   border-color: var(--purple-300, #c4b5fd);

@@ -31,8 +31,12 @@ export function MetaPixel() {
   if (!META_PIXEL_ID) return null
   return (
     <>
-      {/* Snippet oficial da Meta: cria a fila do fbq e carrega o fbevents.js */}
-      <Script id="meta-pixel-init" strategy="afterInteractive">
+      {/* Snippet oficial da Meta: cria a fila do fbq e carrega o fbevents.js.
+          lazyOnload (e não afterInteractive) porque o fbevents.js era a maior
+          tarefa longa da página — 154ms travando a thread principal. Carregado
+          na ociosidade depois do load, o PageView continua sendo registrado,
+          só que sem disputar CPU com a renderização do catálogo. */}
+      <Script id="meta-pixel-init" strategy="lazyOnload">
         {`!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
 n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
 n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;

@@ -704,15 +704,15 @@ Regra simples: quanto menor o número do grão, mais agressiva é a lixa; quanto
   {
     prefix:"4.DISC.POL",
     slug:"4-disc-pol",
-    name:"Disco para Polimento de Vidro",
-    description:"Disco para Polimento de Vidro · 5pol",
+    name:"Disco para Polimento de Vidro | Grape Tools",
+    description:"Disco para Polimento de Vidro | Grape Tools · 5pol",
     category:"Abrasivos",
     subcategory:"Discos Especiais",
-    brand:"Starfer",
-    supplier:"Starfer",
+    brand:"Grape Tools",
+    supplier:"Grape Tools",
     keywords:["disco para polimento de vidro","5\""],
     variations:[
-      {sku:"4.DISC.POL.5",label:"5\"",tiers:[{minQty:1,label:"1",price:25.99}, {minQty:5,label:"5",price:23.99}, {minQty:10,label:"10",price:21.99}, {minQty:30,label:"30",price:19.99}],weight:"A consultar",ncm:""}
+      {sku:"CH.DISC.POL.5",label:"5\"",tiers:[{minQty:1,label:"1",price:25.99}, {minQty:5,label:"5",price:23.99}, {minQty:10,label:"10",price:21.99}, {minQty:30,label:"30",price:19.99}],weight:"A consultar",ncm:""}
     ],
     stock:999,sold:0,isPromotion:false,isLaunch:false,
   },
@@ -756,18 +756,18 @@ Regra simples: quanto menor o número do grão, mais agressiva é a lixa; quanto
   {
     prefix:"5.BUC.GDP",
     slug:"5-buc-gdp",
-    name:"Bucha GDP",
-    description:"Bucha GDP · 4mm a 16mm · 250 Pçs",
+    name:"Bucha GDP para Gesso/Drywall em Polietileno",
+    description:"Bucha GDP para Gesso/Drywall em Polietileno · GDP1 · 250 Peças (Pacote Fechado)",
     category:"Fixação",
     subcategory:"Buchas",
     brand:"Ivplast",
     supplier:"Ivplast",
-    keywords:["bucha gdp","4mm a 16mm","250 pçs","100 pçs","15mm a 23mm"],
+    keywords:["bucha gdp","bucha para gesso","bucha para drywall","bucha gesso","bucha drywall","gesso","drywall","polietileno","gdp1","gdp2","4mm a 16mm","250 peças","100 peças","15mm a 23mm","pacote fechado"],
     variations:[
-      {sku:"5.BUC.GDP.4A16_PCT",label:"4mm a 16mm · 250 Pçs",tiers:[{minQty:1,label:"1",price:55.99}, {minQty:5,label:"5",price:49.99}, {minQty:10,label:"10",price:45.99}, {minQty:20,label:"20",price:41.99}],weight:"A consultar",ncm:"39259090"},
-      {sku:"5.BUC.GDP.4A16",label:"4mm a 16mm · 100 Pçs",tiers:[{minQty:1,label:"1",price:23.99}, {minQty:5,label:"5",price:21.99}, {minQty:10,label:"10",price:19.99}, {minQty:20,label:"20",price:17.99}],weight:"A consultar",ncm:"39259090"},
-      {sku:"5.BUC.GDP.2_PCT",label:"15mm a 23mm · 250 Pçs",tiers:[{minQty:1,label:"1",price:56.99}, {minQty:5,label:"5",price:50.99}, {minQty:10,label:"10",price:46.99}, {minQty:20,label:"20",price:42.99}],weight:"A consultar",ncm:"39259090"},
-      {sku:"5.BUC.GDP.2",label:"15mm a 23mm · 100 Pçs",tiers:[{minQty:1,label:"1",price:24.99}, {minQty:5,label:"5",price:22.99}, {minQty:10,label:"10",price:20.99}, {minQty:20,label:"20",price:18.99}],weight:"A consultar",ncm:"39259090"}
+      {sku:"5.BUC.GDP.4A16_PCT",label:"GDP1 - 250 Peças (Pacote Fechado)",tiers:[{minQty:1,label:"1",price:55.99}, {minQty:5,label:"5",price:49.99}, {minQty:10,label:"10",price:45.99}, {minQty:20,label:"20",price:41.99}],weight:"A consultar",ncm:"39259090"},
+      {sku:"5.BUC.GDP.4A16",label:"GDP1 - 100 Peças",tiers:[{minQty:1,label:"1",price:23.99}, {minQty:5,label:"5",price:21.99}, {minQty:10,label:"10",price:19.99}, {minQty:20,label:"20",price:17.99}],weight:"A consultar",ncm:"39259090"},
+      {sku:"5.BUC.GDP.2_PCT",label:"GDP2 - 250 Peças (Pacote Fechado)",tiers:[{minQty:1,label:"1",price:56.99}, {minQty:5,label:"5",price:50.99}, {minQty:10,label:"10",price:46.99}, {minQty:20,label:"20",price:42.99}],weight:"A consultar",ncm:"39259090"},
+      {sku:"5.BUC.GDP.2",label:"GDP2 - 100 Peças",tiers:[{minQty:1,label:"1",price:24.99}, {minQty:5,label:"5",price:22.99}, {minQty:10,label:"10",price:20.99}, {minQty:20,label:"20",price:18.99}],weight:"A consultar",ncm:"39259090"}
     ],
     stock:999,sold:0,isPromotion:false,isLaunch:false,
   },
@@ -967,13 +967,13 @@ Regra simples: quanto menor o número do grão, mais agressiva é a lixa; quanto
   {
     prefix:"12.CAB.RED.BR",
     slug:"12-cab-red-br",
-    name:"Fixa Cabos",
-    description:"Fixa Cabos · Redondo · 5mm · Cento",
+    name:"Fixa Fio Redondo com Prego 5mm a 10mm | Organizador Cabo Grampo Miguelão",
+    description:"Fixa Fio Redondo com Prego · 5mm a 10mm · Cento",
     category:"Elétrica",
     subcategory:"Fixação de Cabos",
     brand:"Storm",
     supplier:"Storm",
-    keywords:["fixa cabos","redondo","5mm","cento","6mm","7mm","8mm","10mm"],
+    keywords:["fixa cabos","fixa fio","fixa fio redondo","com prego","organizador de cabo","organizador cabo","grampo","miguelão","redondo","cento","5mm","6mm","7mm","8mm","10mm"],
     variations:[
       {sku:"12.CAB.RED.BR.5MM",label:"5mm · Cento",tiers:[{minQty:1,label:"1",price:5.49}, {minQty:5,label:"5",price:4.99}, {minQty:10,label:"10",price:4.49}, {minQty:50,label:"50",price:3.99}],weight:"A consultar",ncm:"73170090"},
       {sku:"12.CAB.RED.BR.6MM",label:"6mm · Cento",tiers:[{minQty:1,label:"1",price:5.69}, {minQty:5,label:"5",price:5.19}, {minQty:10,label:"10",price:4.69}, {minQty:50,label:"50",price:4.19}],weight:"A consultar",ncm:"73170090"},
@@ -1142,13 +1142,13 @@ Regra simples: quanto menor o número do grão, mais agressiva é a lixa; quanto
   {
     prefix:"14.ABRAC.4.8.200",
     slug:"14-abrac-4-8-200",
-    name:"Abraçadeira de Nylon",
-    description:"Abraçadeira de Nylon · Preta · 4,8 x 200",
+    name:"Abraçadeira de Nylon Enforca Gato 4,8mm x 200mm",
+    description:"Abraçadeira de Nylon Enforca Gato 4,8mm x 200mm · Preta",
     category:"Fixação",
     subcategory:"Abraçadeiras",
     brand:"Fertak",
     supplier:"Fertak",
-    keywords:["abraçadeira de nylon","preta","4,8 x 200"],
+    keywords:["abraçadeira de nylon","enforca gato","abraçadeira enforca gato","4,8mm x 200mm","4,8 x 200","preta"],
     variations:[
       {sku:"14.ABRAC.4.8.200.PT",label:"Preta · 4,8 x 200",tiers:[{minQty:1,label:"1",price:9.99}, {minQty:3,label:"3",price:8.99}, {minQty:5,label:"5",price:8.39}, {minQty:10,label:"10",price:7.99}],weight:"A consultar",ncm:"39269090"}
     ],
@@ -1189,13 +1189,13 @@ Regra simples: quanto menor o número do grão, mais agressiva é a lixa; quanto
   {
     prefix:"15.GAN.S",
     slug:"15-gan-s",
-    name:"Gancho em S",
-    description:"Gancho em S · 28mm",
+    name:"Gancho Tipo S Zincado em Aço Multiuso - 3 Medidas",
+    description:"Gancho Tipo S Zincado em Aço Multiuso · 28mm / 53mm / 63mm",
     category:"Fixação",
     subcategory:"Ganchos",
     brand:"São Raphael",
     supplier:"São Raphael",
-    keywords:["gancho em s","28mm","53mm","63mm"],
+    keywords:["gancho em s","gancho tipo s","gancho s","zincado","aço","multiuso","28mm","53mm","63mm"],
     variations:[
       {sku:"15.GAN.S.28",label:"28mm",tiers:[{minQty:1,label:"1",price:0.29}, {minQty:50,label:"50",price:0.27}, {minQty:100,label:"100",price:0.24}, {minQty:500,label:"500",price:0.23}],weight:"A consultar",ncm:"73269090"},
       {sku:"15.GAN.S.53",label:"53mm",tiers:[{minQty:1,label:"1",price:0.79}, {minQty:50,label:"50",price:0.69}, {minQty:100,label:"100",price:0.63}, {minQty:500,label:"500",price:0.59}],weight:"A consultar",ncm:"73269090"},
@@ -1362,21 +1362,6 @@ Regra simples: quanto menor o número do grão, mais agressiva é a lixa; quanto
     stock:999,sold:0,isPromotion:false,isLaunch:false,
   },
   {
-    prefix:"21.PF.5.0",
-    slug:"21-pf-5-0",
-    name:"Parafuso Chipboard",
-    description:"Parafuso Chipboard · 5,0 x 40mm",
-    category:"Fixação",
-    subcategory:"Parafusos",
-    brand:"Newfix",
-    supplier:"Newfix",
-    keywords:["parafuso chipboard","5,0 x 40mm"],
-    variations:[
-      {sku:"21.PF.5.0.40",label:"5,0 x 40mm",tiers:[{minQty:1,label:"1",price:15.99}, {minQty:3,label:"3",price:13.99}, {minQty:5,label:"5",price:12.99}, {minQty:10,label:"10",price:11.99}],weight:"A consultar",ncm:""}
-    ],
-    stock:999,sold:0,isPromotion:false,isLaunch:false,
-  },
-  {
     prefix:"23.SUP.INV",
     slug:"23-sup-inv",
     name:"Suporte Invisível Reforçado | 9,5mm Espessura",
@@ -1394,21 +1379,6 @@ Regra simples: quanto menor o número do grão, mais agressiva é a lixa; quanto
       {sku:"23.SUP.INV.30",label:"30cm",tiers:[{minQty:1,label:"1",price:15.39}, {minQty:5,label:"5",price:14.99}, {minQty:10,label:"10",price:13.99}, {minQty:20,label:"20",price:12.99}],weight:"A consultar",ncm:"94032090"},
       {sku:"23.SUP.INV.35",label:"35cm",tiers:[{minQty:1,label:"1",price:18.99}, {minQty:5,label:"5",price:17.99}, {minQty:10,label:"10",price:16.99}, {minQty:20,label:"20",price:15.99}],weight:"A consultar",ncm:"94032090"},
       {sku:"23.SUP.INV.40",label:"40cm",tiers:[{minQty:1,label:"1",price:19.99}, {minQty:5,label:"5",price:18.99}, {minQty:10,label:"10",price:17.99}, {minQty:500,label:"500",price:16.99}],weight:"A consultar",ncm:"94032090"}
-    ],
-    stock:999,sold:0,isPromotion:false,isLaunch:false,
-  },
-  {
-    prefix:"24.DOB.AMORT",
-    slug:"24-dob-amort",
-    name:"Dobradiça Curva",
-    description:"Dobradiça Curva · Com Amortecedor",
-    category:"Ferragens",
-    subcategory:"Dobradiças",
-    brand:"FGVTN",
-    supplier:"FGVTN",
-    keywords:["dobradiça curva","com amortecedor"],
-    variations:[
-      {sku:"24.DOB.AMORT.CUR",label:"Com Amortecedor",tiers:[{minQty:1,label:"1",price:6}, {minQty:50,label:"50",price:5}, {minQty:100,label:"100",price:4}, {minQty:500,label:"500",price:3}],weight:"A consultar",ncm:""}
     ],
     stock:999,sold:0,isPromotion:false,isLaunch:false,
   },
@@ -1565,30 +1535,15 @@ Regra simples: quanto menor o número do grão, mais agressiva é a lixa; quanto
     stock:999,sold:0,isPromotion:false,isLaunch:false,
   },
   {
-    prefix:"0",
-    slug:"0",
-    name:"Personalizado",
-    description:"Personalizado",
-    category:"Outros",
-    subcategory:"Personalizado",
-    brand:"",
-    supplier:"Grape Tools",
-    keywords:["personalizado"],
-    variations:[
-      {sku:"0",label:"0",tiers:[{minQty:1,label:"1",price:2.8}, {minQty:50,label:"50",price:2.52}, {minQty:100,label:"100",price:2.3}, {minQty:500,label:"500",price:2.02}],weight:"A consultar",ncm:""}
-    ],
-    stock:999,sold:0,isPromotion:false,isLaunch:false,
-  },
-  {
     prefix:"30.BUCHA.C",
     slug:"30-bucha-c",
-    name:"Bucha",
-    description:"Bucha · 8mm · Comum · USAF · 1000 Peças",
+    name:"Bucha 8mm Comum Usaf Convencional Sem Anel | 1000 Unidades",
+    description:"Bucha 8mm Comum Usaf Convencional Sem Anel · 1000 Unidades",
     category:"Fixação",
     subcategory:"Buchas",
     brand:"USAF",
     supplier:"USAF",
-    keywords:["bucha","8mm","comum","usaf","1000 peças"],
+    keywords:["bucha","bucha 8mm","8mm","comum","convencional","sem anel","usaf","1000 unidades","1000 peças"],
     variations:[
       {sku:"30.BUCHA.C.8_PCT",label:"Comum · 1000 Peças",tiers:[{minQty:1,label:"1",price:28.99}, {minQty:50,label:"50",price:27.99}, {minQty:100,label:"100",price:26.99}, {minQty:500,label:"500",price:25.99}],weight:"A consultar",ncm:"39259090"}
     ],
@@ -1627,22 +1582,16 @@ Regra simples: quanto menor o número do grão, mais agressiva é a lixa; quanto
     ],
     stock:999,sold:0,isPromotion:false,isLaunch:false,
   },
-  {
-    prefix:"0.KIT.PF.BUC",
-    slug:"0-kit-pf-buc",
-    name:"Kit mão Francesa (Unitário)",
-    description:"Kit mão Francesa (Unitário)",
-    category:"Ferragens",
-    subcategory:"Mãos Francesas",
-    brand:"",
-    supplier:"Grape Tools",
-    keywords:["kit mão francesa (unitário)"],
-    variations:[
-      {sku:"0.KIT.PF.BUC.MF",label:"MF",tiers:[{minQty:1,label:"1",price:0.28}, {minQty:50,label:"50",price:0.25}, {minQty:100,label:"100",price:0.23}, {minQty:500,label:"500",price:0.2}],weight:"A consultar",ncm:""}
-    ],
-    stock:999,sold:0,isPromotion:false,isLaunch:false,
-  },
 ];
+
+// Componentes que NÃO são vendidos avulsos (não têm página nem aparecem no
+// catálogo), mas entram na composição de kits. O preço precisa continuar aqui,
+// senão o kit que os usa fica mais barato em silêncio.
+const _precoComponenteInterno: Record<string, number> = {
+  // Kit de fixação (parafuso + bucha) da mão francesa. Saiu do catálogo em
+  // 29/07/2026 por não fazer sentido vender avulso; segue compondo o KIT.MAOF12.
+  "0.KIT.PF.BUC.MF": 0.28,
+};
 
 // ============================================================
 // KITS (compostos por outros produtos)
@@ -1651,7 +1600,7 @@ Regra simples: quanto menor o número do grão, mais agressiva é a lixa; quanto
 // venda dá baixa nos componentes (ver lib/estoque.ts). Editar preços depois, se quiser.
 // ============================================================
 
-const _precoBasePorSku: Record<string, number> = {};
+const _precoBasePorSku: Record<string, number> = { ..._precoComponenteInterno };
 for (const _p of products) for (const _v of _p.variations) {
   _precoBasePorSku[_v.sku] = _v.tiers[0]?.price ?? 0;
 }
@@ -1759,7 +1708,7 @@ _kits.push(_kit("3.TPOR.PISO_5", "kit-tpor-piso-5", "Kit 5 Travas de Porta de Pi
 
 // 21) Disco de polir + M14
 _kits.push(_kit("4.KIT.DISC.POL.M14", "kit-disc-pol-m14", "Kit Disco de Polir + Suporte M14", "Discos de Lixa",
-  [_kitVar("4.KIT.DISC.POL.M14", "Disco de polir + M14", [{ sku: "4.DISC.POL.5", quantidade: 1 }, { sku: "4.M14.125", quantidade: 1 }])]));
+  [_kitVar("4.KIT.DISC.POL.M14", "Disco de polir + M14", [{ sku: "CH.DISC.POL.5", quantidade: 1 }, { sku: "4.M14.125", quantidade: 1 }])]));
 
 // 22) Fecho botão trinco — 10x, 2 cores
 _kits.push(_kit("CH.TRAV.PIS.KIT10", "kit-trav-pis-10", "Kit 10 Fechos Botão Trinco | Grape Tools", "Fechos", [

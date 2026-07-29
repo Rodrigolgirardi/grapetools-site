@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { semAcento } from "@/lib/product-image";
 import type { Product } from "@/lib/data";
 
@@ -41,17 +41,28 @@ export function ProductVisual({ product, sku, fileBase }: Props) {
   const sources = bases.flatMap((b) => exts.map((ext) => `/products/${b}.${ext}`));
 
   const [srcIndex, setSrcIndex] = useState(0);
+  const imgRef = useRef<HTMLImageElement>(null);
 
   // Reseta o índice quando o SKU/arquivo muda (troca de variação)
   useEffect(() => {
     setSrcIndex(0);
   }, [sources[0]]);
 
+  // A <img> já vem renderizada do servidor com a 1ª candidata. Se o 404 dela
+  // chegar ANTES da hidratação, o onError acontece sem ninguém ouvindo e a foto
+  // fica quebrada para sempre — some no navegador rápido, aparece no lento.
+  // Esta checagem no mount detecta a imagem que já falhou e retoma a cadeia.
+  useEffect(() => {
+    const img = imgRef.current;
+    if (img && img.complete && img.naturalWidth === 0) setSrcIndex((i) => i + 1);
+  }, [srcIndex]);
+
   return (
     <div className="productVisual" aria-label={`Imagem de ${product.name}`}>
       {srcIndex < sources.length ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img
+          ref={imgRef}
           src={sources[srcIndex]}
           alt={product.name}
           className="productImage"

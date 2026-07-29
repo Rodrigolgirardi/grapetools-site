@@ -77,6 +77,13 @@ const nextConfig: NextConfig = {
       // Bucha Bolt 3/16 + 1/4 unificadas -> "Bucha para Gesso/Drywall com Parafuso".
       { source: "/13-blt-3", destination: "/13-blt", permanent: true },
       { source: "/13-blt-1", destination: "/13-blt", permanent: true },
+      // "Kit mão Francesa (Unitário)" saiu do catálogo (só compõe kits agora).
+      { source: "/0-kit-pf-buc", destination: "/14-maof", permanent: true },
+      // "Dobradiça Curva" (24.DOB.AMORT) era duplicata sem foto da 3.DOB.AMORT.
+      { source: "/24-dob-amort", destination: "/3-dob-amort", permanent: true },
+      // "Parafuso Chipboard" (21.PF.5.0) tinha só o 5,0x40 — o 29.PF cobre essa
+      // medida e mais três, então herda os links do antigo.
+      { source: "/21-pf-5-0", destination: "/29-pf", permanent: true },
     ];
   },
 };
