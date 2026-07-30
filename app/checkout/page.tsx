@@ -8,7 +8,7 @@ import { useAuth } from '@/hooks/useAuth'
 import { useCart } from '@/hooks/useCart'
 import { productImageSrc, handleProductImageError } from '@/lib/product-image'
 import { documentoValido, formatarDocumento } from '@/lib/documento'
-import { formatCurrency, getCartLines, descontoCarrinhoPercent, parcelasMaximas, PARCELAS_MAX, PARCELAS_SEM_JUROS, PARCELA_VALOR_MIN } from '@/lib/pricing'
+import { formatCurrency, getCartLines, descontoCarrinhoPercent, parcelasMaximas, PARCELAS_MAX, PARCELAS_SEM_JUROS, PARCELA_VALOR_MIN, JUROS_AO_MES } from '@/lib/pricing'
 import { trackBeginCheckout, trackPurchase, type GaItem } from '@/lib/analytics'
 import { metaBeginCheckout, metaPurchase } from '@/lib/meta-pixel'
 import { BackToSite } from '@/components/BackToSite'
@@ -368,10 +368,10 @@ export default function CheckoutPage() {
     }
 
     // Valor cobrado: produtos com desconto + frete. 3x sem juros; acima disso,
-    // repassa os juros (2% por parcela). O servidor recalcula tudo de qualquer forma.
+    // repassa os juros (JUROS_AO_MES por parcela). O servidor recalcula tudo.
     const valorCobrar =
-      formaPagamento === 'cartao' && parcelas > 3
-        ? Math.round(totalFinal * (1 + 0.02 * parcelas) * 100) / 100
+      formaPagamento === 'cartao' && parcelas > PARCELAS_SEM_JUROS
+        ? Math.round(totalFinal * (1 + JUROS_AO_MES * parcelas) * 100) / 100
         : totalFinal
 
     // 5. Chama o Pagar.me — com tratamento de rede/erro para o botão NUNCA travar
@@ -893,7 +893,7 @@ export default function CheckoutPage() {
                       <select value={parcelas} onChange={e => setParcelas(Number(e.target.value))}>
                         {Array.from({ length: maxParcelas }, (_, i) => i + 1).map(n => {
                           const comJuros = n > 3
-                          const totalParc = comJuros ? totalFinal * (1 + 0.02 * n) : totalFinal
+                          const totalParc = comJuros ? totalFinal * (1 + JUROS_AO_MES * n) : totalFinal
                           return (
                             <option key={n} value={n}>
                               {n}x de {formatCurrency(totalParc / n)}

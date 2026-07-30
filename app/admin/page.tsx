@@ -81,6 +81,23 @@ export default async function AdminPage() {
       status: (p.status as string) || "pendente",
       rastreio: (p.rastreio as string) || "",
       pagarme_order_id: (p.pagarme_order_id as string) || null,
+      // Frete/etiqueta (migração 008; ausentes em pedidos antigos)
+      entregaTipo: (p.entrega_tipo as string) || "",
+      freteServicoNome: (p.frete_servico_nome as string) || "",
+      freteValor: Number(p.frete_valor) || 0,
+      temEndereco: !!(p.endereco_entrega as Record<string, unknown> | null)?.cep,
+      etiquetaUrl: (p.etiqueta_url as string) || "",
+      enderecoEntrega: (p.endereco_entrega as Record<string, string> | null) || null,
+      // Menu "⋯" da aba Vendas (migração 009 + colunas de cupom da 007)
+      observacao: (p.observacao as string) || "",
+      notaAdmin: (p.nota_admin as string) || "",
+      nfNumero: (p.nf_numero as string) || "",
+      cancelMotivo: (p.cancel_motivo as string) || "",
+      cupomCodigo: (p.cupom_codigo as string) || "",
+      cupomPercent: Number(p.cupom_desconto_percent) || 0,
+      vendedor: (p.vendedor as string) || "",
+      comissaoValor: Number(p.comissao_valor) || 0,
+      parcelas: Number(p.parcelas) || 1,
       itens: itensPorPedido.get(p.id as string) || [],
     };
   });
@@ -126,19 +143,8 @@ export default async function AdminPage() {
     comissao_percent: Number(c.comissao_percent) || 0,
     ativo: !!c.ativo,
   }));
-  const comissaoMap = new Map<string, { vendas: number; totalVendido: number; comissao: number }>();
-  for (const p of pedidosRaw) {
-    const vend = (p.vendedor as string) || "";
-    if (!vend || p.pagamento_status !== "pago") continue;
-    const s = comissaoMap.get(vend) || { vendas: 0, totalVendido: 0, comissao: 0 };
-    s.vendas += 1;
-    s.totalVendido += Number(p.total) || 0;
-    s.comissao += Number(p.comissao_valor) || 0;
-    comissaoMap.set(vend, s);
-  }
-  const comissao = [...comissaoMap.entries()]
-    .map(([vendedor, v]) => ({ vendedor, ...v }))
-    .sort((a, b) => b.comissao - a.comissao);
+  // (Relatório de comissão agora é calculado na própria aba Cupons, por mês,
+  // a partir dos pedidos — cada pedido pago guarda comissao_valor da época.)
 
   return (
     <AdminPanel
@@ -147,7 +153,6 @@ export default async function AdminPage() {
       pausadosIniciais={pausados}
       stats={stats}
       cupons={cupons}
-      comissao={comissao}
     />
   );
 }

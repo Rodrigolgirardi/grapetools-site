@@ -60,10 +60,29 @@ export async function PATCH(request: NextRequest) {
   const body = await request.json().catch(() => ({}))
   const id = String(body?.id || '')
   if (!id) return NextResponse.json({ error: 'ID ausente.' }, { status: 400 })
-  if (typeof body?.ativo !== 'boolean') return NextResponse.json({ error: 'Nada para atualizar.' }, { status: 400 })
+
+  // Monta só os campos enviados: ativo, comissão, desconto e/ou vendedor.
+  // Importante: mudar a comissão só vale para vendas FUTURAS — cada pedido pago
+  // guarda a comissão da época (comissao_valor desnormalizado).
+  const patch: Record<string, unknown> = {}
+  if (typeof body?.ativo === 'boolean') patch.ativo = body.ativo
+  if (body?.comissao_percent !== undefined) {
+    const v = Number(body.comissao_percent)
+    if (!(v >= 0 && v <= 100)) return NextResponse.json({ error: 'Comissão deve ser entre 0% e 100%.' }, { status: 400 })
+    patch.comissao_percent = v
+  }
+  if (body?.desconto_percent !== undefined) {
+    const v = Number(body.desconto_percent)
+    if (!(v >= 0 && v <= 90)) return NextResponse.json({ error: 'Desconto deve ser entre 0% e 90%.' }, { status: 400 })
+    patch.desconto_percent = v
+  }
+  if (body?.vendedor !== undefined) {
+    patch.vendedor = String(body.vendedor).trim().slice(0, 80) || null
+  }
+  if (Object.keys(patch).length === 0) return NextResponse.json({ error: 'Nada para atualizar.' }, { status: 400 })
 
   const admin = createAdminClient()
-  const { error } = await admin.from('cupons').update({ ativo: body.ativo }).eq('id', id)
+  const { error } = await admin.from('cupons').update(patch).eq('id', id)
   if (error) return NextResponse.json({ error: 'Falha ao atualizar.' }, { status: 500 })
   return NextResponse.json({ ok: true })
 }

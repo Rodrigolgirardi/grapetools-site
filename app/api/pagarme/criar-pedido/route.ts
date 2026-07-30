@@ -279,6 +279,25 @@ export async function POST(request: NextRequest) {
           { status: 500 }
         )
       }
+
+      // Dados de frete/entrega para a compra da etiqueta pelo /admin (migração
+      // 008). Gravação em UPDATE separado e best-effort: se a migração ainda não
+      // rodou, só loga — o pedido e a cobrança seguem normais.
+      const { error: errFrete } = await admin
+        .from('pedidos')
+        .update({
+          entrega_tipo: entrega === 'retirada' ? 'retirada' : 'entrega',
+          endereco_entrega: entrega === 'retirada' ? null : endereco,
+          frete_valor: freteValor,
+          frete_servico_id: entrega === 'retirada' || freteValor === 0 ? null : Number(frete_servico_id) || null,
+          frete_servico_nome: freteNome,
+          // Migração 009: a tarifa do cartão varia por parcela (relatório de margem)
+          parcelas: forma_pagamento === 'cartao' ? parcelasEfetivas : 1,
+        })
+        .eq('id', pedido_id)
+      if (errFrete) {
+        console.error('[MIGRACAO 008] Nao gravei dados de frete do pedido (rode a migracao):', errFrete.message)
+      }
     }
 
     const docClean = cleanDoc(cliente.documento || '')

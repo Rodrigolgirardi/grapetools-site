@@ -8,6 +8,7 @@
 // poucos sem mexer aqui.
 
 import { findVariation } from './pricing'
+import { GRAPEONE } from './grape-one.generated'
 
 const ME_API = 'https://melhorenvio.com.br/api/v2'
 
@@ -58,12 +59,161 @@ export function montarPacote(itens: ItemFrete[]) {
   let totalItens = 0
   let pesoKg = 0.15 // embalagem
   for (const it of itens) {
+    // Peso: weight do catálogo do site > peso do export GrapeOne > padrão 250g
     const found = findVariation(it.sku)
-    const unit = pesoUnitarioKg(found?.variation.weight)
+    const doCatalogo = found?.variation.weight
+    const doGrapeOne = GRAPEONE[it.sku]?.pesoG
+    const unit = doCatalogo && /\d/.test(doCatalogo) && !/consultar/i.test(doCatalogo)
+      ? pesoUnitarioKg(doCatalogo)
+      : doGrapeOne && doGrapeOne > 0
+        ? doGrapeOne / 1000
+        : PESO_PADRAO_KG
     pesoKg += unit * it.quantidade
     totalItens += it.quantidade
   }
   return { ...caixaPorQuantidade(totalItens), weight: Math.max(0.05, Math.round(pesoKg * 1000) / 1000) }
+}
+
+function headers(token: string) {
+  return {
+    Authorization: `Bearer ${token}`,
+    'Content-Type': 'application/json',
+    Accept: 'application/json',
+    'User-Agent': 'GrapeTools (contato@grapetools.com.br)',
+  }
+}
+
+export type CompraEtiquetaArgs = {
+  servicoId: number
+  valorSeguro: number // valor declarado dos produtos (seguro)
+  itens: ItemFrete[]
+  destinatario: {
+    nome: string
+    email: string
+    documento: string // CPF ou CNPJ, só dígitos
+    telefone?: string
+    endereco: { rua: string; numero: string; complemento?: string; bairro: string; cidade: string; estado: string; cep: string }
+  }
+}
+
+export type EtiquetaComprada = { etiquetaId: string; etiquetaUrl: string; rastreio: string }
+
+// Compra a etiqueta no Melhor Envio (debita a CARTEIRA da conta): carrinho →
+// checkout → gerar → link de impressão. O remetente vem do cadastro da própria
+// conta Melhor Envio (GET /me), então não há endereço de loja duplicado aqui.
+// Lança Error com mensagem legível em qualquer falha — quem chama decide o HTTP.
+export async function comprarEtiqueta(args: CompraEtiquetaArgs): Promise<EtiquetaComprada> {
+  const token = process.env.MELHORENVIO_TOKEN
+  if (!token) throw new Error('MELHORENVIO_TOKEN ausente')
+  const h = headers(token)
+
+  // Remetente = titular da conta Melhor Envio (endereço padrão do cadastro)
+  const meRes = await fetch(`${ME_API}/me`, { headers: h })
+  if (!meRes.ok) throw new Error(`Melhor Envio /me HTTP ${meRes.status}`)
+  const me = await meRes.json()
+  const endLoja = me?.address
+  if (!endLoja?.postal_code) {
+    throw new Error('A conta Melhor Envio não tem endereço cadastrado (Painel → Cadastro).')
+  }
+
+  const d = args.destinatario
+  const docClean = d.documento.replace(/\D/g, '')
+  const pacote = montarPacote(args.itens)
+
+  // 1) Insere o envio no carrinho do Melhor Envio
+  const cartRes = await fetch(`${ME_API}/me/cart`, {
+    method: 'POST',
+    headers: h,
+    body: JSON.stringify({
+      service: args.servicoId,
+      from: {
+        name: `${me.firstname ?? ''} ${me.lastname ?? ''}`.trim() || 'Grape Tools',
+        phone: me.phone?.phone ?? '',
+        email: me.email ?? '',
+        document: me.document ?? undefined,
+        company_document: me.company_document ?? undefined,
+        address: endLoja.address,
+        number: endLoja.number,
+        complement: endLoja.complement ?? '',
+        district: endLoja.district,
+        city: endLoja.city?.city ?? endLoja.city,
+        state_abbr: endLoja.city?.state?.state_abbr ?? undefined,
+        postal_code: endLoja.postal_code,
+      },
+      to: {
+        name: d.nome,
+        email: d.email,
+        phone: d.telefone ?? '',
+        document: docClean.length === 11 ? docClean : undefined,
+        company_document: docClean.length === 14 ? docClean : undefined,
+        address: d.endereco.rua,
+        number: d.endereco.numero,
+        complement: d.endereco.complemento ?? '',
+        district: d.endereco.bairro,
+        city: d.endereco.cidade,
+        state_abbr: d.endereco.estado,
+        postal_code: d.endereco.cep.replace(/\D/g, ''),
+      },
+      volumes: [{ height: pacote.height, width: pacote.width, length: pacote.length, weight: pacote.weight }],
+      options: {
+        insurance_value: Math.max(1, args.valorSeguro),
+        receipt: false,
+        own_hand: false,
+        reverse: false,
+        non_commercial: true, // envio com declaração de conteúdo (sem NF-e atrelada)
+      },
+    }),
+  })
+  const cart = await cartRes.json().catch(() => null)
+  if (!cartRes.ok || !cart?.id) {
+    throw new Error(`Falha ao montar o envio: ${JSON.stringify(cart?.error ?? cart).slice(0, 200)}`)
+  }
+  const envioId = String(cart.id)
+
+  // 2) Paga com o saldo da carteira
+  const payRes = await fetch(`${ME_API}/me/shipment/checkout`, {
+    method: 'POST',
+    headers: h,
+    body: JSON.stringify({ orders: [envioId] }),
+  })
+  const pay = await payRes.json().catch(() => null)
+  if (!payRes.ok) {
+    const msg = JSON.stringify(pay?.error ?? pay).slice(0, 200)
+    if (/insufficient|saldo/i.test(msg)) {
+      throw new Error('Saldo insuficiente na carteira do Melhor Envio. Adicione créditos e tente de novo.')
+    }
+    throw new Error(`Falha ao pagar a etiqueta: ${msg}`)
+  }
+
+  // 3) Gera a etiqueta
+  const genRes = await fetch(`${ME_API}/me/shipment/generate`, {
+    method: 'POST',
+    headers: h,
+    body: JSON.stringify({ orders: [envioId] }),
+  })
+  if (!genRes.ok) {
+    const t = await genRes.text().catch(() => '')
+    throw new Error(`Etiqueta paga, mas falhou ao gerar (${genRes.status}): ${t.slice(0, 150)}. Gere pelo painel do Melhor Envio.`)
+  }
+
+  // 4) Link público do PDF
+  const printRes = await fetch(`${ME_API}/me/shipment/print`, {
+    method: 'POST',
+    headers: h,
+    body: JSON.stringify({ mode: 'public', orders: [envioId] }),
+  })
+  const print = await printRes.json().catch(() => null)
+
+  // 5) Código de rastreio
+  const trackRes = await fetch(`${ME_API}/me/shipment/tracking`, {
+    method: 'POST',
+    headers: h,
+    body: JSON.stringify({ orders: [envioId] }),
+  })
+  const track = await trackRes.json().catch(() => null)
+  const rastreio = String(track?.[envioId]?.tracking ?? '')
+
+  return { etiquetaId: envioId, etiquetaUrl: String(print?.url ?? ''), rastreio }
 }
 
 // Cota o frete no Melhor Envio. Lança erro em falha de rede/autenticação;

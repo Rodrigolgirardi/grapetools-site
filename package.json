@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "prebuild": "node scripts/gen-image-manifest.mjs",
+    "prebuild": "node scripts/gen-image-manifest.mjs && node scripts/gen-custos.mjs",
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",

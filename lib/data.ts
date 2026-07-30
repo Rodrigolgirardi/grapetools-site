@@ -15,6 +15,9 @@ export type Variation = {
   tiers: Tier[];
   weight: string;
   ncm: string;
+  // Custo unitário de compra (CMV), em R$. Opcional: o painel de Vendas usa
+  // para calcular a margem; sem custo cadastrado, mostra "custo não informado".
+  custo?: number;
   // Se presente, esta variação é um KIT: composta por outros SKUs.
   // O estoque é calculado dos componentes e a venda dá baixa neles.
   composicao?: KitComponente[];

@@ -7,11 +7,12 @@
 import { useMemo, useState, type CSSProperties } from 'react'
 import { Logo } from '@/components/Logo'
 import { AdminEstoque } from '@/components/AdminEstoque'
+import { AdminVendas } from '@/components/AdminVendas'
 import { formatCurrency, findVariation } from '@/lib/pricing'
 import styles from './AdminPanel.module.css'
 
-type Item = { descricao: string; sku: string; quantidade: number; preco_unitario: number }
-type Pedido = {
+export type Item = { descricao: string; sku: string; quantidade: number; preco_unitario: number }
+export type Pedido = {
   id: string
   data: string
   pagoEm: string
@@ -25,6 +26,21 @@ type Pedido = {
   status: string
   rastreio: string
   pagarme_order_id: string | null
+  entregaTipo: string
+  freteServicoNome: string
+  freteValor: number
+  temEndereco: boolean
+  etiquetaUrl: string
+  enderecoEntrega: { rua?: string; numero?: string; complemento?: string; bairro?: string; cidade?: string; estado?: string; cep?: string } | null
+  observacao: string
+  notaAdmin: string
+  nfNumero: string
+  cancelMotivo: string
+  cupomCodigo: string
+  cupomPercent: number
+  vendedor: string
+  comissaoValor: number
+  parcelas: number
   itens: Item[]
 }
 type Cliente = {
@@ -55,14 +71,7 @@ type Cupom = {
   comissao_percent: number
   ativo: boolean
 }
-type Comissao = {
-  vendedor: string
-  vendas: number
-  totalVendido: number
-  comissao: number
-}
-
-const TABS = ['Início', 'Pedidos', 'Clientes', 'Estoque', 'Cupons', 'Financeiro', 'Relatórios'] as const
+const TABS = ['Início', 'Vendas', 'Pedidos', 'Clientes', 'Estoque', 'Cupons', 'Financeiro', 'Relatórios'] as const
 type Tab = (typeof TABS)[number]
 
 function dataBR(iso: string): string {
@@ -171,6 +180,9 @@ function PedidosView({ pedidos, noCap }: { pedidos: Pedido[]; noCap: boolean }) 
   const [aberto, setAberto] = useState<string | null>(null)
   const [statusFiltro, setStatusFiltro] = useState<'todos' | 'nao_pago' | 'pago'>('todos')
   const [overrides, setOverrides] = useState<Record<string, { status?: string; rastreio?: string }>>({})
+  // Etiquetas compradas nesta sessão do painel (url por pedido) + em andamento
+  const [etiquetas, setEtiquetas] = useState<Record<string, string>>({})
+  const [comprandoEtiqueta, setComprandoEtiqueta] = useState<Set<string>>(new Set())
   // Draft e "salvando" POR PEDIDO (não global): evita o rascunho de rastreio vazar
   // entre pedidos e não trava os botões de todos ao salvar um.
   const [rastreioDraft, setRastreioDraft] = useState<Record<string, string>>({})
@@ -241,6 +253,41 @@ function PedidosView({ pedidos, noCap }: { pedidos: Pedido[]; noCap: boolean }) 
       setSalvando((prev) => {
         const n = new Set(prev)
         n.delete(id)
+        return n
+      })
+    }
+  }
+
+  async function comprarEtiqueta(p: Pedido) {
+    const freteTxt = p.freteServicoNome
+      ? `${p.freteServicoNome}${p.freteValor > 0 ? ` (cliente pagou ${formatCurrency(p.freteValor)})` : ' (frete grátis)'}`
+      : 'serviço mais barato disponível'
+    // Compra debita a carteira do Melhor Envio — sempre confirmar antes.
+    if (!confirm(`Comprar etiqueta via ${freteTxt}?\n\nO valor será debitado da carteira do Melhor Envio.`)) return
+    setComprandoEtiqueta((prev) => new Set(prev).add(p.id))
+    try {
+      const res = await fetch('/api/admin/etiqueta', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pedido_id: p.id }),
+      })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) {
+        // 409 = já tinha etiqueta; aproveita o link se veio
+        if (data?.etiqueta_url) setEtiquetas((prev) => ({ ...prev, [p.id]: data.etiqueta_url }))
+        alert(data?.error || 'Não foi possível comprar a etiqueta.')
+        return
+      }
+      if (data.etiqueta_url) setEtiquetas((prev) => ({ ...prev, [p.id]: data.etiqueta_url }))
+      if (data.rastreio) setOverrides((prev) => ({ ...prev, [p.id]: { ...prev[p.id], rastreio: data.rastreio } }))
+      setOverrides((prev) => ({ ...prev, [p.id]: { ...prev[p.id], status: 'em_separacao' } }))
+      alert(`Etiqueta comprada!${data.rastreio ? `\nRastreio: ${data.rastreio}` : ''}\n\nO link de impressão está no pedido.`)
+    } catch {
+      alert('Erro de rede ao comprar a etiqueta. Confira no painel do Melhor Envio antes de tentar de novo (pode ter sido comprada).')
+    } finally {
+      setComprandoEtiqueta((prev) => {
+        const n = new Set(prev)
+        n.delete(p.id)
         return n
       })
     }
@@ -385,6 +432,26 @@ function PedidosView({ pedidos, noCap }: { pedidos: Pedido[]; noCap: boolean }) 
                           </button>
                         </div>
                       </div>
+                      {/* Etiqueta Melhor Envio: comprar (pago + entrega) ou imprimir */}
+                      {(etiquetas[p.id] || p.etiquetaUrl) ? (
+                        <a
+                          className={styles.waBtn}
+                          href={etiquetas[p.id] || p.etiquetaUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          🖨 Imprimir etiqueta
+                        </a>
+                      ) : p.pagamento_status === 'pago' && p.entregaTipo === 'entrega' && p.temEndereco ? (
+                        <button
+                          type="button"
+                          className={styles.waBtn}
+                          disabled={comprandoEtiqueta.has(p.id)}
+                          onClick={() => comprarEtiqueta(p)}
+                        >
+                          {comprandoEtiqueta.has(p.id) ? 'Comprando…' : `📦 Comprar etiqueta${p.freteServicoNome ? ` · ${p.freteServicoNome}` : ''}`}
+                        </button>
+                      ) : null}
                       {waLink(p) && (
                         <a
                           className={styles.waBtn}
@@ -715,13 +782,19 @@ const cuTh: CSSProperties = { textAlign: 'left', padding: '8px 10px', borderBott
 const cuTd: CSSProperties = { padding: '10px', borderBottom: '1px solid #f3f4f6', whiteSpace: 'nowrap' }
 const cuPill: CSSProperties = { border: 'none', borderRadius: 999, padding: '3px 12px', fontSize: 12, fontWeight: 600, cursor: 'pointer' }
 
-function CuponsView({ cupons, comissao }: { cupons: Cupom[]; comissao: Comissao[] }) {
+function CuponsView({ cupons, pedidos }: { cupons: Cupom[]; pedidos: Pedido[] }) {
   const [codigo, setCodigo] = useState('')
   const [desconto, setDesconto] = useState('5')
   const [vendedor, setVendedor] = useState('')
   const [comissaoPct, setComissaoPct] = useState('')
   const [busy, setBusy] = useState(false)
   const [erro, setErro] = useState<string | null>(null)
+
+  // Edição inline de um cupom (comissão / desconto / vendedor)
+  const [editId, setEditId] = useState<string | null>(null)
+  const [editComissao, setEditComissao] = useState('')
+  const [editDesconto, setEditDesconto] = useState('')
+  const [editVendedor, setEditVendedor] = useState('')
 
   async function criar() {
     setErro(null)
@@ -762,7 +835,82 @@ function CuponsView({ cupons, comissao }: { cupons: Cupom[]; comissao: Comissao[
     } finally { window.location.reload() }
   }
 
-  const totalComissao = comissao.reduce((s, c) => s + c.comissao, 0)
+  function abrirEdicao(c: Cupom) {
+    setEditId(c.id)
+    setEditComissao(String(c.comissao_percent))
+    setEditDesconto(String(c.desconto_percent))
+    setEditVendedor(c.vendedor)
+  }
+
+  async function salvarEdicao(id: string) {
+    setBusy(true)
+    try {
+      const res = await fetch('/api/admin/cupons', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id,
+          comissao_percent: Number(editComissao) || 0,
+          desconto_percent: Number(editDesconto) || 0,
+          vendedor: editVendedor.trim(),
+        }),
+      })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok || data.error) { alert(data.error || 'Erro ao salvar.'); setBusy(false); return }
+      window.location.reload()
+    } catch {
+      alert('Falha de conexão.'); setBusy(false)
+    }
+  }
+
+  // ─── Fechamento mensal por vendedor ───
+  // Base: pedidos PAGOS com vendedor. Mês pelo dia do PAGAMENTO (pagoEm; se
+  // vazio, a data do pedido). A comissão vem congelada de cada pedido
+  // (comissao_valor) — mudar o % do cupom hoje não mexe no passado.
+  const vendasComissionadas = useMemo(
+    () => pedidos.filter((p) => p.vendedor && p.pagamento_status === 'pago'),
+    [pedidos]
+  )
+  const mesDe = (p: Pedido) => (p.pagoEm || p.data || '').slice(0, 7)
+  const meses = useMemo(
+    () => [...new Set(vendasComissionadas.map(mesDe).filter(Boolean))].sort().reverse(),
+    [vendasComissionadas]
+  )
+  const [mes, setMes] = useState<string>('atual')
+  const mesEscolhido = mes === 'atual' ? (meses[0] || '') : mes
+
+  const fechamento = useMemo(() => {
+    const doMes = mesEscolhido === 'todos'
+      ? vendasComissionadas
+      : vendasComissionadas.filter((p) => mesDe(p) === mesEscolhido)
+    const porVendedor = new Map<string, { vendas: number; cupons: Set<string>; totalVendido: number; comissao: number }>()
+    for (const p of doMes) {
+      const s = porVendedor.get(p.vendedor) || { vendas: 0, cupons: new Set<string>(), totalVendido: 0, comissao: 0 }
+      s.vendas += 1
+      if (p.cupomCodigo) s.cupons.add(p.cupomCodigo)
+      s.totalVendido += p.total
+      s.comissao += p.comissaoValor
+      porVendedor.set(p.vendedor, s)
+    }
+    return [...porVendedor.entries()]
+      .map(([vend, s]) => ({ vendedor: vend, ...s }))
+      .sort((a, b) => b.comissao - a.comissao)
+  }, [vendasComissionadas, mesEscolhido])
+
+  const totalComissao = fechamento.reduce((s, c) => s + c.comissao, 0)
+  const tituloMes = mesEscolhido === 'todos' ? 'todos os meses' : mesEscolhido ? mesLabel(mesEscolhido) : '—'
+
+  function exportarFechamento() {
+    const cols = ['Vendedor', 'Cupons', 'Vendas pagas', 'Total vendido (R$)', 'Comissão (R$)']
+    const linhas = fechamento.map((c) => [
+      c.vendedor,
+      [...c.cupons].join(' '),
+      c.vendas,
+      numBR(c.totalVendido),
+      numBR(c.comissao),
+    ])
+    baixarCSV(`comissao-${mesEscolhido === 'todos' ? 'geral' : mesEscolhido}.csv`, cols, linhas)
+  }
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
@@ -787,7 +935,7 @@ function CuponsView({ cupons, comissao }: { cupons: Cupom[]; comissao: Comissao[
         <button type="button" onClick={criar} disabled={busy} style={cuBtn}>{busy ? 'Salvando…' : 'Criar cupom'}</button>
       </div>
 
-      {/* Lista de cupons */}
+      {/* Lista de cupons (com edição de comissão/desconto/vendedor) */}
       <div style={cuCard}>
         <h3 style={cuTitle}>Cupons ({cupons.length})</h3>
         {cupons.length === 0 ? (
@@ -795,51 +943,92 @@ function CuponsView({ cupons, comissao }: { cupons: Cupom[]; comissao: Comissao[
         ) : (
           <div style={{ overflowX: 'auto' }}>
             <table style={cuTable}>
-              <thead><tr>{['Código', 'Desconto', 'Vendedor', 'Comissão', 'Status', ''].map((h) => <th key={h} style={cuTh}>{h}</th>)}</tr></thead>
+              <thead><tr>{['Código', 'Desconto', 'Vendedor', 'Comissão', 'Status', '', ''].map((h, i) => <th key={i} style={cuTh}>{h}</th>)}</tr></thead>
               <tbody>
                 {cupons.map((c) => (
-                  <tr key={c.id}>
-                    <td style={cuTd}><strong>{c.codigo}</strong></td>
-                    <td style={cuTd}>{c.desconto_percent}%</td>
-                    <td style={cuTd}>{c.vendedor || <span style={{ color: '#9ca3af' }}>Empresa</span>}</td>
-                    <td style={cuTd}>{c.comissao_percent > 0 ? `${c.comissao_percent}%` : '—'}</td>
-                    <td style={cuTd}>
-                      <button type="button" onClick={() => toggle(c.id, !c.ativo)} disabled={busy} style={{ ...cuPill, background: c.ativo ? '#dcfce7' : '#f3f4f6', color: c.ativo ? '#15803d' : '#6b7280' }}>
-                        {c.ativo ? 'Ativo' : 'Inativo'}
-                      </button>
-                    </td>
-                    <td style={cuTd}>
-                      <button type="button" onClick={() => remover(c.id, c.codigo)} disabled={busy} style={{ background: 'none', border: 'none', color: '#dc2626', cursor: 'pointer', fontSize: 12 }}>Remover</button>
-                    </td>
-                  </tr>
+                  editId === c.id ? (
+                    <tr key={c.id} style={{ background: '#f5f3ff' }}>
+                      <td style={cuTd}><strong>{c.codigo}</strong></td>
+                      <td style={cuTd}>
+                        <input value={editDesconto} inputMode="decimal" onChange={(e) => setEditDesconto(e.target.value.replace(/[^\d.,]/g, '').replace(',', '.'))} style={{ ...cuInp, height: 32, width: 70 }} /> %
+                      </td>
+                      <td style={cuTd}>
+                        <input value={editVendedor} onChange={(e) => setEditVendedor(e.target.value)} placeholder="Empresa" style={{ ...cuInp, height: 32, width: 130 }} />
+                      </td>
+                      <td style={cuTd}>
+                        <input value={editComissao} inputMode="decimal" onChange={(e) => setEditComissao(e.target.value.replace(/[^\d.,]/g, '').replace(',', '.'))} style={{ ...cuInp, height: 32, width: 70 }} /> %
+                      </td>
+                      <td style={cuTd} colSpan={2}>
+                        <button type="button" onClick={() => salvarEdicao(c.id)} disabled={busy} style={{ ...cuPill, background: '#5b21b6', color: '#fff' }}>
+                          {busy ? '…' : 'Salvar'}
+                        </button>
+                      </td>
+                      <td style={cuTd}>
+                        <button type="button" onClick={() => setEditId(null)} disabled={busy} style={{ background: 'none', border: 'none', color: '#6b7280', cursor: 'pointer', fontSize: 12 }}>Cancelar</button>
+                      </td>
+                    </tr>
+                  ) : (
+                    <tr key={c.id}>
+                      <td style={cuTd}><strong>{c.codigo}</strong></td>
+                      <td style={cuTd}>{c.desconto_percent}%</td>
+                      <td style={cuTd}>{c.vendedor || <span style={{ color: '#9ca3af' }}>Empresa</span>}</td>
+                      <td style={cuTd}>{c.comissao_percent > 0 ? `${c.comissao_percent}%` : '—'}</td>
+                      <td style={cuTd}>
+                        <button type="button" onClick={() => toggle(c.id, !c.ativo)} disabled={busy} style={{ ...cuPill, background: c.ativo ? '#dcfce7' : '#f3f4f6', color: c.ativo ? '#15803d' : '#6b7280' }}>
+                          {c.ativo ? 'Ativo' : 'Inativo'}
+                        </button>
+                      </td>
+                      <td style={cuTd}>
+                        <button type="button" onClick={() => abrirEdicao(c)} disabled={busy} style={{ background: 'none', border: 'none', color: '#5b21b6', cursor: 'pointer', fontSize: 12, fontWeight: 600 }}>Editar</button>
+                      </td>
+                      <td style={cuTd}>
+                        <button type="button" onClick={() => remover(c.id, c.codigo)} disabled={busy} style={{ background: 'none', border: 'none', color: '#dc2626', cursor: 'pointer', fontSize: 12 }}>Remover</button>
+                      </td>
+                    </tr>
+                  )
                 ))}
               </tbody>
             </table>
           </div>
         )}
-        <p style={{ color: '#9ca3af', fontSize: 11.5, margin: '10px 0 0' }}>Clique em Ativo/Inativo pra ligar ou desligar o cupom sem apagar.</p>
+        <p style={{ color: '#9ca3af', fontSize: 11.5, margin: '10px 0 0' }}>
+          Mudar a comissão vale só para as vendas FUTURAS — cada venda paga guarda a comissão da época.
+        </p>
       </div>
 
-      {/* Relatório de comissão */}
+      {/* Fechamento mensal por vendedor */}
       <div style={cuCard}>
-        <h3 style={cuTitle}>Comissão a pagar por vendedor</h3>
-        {comissao.length === 0 ? (
-          <p style={{ color: '#6b7280', fontSize: 13, margin: 0 }}>Ainda não há vendas PAGAS com cupom de vendedor.</p>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', marginBottom: 12 }}>
+          <h3 style={{ ...cuTitle, margin: 0, flex: 1 }}>Fechamento de comissões — {tituloMes}</h3>
+          <select value={mes} onChange={(e) => setMes(e.target.value)} style={{ ...cuInp, height: 34, fontWeight: 600 }}>
+            {meses.map((m, i) => (
+              <option key={m} value={i === 0 ? 'atual' : m}>{mesLabel(m)}{i === 0 ? ' (atual)' : ''}</option>
+            ))}
+            <option value="todos">Todos os meses</option>
+          </select>
+          <button type="button" onClick={exportarFechamento} disabled={fechamento.length === 0} style={{ ...cuPill, background: '#f3f4f6', color: '#374151', height: 34, padding: '0 14px' }}>
+            ⬇ Exportar
+          </button>
+        </div>
+        {fechamento.length === 0 ? (
+          <p style={{ color: '#6b7280', fontSize: 13, margin: 0 }}>Nenhuma venda PAGA com cupom de vendedor em {tituloMes}.</p>
         ) : (
           <div style={{ overflowX: 'auto' }}>
             <table style={cuTable}>
-              <thead><tr>{['Vendedor', 'Vendas pagas', 'Total vendido', 'Comissão a pagar'].map((h) => <th key={h} style={cuTh}>{h}</th>)}</tr></thead>
+              <thead><tr>{['Vendedor', 'Cupons usados', 'Vendas pagas', 'Total vendido', 'Comissão a pagar'].map((h) => <th key={h} style={cuTh}>{h}</th>)}</tr></thead>
               <tbody>
-                {comissao.map((c) => (
+                {fechamento.map((c) => (
                   <tr key={c.vendedor}>
                     <td style={cuTd}><strong>{c.vendedor}</strong></td>
+                    <td style={cuTd}>{[...c.cupons].join(', ') || '—'}</td>
                     <td style={cuTd}>{c.vendas}</td>
                     <td style={cuTd}>{formatCurrency(c.totalVendido)}</td>
                     <td style={{ ...cuTd, fontWeight: 700, color: '#5b21b6' }}>{formatCurrency(c.comissao)}</td>
                   </tr>
                 ))}
                 <tr>
-                  <td style={{ ...cuTd, fontWeight: 700 }}>Total</td>
+                  <td style={{ ...cuTd, fontWeight: 700 }}>Total do mês</td>
+                  <td style={cuTd} />
                   <td style={cuTd} />
                   <td style={cuTd} />
                   <td style={{ ...cuTd, fontWeight: 800, color: '#5b21b6' }}>{formatCurrency(totalComissao)}</td>
@@ -848,27 +1037,26 @@ function CuponsView({ cupons, comissao }: { cupons: Cupom[]; comissao: Comissao[
             </table>
           </div>
         )}
-        <p style={{ color: '#9ca3af', fontSize: 11.5, margin: '10px 0 0' }}>Conta só pedidos PAGOS, dos últimos 300 pedidos.</p>
+        <p style={{ color: '#9ca3af', fontSize: 11.5, margin: '10px 0 0' }}>
+          Conta só pedidos PAGOS (mês do pagamento), dos últimos 300 pedidos. Use o Exportar pra fechar o mês com o vendedor.
+        </p>
       </div>
     </div>
   )
 }
 
-// ---------- Painel ----------
 export function AdminPanel({
   pedidos,
   clientes,
   pausadosIniciais,
   stats,
   cupons,
-  comissao,
 }: {
   pedidos: Pedido[]
   clientes: Cliente[]
   pausadosIniciais: string[]
   stats: Stats
   cupons: Cupom[]
-  comissao: Comissao[]
 }) {
   const [tab, setTab] = useState<Tab>('Início')
 
@@ -902,10 +1090,11 @@ export function AdminPanel({
         </div>
 
         {tab === 'Início' && <Dashboard stats={stats} pedidos={pedidos} />}
+        {tab === 'Vendas' && <AdminVendas pedidos={pedidos} />}
         {tab === 'Pedidos' && <PedidosView pedidos={pedidos} noCap={stats.pedidosNoCap} />}
         {tab === 'Clientes' && <ClientesView clientes={clientes} pedidos={pedidos} />}
         {tab === 'Estoque' && <AdminEstoque pausadosIniciais={pausadosIniciais} />}
-        {tab === 'Cupons' && <CuponsView cupons={cupons} comissao={comissao} />}
+        {tab === 'Cupons' && <CuponsView cupons={cupons} pedidos={pedidos} />}
         {tab === 'Financeiro' && <FinanceiroView pedidos={pedidos} noCap={stats.pedidosNoCap} />}
         {tab === 'Relatórios' && <RelatoriosView pedidos={pedidos} noCap={stats.pedidosNoCap} />}
       </section>

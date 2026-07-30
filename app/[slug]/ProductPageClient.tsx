@@ -12,13 +12,13 @@ import { products } from "@/lib/data";
 import { useCart } from "@/hooks/useCart";
 import { useEstoque } from "@/hooks/useEstoque";
 import { kitDisponivel } from "@/lib/kit";
-import { formatCurrency, getTierForQuantity, getTierRangeLabel } from "@/lib/pricing";
+import { formatCurrency, getTierForQuantity, getTierRangeLabel, JUROS_AO_MES, PARCELAS_SEM_JUROS } from "@/lib/pricing";
 import { productJsonLd } from "@/lib/seo";
 import { FreteCalc } from "@/components/FreteCalc";
 
 function calcInstallment(price: number, n: number): number {
-  if (n <= 3) return price / n;
-  return (price * (1 + 0.02 * n)) / n;
+  if (n <= PARCELAS_SEM_JUROS) return price / n;
+  return (price * (1 + JUROS_AO_MES * n)) / n;
 }
 
 function PaymentBlock({ total }: { total: number }) {

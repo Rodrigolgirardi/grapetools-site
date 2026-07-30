@@ -36,6 +36,17 @@ export async function POST(request: NextRequest) {
   if (body?.rastreio !== undefined) {
     patch.rastreio = String(body.rastreio).trim().slice(0, 120) || null
   }
+  // Campos administrativos (migração 009): nota interna, motivo de cancelamento
+  // e nº da NF-e informado manualmente.
+  if (body?.nota_admin !== undefined) {
+    patch.nota_admin = String(body.nota_admin).trim().slice(0, 2000) || null
+  }
+  if (body?.cancel_motivo !== undefined) {
+    patch.cancel_motivo = String(body.cancel_motivo).trim().slice(0, 300) || null
+  }
+  if (body?.nf_numero !== undefined) {
+    patch.nf_numero = String(body.nf_numero).trim().slice(0, 60) || null
+  }
   if (Object.keys(patch).length === 0) {
     return NextResponse.json({ error: 'Nada para atualizar.' }, { status: 400 })
   }
@@ -53,7 +64,21 @@ export async function POST(request: NextRequest) {
   const { data, error } = await admin.from('pedidos').update(patch).eq('id', pedidoId).select('id')
   if (error) {
     console.error('Erro ao atualizar pedido (admin):', error.message)
-    return NextResponse.json({ error: 'Não foi possível salvar. Rode a migração 006?' }, { status: 500 })
+    // Aponta a migração certa conforme a coluna que faltou
+    const m = error.message || ''
+    const migracao = /nota_admin|cancel_motivo|nf_numero|parcelas/.test(m)
+      ? '009'
+      : /entrega_tipo|endereco_entrega|frete_|etiqueta_/.test(m)
+        ? '008'
+        : /rastreio/.test(m)
+          ? '006'
+          : null
+    return NextResponse.json(
+      { error: migracao
+          ? `Não foi possível salvar — rode a migração ${migracao} no Supabase (SQL Editor).`
+          : 'Não foi possível salvar. Tente novamente.' },
+      { status: 500 }
+    )
   }
   if (!data || data.length === 0) {
     return NextResponse.json({ error: 'Pedido não encontrado.' }, { status: 404 })

@@ -1,0 +1,169 @@
+/* Aba Vendas do admin — cartões de expedição no estilo Mercado Livre */
+
+.chips { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+.chip { display: inline-flex; align-items: center; gap: 7px; padding: 7px 14px; border: 1px solid var(--line); border-radius: 20px; background: var(--white); font: inherit; font-size: 13px; font-weight: 600; color: var(--muted); cursor: pointer; }
+.chip:hover { border-color: var(--purple-400); }
+.chipOn { background: var(--purple-700); border-color: var(--purple-700); color: #fff; }
+.chipN { font-size: 11px; background: rgba(15, 10, 30, 0.07); padding: 1px 8px; border-radius: 10px; }
+.chipOn .chipN { background: rgba(255, 255, 255, 0.22); color: #fff; }
+
+.search { width: 100%; padding: 10px 14px; margin-bottom: 12px; border: 1px solid var(--line); border-radius: var(--r); font-size: 14px; background: var(--white); color: var(--ink); }
+.search:focus { outline: 2px solid var(--purple-400); }
+.vazio { text-align: center; color: var(--muted); padding: 28px; font-size: 13px; }
+
+.lista { display: grid; gap: 12px; }
+
+.card { background: var(--white); border: 1px solid var(--line); border-radius: var(--r); box-shadow: var(--shadow-sm); overflow: hidden; }
+
+/* Cabeçalho do cartão: data · código · serviço · cliente · chat */
+.head { display: flex; align-items: center; gap: 12px; padding: 10px 16px; border-bottom: 1px solid var(--surface); flex-wrap: wrap; }
+.headData { font-size: 12px; color: var(--muted); white-space: nowrap; }
+.headCod { font-size: 12.5px; font-weight: 700; color: var(--ink); font-family: monospace; }
+.headTipo { font-size: 10.5px; font-weight: 700; letter-spacing: 0.04em; color: var(--purple-700); background: var(--purple-50); padding: 2px 8px; border-radius: 4px; text-transform: uppercase; }
+.headCliente { margin-left: auto; font-size: 13px; font-weight: 600; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.headCliente em { font-style: normal; font-weight: 400; font-size: 11.5px; color: var(--muted); font-family: monospace; margin-left: 6px; }
+.headChat { font-size: 12.5px; font-weight: 600; color: var(--purple-700); text-decoration: none; white-space: nowrap; }
+.headChat:hover { text-decoration: underline; }
+
+/* Linha de status + botões (aviso à esquerda, ações à direita) */
+.statusRow { display: flex; align-items: center; gap: 12px; padding: 12px 16px; flex-wrap: wrap; }
+.statusTexto { flex: 1; min-width: 240px; font-size: 13px; }
+.statusLaranja { color: #c2410c; font-weight: 600; }
+.statusOk { color: #15803d; font-weight: 600; }
+.statusAcoes { display: flex; gap: 8px; flex-wrap: wrap; }
+.btnAzul { display: inline-flex; align-items: center; padding: 8px 18px; border: none; border-radius: 6px; background: #3483fa; color: #fff; font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; text-decoration: none; }
+.btnAzul:hover:not(:disabled) { background: #2968c8; }
+.btnAzul:disabled { opacity: 0.6; cursor: default; }
+.btnBranco { display: inline-flex; align-items: center; padding: 8px 14px; border: 1px solid var(--line); border-radius: 6px; background: var(--white); color: var(--purple-700); font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; }
+.btnBranco:hover { background: var(--purple-50); }
+
+/* Linha de item: thumb · nome · preço · qtd · sku */
+.item { display: flex; align-items: center; gap: 12px; margin: 0 16px 10px; padding: 10px 12px; background: var(--surface); border-radius: 8px; }
+.itemThumb { width: 52px; height: 52px; flex-shrink: 0; background: var(--white); border: 1px solid var(--line); border-radius: 6px; display: grid; place-items: center; overflow: hidden; }
+.itemThumb img { width: 100%; height: 100%; object-fit: contain; }
+.itemNome { flex: 1; min-width: 200px; font-size: 13px; color: var(--ink); }
+.itemPreco { font-size: 12.5px; color: var(--ink-80); white-space: nowrap; }
+.itemQtd { font-size: 12.5px; color: var(--muted); white-space: nowrap; }
+.itemSku { font-size: 12px; color: var(--muted); font-family: monospace; white-space: nowrap; }
+
+.rodape { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 8px 16px 12px; font-size: 12.5px; color: var(--muted); flex-wrap: wrap; }
+.rodapeTotal { color: var(--ink); font-size: 13px; }
+.rodapeNota { color: var(--purple-700); }
+
+/* Menu "⋯" */
+.menuWrap { position: relative; }
+.menuBtn { border: 1px solid var(--line); background: var(--white); border-radius: 6px; width: 30px; height: 30px; font-size: 16px; color: var(--ink-80); cursor: pointer; line-height: 1; }
+.menuBtn:hover { background: var(--surface); }
+.menu { position: absolute; right: 0; top: 34px; z-index: 30; display: grid; min-width: 210px; background: var(--white); border: 1px solid var(--line); border-radius: 8px; box-shadow: 0 8px 28px rgba(15, 10, 30, 0.14); padding: 4px; }
+.menu button { text-align: left; padding: 9px 12px; border: none; background: none; border-radius: 6px; font: inherit; font-size: 13px; color: var(--ink); cursor: pointer; }
+.menu button:hover:not(:disabled) { background: var(--surface); }
+.menu button:disabled { color: var(--muted); cursor: default; }
+
+/* Modais */
+.overlay { position: fixed; inset: 0; z-index: 60; background: rgba(15, 10, 30, 0.45); display: grid; place-items: center; padding: 18px; }
+.modal { background: var(--white); border-radius: 12px; max-width: 640px; width: 100%; max-height: 88vh; overflow-y: auto; padding: 18px 20px; box-shadow: 0 18px 60px rgba(15, 10, 30, 0.3); }
+.modalHead { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 6px; }
+.modalHead h3 { margin: 0; font-size: 16px; color: var(--ink); }
+.modalFechar { border: none; background: none; font-size: 15px; color: var(--muted); cursor: pointer; padding: 4px; }
+.modalFechar:hover { color: var(--ink); }
+.modalSecao { margin: 14px 0 6px; font-size: 11.5px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: var(--purple-600); }
+.modalTexto { margin: 0 0 4px; font-size: 13px; color: var(--ink); line-height: 1.5; }
+.modalMuted { font-size: 12px; color: var(--muted); }
+.modalAviso { color: #c2410c; font-size: 12px; }
+.modalTabela { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+.modalTabela th, .modalTabela td { padding: 6px 8px; border-bottom: 1px solid var(--surface); text-align: left; color: var(--ink); }
+.modalTabela th { font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); }
+.num { text-align: right !important; white-space: nowrap; }
+.totRow td { font-weight: 800; color: var(--purple-700); border-top: 2px solid var(--line); }
+.mono { font-family: monospace; font-size: 11.5px; }
+
+.nfRow { display: flex; align-items: center; gap: 8px; margin-top: 4px; flex-wrap: wrap; }
+.nfRow label { font-size: 12px; color: var(--muted); }
+.nfRow input { flex: 1; min-width: 140px; padding: 7px 10px; border: 1px solid var(--line); border-radius: 6px; font: inherit; font-size: 13px; }
+.nfRow button { padding: 7px 14px; border: 1px solid var(--line); border-radius: 6px; background: var(--white); color: var(--purple-700); font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; }
+.nfRow button:disabled { opacity: 0.5; cursor: default; }
+
+.motivos { display: grid; gap: 8px; margin: 8px 0 12px; }
+.motivo { display: flex; align-items: center; gap: 9px; font-size: 13.5px; color: var(--ink); cursor: pointer; padding: 9px 12px; border: 1px solid var(--line); border-radius: 8px; }
+.motivo:hover { border-color: var(--purple-400); }
+.motivoOutro { width: 100%; padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; font: inherit; font-size: 13px; resize: vertical; }
+
+.notaArea { width: 100%; margin-top: 8px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; font: inherit; font-size: 13.5px; resize: vertical; }
+
+.modalAcoes { display: flex; justify-content: flex-end; gap: 8px; margin-top: 14px; }
+
+/* ── Detalhe da venda (layout estilo ML) ── */
+.modalLarga { max-width: 940px; background: var(--surface); }
+.detTopo { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+.detTrilha { font-size: 11px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: var(--purple-600); }
+.detTitulo { margin: 3px 0 3px; font-size: 19px; line-height: 1.25; color: var(--ink); }
+.detSub { font-size: 12px; color: var(--muted); }
+.detTopoAcoes { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+.detImprimir { border: none; background: none; color: #3483fa; font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; padding: 4px; }
+.detImprimir:hover { text-decoration: underline; }
+
+.detCols { display: grid; grid-template-columns: 1fr 300px; gap: 12px; align-items: start; }
+.detMain { display: grid; gap: 12px; min-width: 0; }
+.detLado { position: sticky; top: 0; }
+.detCard { background: var(--white); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; }
+.detCardTitulo { margin: 0 0 8px; font-size: 13.5px; font-weight: 700; color: var(--ink); }
+.detTexto { margin: 0; font-size: 13px; color: var(--ink); line-height: 1.55; }
+
+/* Cliente */
+.cliRow { display: flex; align-items: center; gap: 12px; }
+.cliAvatar { width: 42px; height: 42px; border-radius: 50%; background: var(--purple-50); color: var(--purple-700); display: grid; place-items: center; font-size: 14px; font-weight: 800; flex-shrink: 0; }
+.cliInfo { flex: 1; min-width: 0; display: grid; gap: 1px; }
+.cliInfo strong { font-size: 14px; color: var(--ink); }
+.cliInfo em { font-style: normal; font-size: 12px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cliChat { font-size: 13px; font-weight: 600; color: #3483fa; text-decoration: none; white-space: nowrap; }
+.cliChat:hover { text-decoration: underline; }
+
+/* Situação do envio */
+.envioTitulo { margin: 0 0 2px; font-size: 14.5px; font-weight: 700; }
+.envioBom { color: #15803d; }
+.envioAtencao { color: #c2410c; }
+.envioRuim { color: #dc2626; }
+.envioDesc { margin: 0 0 10px; font-size: 12.5px; color: var(--muted); }
+.detItem { display: flex; align-items: center; gap: 10px; padding: 9px 10px; background: var(--surface); border-radius: 8px; margin-top: 6px; }
+.detItemNome { flex: 1; min-width: 140px; font-size: 12.5px; color: var(--ink); }
+.detItemMeta { font-size: 12px; color: var(--ink-80); white-space: nowrap; }
+.detItemSku { font-size: 11px; color: var(--muted); font-family: monospace; white-space: nowrap; }
+
+/* Resumo financeiro (coluna direita) */
+.pagOk { margin: 0; font-size: 14.5px; font-weight: 800; color: #15803d; }
+.pagRuim { margin: 0; font-size: 14.5px; font-weight: 800; color: #dc2626; }
+.finLinhas { display: grid; gap: 7px; margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--surface); }
+.finLinha { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+.finLinha em { font-style: normal; font-size: 12px; color: var(--muted); }
+.finLinha strong { font-size: 12.5px; color: var(--ink); white-space: nowrap; }
+.finNeg { color: #b91c1c !important; }
+/* % da linha em relação ao preço de venda (produtos = 100%) */
+.finPct { font-style: normal; font-size: 10.5px; font-weight: 600; color: var(--muted); display: inline-block; min-width: 38px; text-align: right; }
+.finPctTotal { font-style: normal; font-size: 12px; font-weight: 700; color: var(--muted); margin-left: 2px; }
+.finAviso { font-size: 11.5px; color: #c2410c; }
+.finTotal { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; padding-top: 10px; border-top: 2px solid var(--line); }
+.finTotal span { font-size: 13px; font-weight: 700; color: var(--ink); }
+.finTotal strong { font-size: 19px; font-weight: 800; color: var(--purple-700); }
+
+/* Cartão de conciliação: leva à venda no Pagar.me (estilo caixinha do ML) */
+.detFaturamento { display: flex; align-items: center; gap: 11px; margin-top: 12px; padding: 12px 14px; background: var(--white); border: 1px solid var(--line); border-radius: 10px; text-decoration: none; transition: border-color 0.15s, box-shadow 0.15s; }
+.detFaturamento:hover { border-color: var(--purple-400); box-shadow: var(--shadow-sm); }
+.detFaturamentoIco { flex-shrink: 0; line-height: 0; }
+.detFaturamentoIco img { height: 20px; width: auto; display: block; }
+.detFaturamentoTexto { flex: 1; min-width: 0; display: grid; gap: 1px; }
+.detFaturamentoTexto strong { font-size: 13px; color: var(--ink); }
+.detFaturamentoTexto em { font-style: normal; font-size: 11.5px; color: var(--muted); line-height: 1.35; }
+.detFaturamentoSeta { font-size: 20px; color: var(--muted); flex-shrink: 0; }
+
+@media (max-width: 760px) {
+  .detCols { grid-template-columns: 1fr; }
+  .detLado { position: static; }
+}
+.btnCinza { padding: 8px 16px; border: 1px solid var(--line); border-radius: 6px; background: var(--white); color: var(--ink-80); font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; }
+.btnVermelho { padding: 8px 16px; border: none; border-radius: 6px; background: #dc2626; color: #fff; font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; }
+.btnVermelho:disabled { opacity: 0.5; cursor: default; }
+
+@media (max-width: 640px) {
+  .headCliente { margin-left: 0; width: 100%; }
+  .itemNome { min-width: 120px; }
+}

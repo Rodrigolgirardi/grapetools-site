@@ -90,7 +90,9 @@ export function getTierRangeLabel(tiers: Tier[], index: number): string {
 // ---- Cálculo AUTORITATIVO de pedido (fonte de verdade no servidor) ----
 // Regra de parcelamento: até N parcelas sem juros; acima disso, juros/parcela.
 export const PARCELAS_SEM_JUROS = 3;
-export const JUROS_AO_MES = 0.02;
+// 2,8%/parcela (decisão de 30/07/2026): cobre a tarifa progressiva do cartão no
+// Pagar.me — com 2% a loja absorvia parte do custo do parcelamento longo.
+export const JUROS_AO_MES = 0.028;
 export const PARCELAS_MAX = 12;
 // Valor mínimo de cada parcela. As adquirentes recusam parcelas muito baixas, e a
 // recusa chega ao cliente como um "não autorizado" genérico — então é melhor nem
