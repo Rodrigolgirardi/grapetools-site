@@ -13,6 +13,14 @@ import { trackBeginCheckout, trackPurchase, type GaItem } from '@/lib/analytics'
 import { metaBeginCheckout, metaPurchase } from '@/lib/meta-pixel'
 import { BackToSite } from '@/components/BackToSite'
 
+type FreteOpcao = {
+  id: number
+  nome: string
+  transportadora: string
+  preco: number
+  prazo: number
+}
+
 interface Endereco {
   rua?: string
   numero?: string
@@ -100,8 +108,52 @@ export default function CheckoutPage() {
   const totalComDesc = lines.reduce((s, l) => s + precoComDesc(l.tier.price) * l.quantity, 0)
   const descValor = subtotal - totalComDesc
 
+  // ——— FRETE (cotação real via Melhor Envio) ———
+  const [freteOpcoes, setFreteOpcoes] = useState<FreteOpcao[] | null>(null)
+  const [freteId, setFreteId] = useState<number | null>(null)
+  const [freteLoading, setFreteLoading] = useState(false)
+  const [freteErro, setFreteErro] = useState<string | null>(null)
+
+  const cepDigits = (endereco.cep || '').replace(/\D/g, '')
+  // Frete grátis: >= R$199 com destino na Grande SP (CEP 0xxxx-xxx) — regra do topo do site
+  const freteGratis = entregaTipo === 'entrega' && cepDigits.length === 8 && cepDigits.startsWith('0') && totalComDesc >= 199
+  const freteEscolhido = freteOpcoes?.find(o => o.id === freteId) || null
+  const freteValor = entregaTipo === 'retirada' || freteGratis ? 0 : (freteEscolhido?.preco ?? 0)
+  const freteDefinido = entregaTipo === 'retirada' || freteGratis || !!freteEscolhido
+  const totalFinal = Math.round((totalComDesc + freteValor) * 100) / 100
+
+  // Cota quando o CEP fica completo (e re-cota se o carrinho ou o CEP mudarem)
+  const linesKey = lines.map(l => `${l.variation.sku}:${l.quantity}`).join('|')
+  useEffect(() => {
+    setFreteOpcoes(null)
+    setFreteId(null)
+    setFreteErro(null)
+    if (entregaTipo !== 'entrega' || cepDigits.length !== 8 || freteGratis || lines.length === 0) return
+    let cancelado = false
+    setFreteLoading(true)
+    fetch('/api/frete/calcular', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ cep: cepDigits, itens: lines.map(l => ({ sku: l.variation.sku, quantidade: l.quantity })) }),
+    })
+      .then(r => r.json().then(d => ({ ok: r.ok, d })))
+      .then(({ ok, d }) => {
+        if (cancelado) return
+        if (!ok || !d.opcoes) { setFreteErro(d.error || 'Não foi possível cotar o frete.'); return }
+        if (d.opcoes.length === 0) { setFreteErro('Nenhuma transportadora atende esse CEP.'); return }
+        const top = d.opcoes.slice(0, 4)
+        setFreteOpcoes(top)
+        setFreteId(top[0].id) // pré-seleciona a mais barata
+      })
+      .catch(() => { if (!cancelado) setFreteErro('Não foi possível cotar o frete.') })
+      .finally(() => { if (!cancelado) setFreteLoading(false) })
+    return () => { cancelado = true }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cepDigits, entregaTipo, freteGratis, linesKey])
+
   // Só oferece parcelas que respeitem o valor mínimo por parcela (ver pricing.ts).
-  const maxParcelas = parcelasMaximas(totalComDesc)
+  // Base: produtos + frete — é o valor que o cliente parcela de fato.
+  const maxParcelas = parcelasMaximas(totalFinal)
   // Se o carrinho encolher depois de escolher (ex.: 6x e o cliente tira um item),
   // a opção selecionada some do menu mas o estado continuaria em 6 — reancora.
   useEffect(() => {
@@ -181,6 +233,8 @@ export default function CheckoutPage() {
     if (!telefoneContato.trim()) return false
     if (!documentoValido(documento)) return false
     if (entregaTipo === 'entrega' && !enderecoCompleto()) return false
+    // Entrega precisa de frete resolvido (opção escolhida ou grátis)
+    if (entregaTipo === 'entrega' && !freteDefinido) return false
     return true
   }
 
@@ -248,7 +302,7 @@ export default function CheckoutPage() {
       .insert({
         user_id: user.id,
         status: 'pendente',
-        total: totalComDesc,
+        total: totalFinal,
         forma_pagamento: formaPagamento,
         observacao: `Entrega: ${entregaLabel}${descTotalPercent > 0 ? ` | Desconto ${descTotalPercent}%` : ''}${cupomAplicado ? ` | Cupom ${cupomAplicado.codigo}` : ''}${obs ? ' | Obs: ' + obs : ''}`,
       })
@@ -313,12 +367,12 @@ export default function CheckoutPage() {
       }
     }
 
-    // Valor cobrado: parte do total JÁ COM desconto. 3x sem juros; acima disso,
-    // repassa os juros (2% por parcela).
+    // Valor cobrado: produtos com desconto + frete. 3x sem juros; acima disso,
+    // repassa os juros (2% por parcela). O servidor recalcula tudo de qualquer forma.
     const valorCobrar =
       formaPagamento === 'cartao' && parcelas > 3
-        ? Math.round(totalComDesc * (1 + 0.02 * parcelas) * 100) / 100
-        : totalComDesc
+        ? Math.round(totalFinal * (1 + 0.02 * parcelas) * 100) / 100
+        : totalFinal
 
     // 5. Chama o Pagar.me — com tratamento de rede/erro para o botão NUNCA travar
     try {
@@ -345,6 +399,8 @@ export default function CheckoutPage() {
           card_token: cardToken,
           parcelas,
           cupom: cupomAplicado?.codigo || undefined,
+          entrega: entregaTipo,
+          frete_servico_id: entregaTipo === 'entrega' && !freteGratis ? freteId ?? undefined : undefined,
         }),
       })
 
@@ -669,6 +725,46 @@ export default function CheckoutPage() {
                   </div>
                 )}
 
+                {/* ─── FRETE: opções cotadas no Melhor Envio ─── */}
+                {entregaTipo === 'entrega' && cepDigits.length === 8 && (
+                  <div className="checkoutFreteBloco">
+                    <label className="checkoutLabel">Frete</label>
+                    {freteGratis && (
+                      <div className="checkoutPixInfo checkoutPixInfoBranco" style={{ marginBottom: 10 }}>
+                        <p><strong>Frete grátis</strong> — seu pedido passa de {formatCurrency(199)} e o destino é na Grande São Paulo. 🎉</p>
+                      </div>
+                    )}
+                    {!freteGratis && freteLoading && (
+                      <p className="checkoutFreteStatus">Cotando frete para o seu CEP…</p>
+                    )}
+                    {!freteGratis && freteErro && (
+                      <p className="checkoutFreteStatus checkoutFreteStatusErro">{freteErro}</p>
+                    )}
+                    {!freteGratis && freteOpcoes && (
+                      <div className="checkoutPayOptions" style={{ marginBottom: 4 }}>
+                        {freteOpcoes.map(o => (
+                          <button
+                            key={o.id}
+                            type="button"
+                            className={`checkoutPayOption checkoutFreteOpcao ${freteId === o.id ? 'active' : ''}`}
+                            onClick={() => setFreteId(o.id)}
+                          >
+                            <div>
+                              <strong>{o.transportadora} {o.nome}</strong>
+                              <span>Chega em até {o.prazo} dia{o.prazo === 1 ? '' : 's'} út{o.prazo === 1 ? 'il' : 'eis'}</span>
+                            </div>
+                            <em className="checkoutFretePreco">{formatCurrency(o.preco)}</em>
+                            <span className={`checkoutPayCheck ${freteId === o.id ? 'checked' : ''}`} aria-hidden="true" />
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                    {mostrarErros && !freteDefinido && (
+                      <span style={{ color: '#dc2626', fontSize: 12 }}>Escolha uma opção de frete para continuar.</span>
+                    )}
+                  </div>
+                )}
+
                 <div className="checkoutFieldFull">
                   <label className="checkoutLabel">Observações <span className="checkoutOptional">opcional</span></label>
                   <textarea
@@ -797,7 +893,7 @@ export default function CheckoutPage() {
                       <select value={parcelas} onChange={e => setParcelas(Number(e.target.value))}>
                         {Array.from({ length: maxParcelas }, (_, i) => i + 1).map(n => {
                           const comJuros = n > 3
-                          const totalParc = comJuros ? totalComDesc * (1 + 0.02 * n) : totalComDesc
+                          const totalParc = comJuros ? totalFinal * (1 + 0.02 * n) : totalFinal
                           return (
                             <option key={n} value={n}>
                               {n}x de {formatCurrency(totalParc / n)}
@@ -822,7 +918,7 @@ export default function CheckoutPage() {
                     onClick={finalizarPedido}
                     disabled={submitting || (formaPagamento === 'cartao' && !cartaoValido())}
                   >
-                    {submitting ? 'Processando…' : `Finalizar pedido · ${formatCurrency(totalComDesc)}`}
+                    {submitting ? 'Processando…' : `Finalizar pedido · ${formatCurrency(totalFinal)}`}
                   </button>
                 </div>
               </div>
@@ -874,7 +970,15 @@ export default function CheckoutPage() {
               <div className="checkoutSidebarFrete">
                 <span>Frete</span>
                 <span className="checkoutSidebarFreteVal">
-                  {entregaTipo === 'retirada' ? 'Grátis · Retirar na loja' : 'A combinar'}
+                  {entregaTipo === 'retirada'
+                    ? 'Grátis · Retirar na loja'
+                    : freteGratis
+                      ? 'Grátis (Grande SP)'
+                      : freteLoading
+                        ? 'calculando…'
+                        : freteEscolhido
+                          ? formatCurrency(freteEscolhido.preco)
+                          : 'Informe o CEP'}
                 </span>
               </div>
 
@@ -882,7 +986,7 @@ export default function CheckoutPage() {
 
               <div className="checkoutSidebarTotalFinal">
                 <span>TOTAL</span>
-                <strong>{formatCurrency(totalComDesc)}</strong>
+                <strong>{formatCurrency(totalFinal)}</strong>
               </div>
 
               {/* Cupom de desconto */}

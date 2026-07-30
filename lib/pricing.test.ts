@@ -116,6 +116,23 @@ describe('calcularPedidoServidor — PROTEÇÃO DE PREÇO (anti-adulteração)',
     expect(comJuros.valorCobrar).toBeGreaterThan(comJuros.total)
   })
 
+  it('frete entra no valor cobrado (e na base dos juros), mas não no total dos produtos', () => {
+    const semFrete = calcularPedidoServidor([{ sku: v.sku, quantidade: 2 }], { cartao: false, parcelas: 1 })
+    const comFrete = calcularPedidoServidor([{ sku: v.sku, quantidade: 2 }], { cartao: false, parcelas: 1, freteReais: 23.5 })
+    expect(comFrete.total).toBeCloseTo(semFrete.total, 2)          // produtos não mudam
+    expect(comFrete.frete).toBeCloseTo(23.5, 2)
+    expect(comFrete.valorCobrar).toBeCloseTo(semFrete.total + 23.5, 2)
+
+    // Com cartão parcelado, os juros incidem sobre produtos + frete
+    const q = qtdParaTotalMinimo(6 * PARCELA_VALOR_MIN)
+    const parcelado = calcularPedidoServidor([{ sku: v.sku, quantidade: q }], { cartao: true, parcelas: 6, freteReais: 20 })
+    expect(parcelado.valorCobrar).toBeCloseTo(r2((parcelado.total + 20) * (1 + JUROS_AO_MES * parcelado.parcelas!)), 2)
+
+    // Frete negativo/lixo não vira desconto
+    const lixo = calcularPedidoServidor([{ sku: v.sku, quantidade: 2 }], { cartao: false, parcelas: 1, freteReais: -50 })
+    expect(lixo.valorCobrar).toBeCloseTo(lixo.total, 2)
+  })
+
   it('limita as parcelas pelo valor mínimo por parcela (e ignora o pedido do cliente)', () => {
     // Pedido pequeno: mesmo pedindo 12x, o servidor cobra à vista e sem juros.
     const pequeno = calcularPedidoServidor([{ sku: v.sku, quantidade: 1 }], { cartao: true, parcelas: 12 })

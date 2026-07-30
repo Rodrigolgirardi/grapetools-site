@@ -4,59 +4,33 @@ import { useState } from "react";
 import { Truck, MapPin } from "lucide-react";
 
 /* ─────────────────────────────────────────────
-   TABELA DE FRETE (edite aqui os valores/prazos)
-   Agrupado por UF. Quando integrar Correios /
-   Melhor Envio, basta substituir o estimarFrete().
+   Cotação REAL via Melhor Envio (rota /api/frete/calcular,
+   que consulta os contratos da loja). O CEP também passa
+   pelo ViaCEP só para exibir a cidade de destino.
 ───────────────────────────────────────────── */
-const TABELA_FRETE: Record<string, { preco: number; prazoMin: number; prazoMax: number }> = {
-  // Sudeste
-  SP: { preco: 14.9, prazoMin: 2, prazoMax: 4 },
-  RJ: { preco: 19.9, prazoMin: 3, prazoMax: 6 },
-  MG: { preco: 19.9, prazoMin: 3, prazoMax: 6 },
-  ES: { preco: 21.9, prazoMin: 4, prazoMax: 7 },
-  // Sul
-  PR: { preco: 21.9, prazoMin: 4, prazoMax: 7 },
-  SC: { preco: 23.9, prazoMin: 4, prazoMax: 8 },
-  RS: { preco: 25.9, prazoMin: 5, prazoMax: 9 },
-  // Centro-Oeste
-  GO: { preco: 24.9, prazoMin: 5, prazoMax: 9 },
-  DF: { preco: 24.9, prazoMin: 5, prazoMax: 9 },
-  MT: { preco: 28.9, prazoMin: 6, prazoMax: 10 },
-  MS: { preco: 27.9, prazoMin: 6, prazoMax: 10 },
-  // Nordeste
-  BA: { preco: 29.9, prazoMin: 6, prazoMax: 11 },
-  PE: { preco: 32.9, prazoMin: 7, prazoMax: 12 },
-  CE: { preco: 32.9, prazoMin: 7, prazoMax: 12 },
-  RN: { preco: 33.9, prazoMin: 7, prazoMax: 12 },
-  PB: { preco: 33.9, prazoMin: 7, prazoMax: 12 },
-  AL: { preco: 33.9, prazoMin: 7, prazoMax: 12 },
-  SE: { preco: 33.9, prazoMin: 7, prazoMax: 12 },
-  MA: { preco: 34.9, prazoMin: 8, prazoMax: 13 },
-  PI: { preco: 34.9, prazoMin: 8, prazoMax: 13 },
-  // Norte
-  TO: { preco: 34.9, prazoMin: 8, prazoMax: 13 },
-  PA: { preco: 37.9, prazoMin: 9, prazoMax: 14 },
-  AM: { preco: 39.9, prazoMin: 10, prazoMax: 16 },
-  RO: { preco: 39.9, prazoMin: 10, prazoMax: 16 },
-  AC: { preco: 42.9, prazoMin: 11, prazoMax: 17 },
-  RR: { preco: 42.9, prazoMin: 11, prazoMax: 17 },
-  AP: { preco: 42.9, prazoMin: 11, prazoMax: 17 },
-};
 
 const FRETE_GRATIS_ACIMA = 199; // R$ — mesmo valor da barra do carrinho
+
+type OpcaoFrete = {
+  id: number;
+  nome: string;
+  transportadora: string;
+  preco: number;
+  prazo: number;
+};
 
 type FreteResultado = {
   cidade: string;
   uf: string;
-  preco: number;
-  prazoMin: number;
-  prazoMax: number;
+  opcoes: OpcaoFrete[];
   gratis: boolean;
 };
 
 type FreteCalcProps = {
   /** subtotal atual (preço × quantidade) para aplicar frete grátis */
   subtotal?: number;
+  /** itens a cotar (SKU + quantidade). Sem itens, não há o que cotar. */
+  itens: { sku: string; quantidade: number }[];
 };
 
 function maskCep(value: string) {
@@ -65,7 +39,9 @@ function maskCep(value: string) {
   return digits;
 }
 
-export function FreteCalc({ subtotal = 0 }: FreteCalcProps) {
+const brl = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+
+export function FreteCalc({ subtotal = 0, itens }: FreteCalcProps) {
   const [cep, setCep] = useState("");
   const [loading, setLoading] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
@@ -78,38 +54,53 @@ export function FreteCalc({ subtotal = 0 }: FreteCalcProps) {
       setResultado(null);
       return;
     }
+    if (!itens.length) {
+      setErro("Escolha a quantidade primeiro.");
+      return;
+    }
 
     setLoading(true);
     setErro(null);
     setResultado(null);
 
     try {
-      const res = await fetch(`https://viacep.com.br/ws/${digits}/json/`);
-      const data = await res.json();
+      // Cidade (só exibição) e cotação real, em paralelo
+      const [viaRes, cotRes] = await Promise.all([
+        fetch(`https://viacep.com.br/ws/${digits}/json/`).then((r) => r.json()).catch(() => null),
+        fetch("/api/frete/calcular", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ cep: digits, itens }),
+        }),
+      ]);
 
-      if (data.erro) {
-        setErro("CEP não encontrado. Confira e tente novamente.");
+      const cot = await cotRes.json().catch(() => null);
+      if (!cotRes.ok || !cot?.opcoes) {
+        setErro(cot?.error || "Não foi possível cotar o frete. Tente novamente.");
+        return;
+      }
+      if (cot.opcoes.length === 0) {
+        setErro("Nenhuma transportadora atende esse CEP no momento.");
         return;
       }
 
-      const uf: string = data.uf;
-      const faixa = TABELA_FRETE[uf];
-
-      if (!faixa) {
-        setErro("Não entregamos nessa região no momento.");
-        return;
-      }
+      // Mostra as 3 melhores: mais barata + até 2 alternativas mais rápidas
+      const porPreco: OpcaoFrete[] = cot.opcoes;
+      const maisBarata = porPreco[0];
+      const maisRapidas = [...porPreco]
+        .sort((a, b) => a.prazo - b.prazo || a.preco - b.preco)
+        .filter((o) => o.id !== maisBarata.id)
+        .slice(0, 2);
 
       setResultado({
-        cidade: data.localidade,
-        uf,
-        preco: faixa.preco,
-        prazoMin: faixa.prazoMin,
-        prazoMax: faixa.prazoMax,
-        gratis: subtotal >= FRETE_GRATIS_ACIMA,
+        cidade: viaRes?.localidade || "",
+        uf: viaRes?.uf || "",
+        opcoes: [maisBarata, ...maisRapidas],
+        // Frete grátis: >= R$199 com destino na Grande SP (CEP começando em 0)
+        gratis: digits.startsWith("0") && subtotal >= FRETE_GRATIS_ACIMA,
       });
     } catch {
-      setErro("Erro ao consultar o CEP. Tente novamente.");
+      setErro("Erro ao cotar o frete. Tente novamente.");
     } finally {
       setLoading(false);
     }
@@ -158,35 +149,28 @@ export function FreteCalc({ subtotal = 0 }: FreteCalcProps) {
 
       {resultado && (
         <div className="freteCalcResultado">
-          <div className="freteCalcDestino">
-            <MapPin size={13} />
-            <span>{resultado.cidade} — {resultado.uf}</span>
-          </div>
-          <div className="freteCalcOpcao">
-            <div>
-              <strong>Envio padrão</strong>
-              <span>
-                Chega em {resultado.prazoMin} a {resultado.prazoMax} dias úteis
-              </span>
+          {resultado.cidade && (
+            <div className="freteCalcDestino">
+              <MapPin size={13} />
+              <span>{resultado.cidade} — {resultado.uf}</span>
             </div>
-            {resultado.gratis ? (
-              <em className="freteCalcGratis">Grátis</em>
-            ) : (
-              <em>
-                {resultado.preco.toLocaleString("pt-BR", {
-                  style: "currency",
-                  currency: "BRL",
-                })}
-              </em>
-            )}
-          </div>
+          )}
+          {resultado.opcoes.map((o) => (
+            <div className="freteCalcOpcao" key={o.id}>
+              <div>
+                <strong>{o.transportadora} {o.nome}</strong>
+                <span>Chega em até {o.prazo} dia{o.prazo === 1 ? "" : "s"} út{o.prazo === 1 ? "il" : "eis"}</span>
+              </div>
+              {resultado.gratis ? (
+                <em className="freteCalcGratis">Grátis</em>
+              ) : (
+                <em>{brl(o.preco)}</em>
+              )}
+            </div>
+          ))}
           {!resultado.gratis && (
             <div className="freteCalcHint">
-              Frete grátis em compras acima de{" "}
-              {FRETE_GRATIS_ACIMA.toLocaleString("pt-BR", {
-                style: "currency",
-                currency: "BRL",
-              })}
+              Frete grátis em compras acima de {brl(FRETE_GRATIS_ACIMA)} para a Grande São Paulo
             </div>
           )}
         </div>

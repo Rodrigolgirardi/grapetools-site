@@ -26,10 +26,10 @@ export function CartProgressBar({ subtotal }: Props) {
             <Truck size={15} className="promoBarIcon" />
           )}
           {temFrete ? (
-            <span className="promoBarDone">Frete grátis liberado!</span>
+            <span className="promoBarDone">Frete grátis liberado! (Grande SP)</span>
           ) : (
             <span>
-              Faltam <span className="promoBarValue">{formatCurrency(faltaFrete)}</span> para o frete grátis
+              Faltam <span className="promoBarValue">{formatCurrency(faltaFrete)}</span> para o frete grátis (Grande SP)
             </span>
           )}
         </span>

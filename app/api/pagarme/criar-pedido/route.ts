@@ -10,6 +10,7 @@ import { getEstoqueMap, confirmarPedidoPago } from '@/lib/estoque'
 import { composicaoDoSku } from '@/lib/data'
 import { calcularPedidoServidor } from '@/lib/pricing'
 import { buscarCupomAtivo } from '@/lib/cupom'
+import { cotarFrete, freteGratisElegivel } from '@/lib/frete-server'
 
 const PAGARME_API = 'https://api.pagar.me/core/v5'
 const SECRET_KEY = process.env.PAGARME_SECRET_KEY!
@@ -46,6 +47,8 @@ interface CriarPedidoPayload {
   card_token?: string     // token do cartão (gerado no navegador, nunca o cartão cru)
   parcelas?: number       // número de parcelas (cartão de crédito)
   cupom?: string          // código do cupom (opcional) — validado no servidor
+  entrega?: 'entrega' | 'retirada'
+  frete_servico_id?: number // serviço do Melhor Envio escolhido (só informa QUAL; o preço é recotado aqui)
 }
 
 function toAmountCents(reais: number): number {
@@ -91,7 +94,7 @@ export async function POST(request: NextRequest) {
     const body: CriarPedidoPayload = await request.json()
     // Obs.: `total` e `itens[].preco_unitario` do corpo NÃO são confiáveis — o preço
     // é recalculado no servidor (0f). Só usamos sku + quantidade do cliente.
-    const { pedido_id, forma_pagamento, itens, cliente, endereco, card_token, parcelas, cupom: cupomCodigo } = body
+    const { pedido_id, forma_pagamento, itens, cliente, endereco, card_token, parcelas, cupom: cupomCodigo, entrega, frete_servico_id } = body
 
     // 0b) Confere que o pedido existe E pertence a quem está logado
     //     (impede criar cobranças para pedidos de outras pessoas)
@@ -162,18 +165,65 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // 0f-frete) FONTE DE VERDADE DO FRETE: o cliente só informa QUAL serviço
+    //     escolheu (id do Melhor Envio); o preço é recotado aqui. Grátis: pedido
+    //     >= R$199 com destino na Grande SP (regra do topo do site) ou retirada.
+    const itensCalc = (itens || []).map((i) => ({ sku: i.sku, quantidade: i.quantidade }))
+    const calcSemFrete = calcularPedidoServidor(itensCalc, {
+      cartao: false,
+      parcelas: 1,
+      cupomPercent: cupom?.desconto_percent || 0,
+    })
+    if (!calcSemFrete.ok) {
+      return NextResponse.json({ error: calcSemFrete.erro || 'Itens do pedido inválidos.' }, { status: 400 })
+    }
+
+    let freteValor = 0
+    let freteNome = 'Retirada na loja'
+    if (entrega !== 'retirada') {
+      const cepDestino = String(endereco?.cep || '').replace(/\D/g, '')
+      if (cepDestino.length !== 8) {
+        return NextResponse.json({ error: 'CEP de entrega inválido.' }, { status: 400 })
+      }
+      if (freteGratisElegivel(cepDestino, calcSemFrete.total)) {
+        freteValor = 0
+        freteNome = 'Frete grátis (Grande SP)'
+      } else {
+        if (!frete_servico_id) {
+          return NextResponse.json({ error: 'Escolha uma opção de frete.' }, { status: 400 })
+        }
+        let opcoes
+        try {
+          opcoes = await cotarFrete(cepDestino, itensCalc)
+        } catch (e) {
+          console.error('Cotação de frete falhou no criar-pedido:', e instanceof Error ? e.message : e)
+          return NextResponse.json(
+            { error: 'Não foi possível confirmar o frete. Tente novamente.' },
+            { status: 502 }
+          )
+        }
+        const escolhida = opcoes.find((o) => o.id === Number(frete_servico_id))
+        if (!escolhida) {
+          return NextResponse.json(
+            { error: 'A opção de frete escolhida não está mais disponível. Recalcule o frete.' },
+            { status: 409 }
+          )
+        }
+        freteValor = escolhida.preco
+        freteNome = `${escolhida.transportadora} ${escolhida.nome}`.trim()
+      }
+    }
+
     // 0f) FONTE DE VERDADE DO PREÇO: recalcula preço/desconto/juros no servidor a
     //     partir do catálogo, IGNORANDO total/preço enviados pelo cliente
     //     (impede adulteração de preço — pagar R$0,01). O cliente só informa sku+qtd.
     //     O desconto do cupom SOMA com o desconto por valor do carrinho.
-    const calc = calcularPedidoServidor(
-      (itens || []).map((i) => ({ sku: i.sku, quantidade: i.quantidade })),
-      {
-        cartao: forma_pagamento === 'cartao',
-        parcelas: parcelas && parcelas > 0 ? parcelas : 1,
-        cupomPercent: cupom?.desconto_percent || 0,
-      }
-    )
+    const calc = calcularPedidoServidor(itensCalc, {
+      cartao: forma_pagamento === 'cartao',
+      parcelas: parcelas && parcelas > 0 ? parcelas : 1,
+      cupomPercent: cupom?.desconto_percent || 0,
+      freteReais: freteValor,
+    })
     if (!calc.ok) {
       return NextResponse.json({ error: calc.erro || 'Itens do pedido inválidos.' }, { status: 400 })
     }
@@ -196,7 +246,8 @@ export async function POST(request: NextRequest) {
     {
       // Só inclui os campos de cupom se um cupom foi usado — assim pedidos SEM cupom
       // não tocam as colunas novas (funciona mesmo se a migração 007 ainda não rodou).
-      const pedidoPatch: Record<string, unknown> = { total: calc.total }
+      // Total do pedido = produtos + frete (o que o cliente paga, sem juros de parcelamento)
+      const pedidoPatch: Record<string, unknown> = { total: Math.round((calc.total + freteValor) * 100) / 100 }
       if (cupom) {
         pedidoPatch.cupom_codigo = cupom.codigo
         pedidoPatch.cupom_desconto_percent = cupom.desconto_percent
@@ -272,8 +323,8 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Itens; se o total cobrado for maior que a soma (juros do parcelamento no
-    // cartão), adiciona um item de "Juros" para o Pagar.me bater o valor.
+    // Itens; o frete vai em shipping.amount. Se ainda sobrar diferença (juros do
+    // parcelamento no cartão), adiciona um item de "Juros" para o Pagar.me bater.
     const itemsBody: Array<{ code: string; description: string; amount: number; quantity: number }> =
       calc.itens.map(item => ({
         code: item.sku,
@@ -282,12 +333,13 @@ export async function POST(request: NextRequest) {
         quantity: item.quantidade,
       }))
     const somaItens = itemsBody.reduce((s, it) => s + it.amount * it.quantity, 0)
+    const freteCents = toAmountCents(freteValor)
     const totalCents = toAmountCents(calc.valorCobrar)
-    if (totalCents > somaItens) {
+    if (totalCents > somaItens + freteCents) {
       itemsBody.push({
         code: 'JUROS',
         description: 'Juros do parcelamento',
-        amount: totalCents - somaItens,
+        amount: totalCents - somaItens - freteCents,
         quantity: 1,
       })
     }
@@ -315,8 +367,8 @@ export async function POST(request: NextRequest) {
       items: itemsBody,
       payments: [pagamento],
       shipping: {
-        amount: 0,
-        description: 'A combinar',
+        amount: freteCents,
+        description: freteNome.slice(0, 100),
         address: {
           line_1: `${endereco.numero}, ${endereco.rua}`,
           line_2: endereco.complemento || '',

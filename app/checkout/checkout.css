@@ -328,6 +328,27 @@
   flex-shrink: 0;
 }
 
+/* Bloco de frete (opções cotadas no Melhor Envio) */
+.checkoutFreteBloco { margin-bottom: 12px; }
+.checkoutFreteStatus {
+  font-family: var(--font-dm-sans), sans-serif;
+  font-size: 0.8125rem;
+  color: #6b7280;
+  margin: 4px 0 8px;
+}
+.checkoutFreteStatusErro { color: #dc2626; }
+.checkoutFreteOpcao { padding: 8px 14px; }
+.checkoutFretePreco {
+  font-style: normal;
+  font-family: var(--font-dm-sans), sans-serif;
+  font-size: 0.875rem;
+  font-weight: 800;
+  color: #1a1a2e;
+  margin-left: auto;
+  white-space: nowrap;
+}
+.checkoutFreteOpcao .checkoutPayCheck { margin-left: 12px; }
+
 /* Selo de segurança abaixo das formas de pagamento */
 .checkoutTrust {
   display: flex;

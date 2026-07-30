@@ -127,8 +127,9 @@ export type CalculoPedido = {
   cupomPercent: number;  // % de desconto do cupom (0 se não usou)
   totalDescPercent: number; // desconto total aplicado (carrinho + cupom, somados)
   descValor: number;     // subtotal - total
-  total: number;         // valor real da compra (com desconto), sem juros de cartão
-  valorCobrar: number;   // total + juros do parcelamento (se cartão > PARCELAS_SEM_JUROS)
+  total: number;         // valor dos PRODUTOS (com desconto), sem frete e sem juros
+  frete?: number;        // frete cobrado (0 = grátis ou retirada)
+  valorCobrar: number;   // total + frete + juros do parcelamento (se cartão > PARCELAS_SEM_JUROS)
   parcelas?: number;     // parcelas EFETIVAS (pedido do cliente já limitado ao mínimo por parcela)
 };
 
@@ -138,7 +139,7 @@ export type CalculoPedido = {
 // é a única fonte confiável: o cliente só informa sku + quantidade.
 export function calcularPedidoServidor(
   itensPedido: { sku: string; quantidade: number }[],
-  opts: { cartao: boolean; parcelas: number; cupomPercent?: number }
+  opts: { cartao: boolean; parcelas: number; cupomPercent?: number; freteReais?: number }
 ): CalculoPedido {
   const vazio: CalculoPedido = { ok: false, itens: [], subtotal: 0, descPercent: 0, cupomPercent: 0, totalDescPercent: 0, descValor: 0, total: 0, valorCobrar: 0 };
 
@@ -184,17 +185,21 @@ export function calcularPedidoServidor(
   const total = r2(itens.reduce((s, i) => s + i.preco_unitario * i.quantidade, 0));
   const descValor = r2(subtotal - total);
 
-  // 4) Parcelamento: o número vem do cliente, então é limitado aqui pelo valor
-  //    mínimo por parcela. O teto usa o total SEM juros (mesma base do checkout),
-  //    senão o cálculo ficaria circular — juros dependem das parcelas.
+  // 4) Frete entra ANTES do parcelamento: o cliente parcela (e paga juros sobre)
+  //    o valor cheio da compra, produtos + entrega.
+  const frete = r2(Math.max(0, Number(opts.freteReais) || 0));
+  const base = r2(total + frete);
+
+  // 5) Parcelamento: o número vem do cliente, então é limitado aqui pelo valor
+  //    mínimo por parcela sobre a base sem juros (senão o cálculo fica circular).
   const parcelas = Math.min(
     Math.max(1, Math.floor(Number(opts.parcelas) || 1)),
-    parcelasMaximas(total)
+    parcelasMaximas(base)
   );
 
-  // 5) Juros do parcelamento (só cartão acima de PARCELAS_SEM_JUROS)
+  // 6) Juros do parcelamento (só cartão acima de PARCELAS_SEM_JUROS)
   const comJuros = opts.cartao && parcelas > PARCELAS_SEM_JUROS;
-  const valorCobrar = comJuros ? r2(total * (1 + JUROS_AO_MES * parcelas)) : total;
+  const valorCobrar = comJuros ? r2(base * (1 + JUROS_AO_MES * parcelas)) : base;
 
-  return { ok: true, itens, subtotal, descPercent, cupomPercent, totalDescPercent, descValor, total, valorCobrar, parcelas };
+  return { ok: true, itens, subtotal, descPercent, cupomPercent, totalDescPercent, descValor, total, frete, valorCobrar, parcelas };
 }

@@ -314,7 +314,7 @@ export default function ProductPageClient({ slug }: { slug: string }) {
               </div>
             </div>
 
-            <FreteCalc subtotal={orderTotal} />
+            <FreteCalc subtotal={orderTotal} itens={[{ sku: variation.sku, quantidade: qty }]} />
           </aside>
         </section>
 
