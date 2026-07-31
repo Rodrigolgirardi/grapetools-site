@@ -3,7 +3,7 @@
 import { Minus, Plus } from "lucide-react";
 import { useState } from "react";
 import type { Product } from "@/lib/data";
-import { formatCurrency, getMaxDiscount } from "@/lib/pricing";
+import { formatCurrency } from "@/lib/pricing";
 import { useEstoque } from "@/hooks/useEstoque";
 import { kitDisponivel } from "@/lib/kit";
 import { ProductVisual } from "./ProductVisual";
@@ -16,7 +16,6 @@ export function ProductCard({ product, onAdd }: Props) {
   const estoque = useEstoque();
   const variation = product.variations[selectedIdx];
   const bestPrice = variation.tiers[variation.tiers.length - 1].price;
-  const discount = getMaxDiscount(variation.tiers);
   const hasVariations = product.variations.length > 1;
   const isMarcaPropria = product.brand === "Grape Tools";
   const kitDisp = variation.composicao ? kitDisponivel(variation.composicao, estoque) : null;
@@ -38,7 +37,6 @@ export function ProductCard({ product, onAdd }: Props) {
       <a href={`/${product.slug}`} aria-label={`Ver ${product.name}`} className="productThumb">
         <ProductVisual product={product} sku={variation.sku} />
         {badge && <span className={`productBadge ${badge.className}`}>{badge.label}</span>}
-        {discount > 0 && <span className="productDiscount">ATÉ {discount}% OFF</span>}
         {isMarcaPropria && <span className="marcaPropriaDot" title="Marca Própria Grape Tools">MP</span>}
         {esgotado && <span className="productEsgotado">Esgotado</span>}
       </a>

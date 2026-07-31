@@ -94,6 +94,10 @@ export const PARCELAS_SEM_JUROS = 3;
 // Pagar.me — com 2% a loja absorvia parte do custo do parcelamento longo.
 export const JUROS_AO_MES = 0.028;
 export const PARCELAS_MAX = 12;
+// Desconto para pagamento via Pix (decisão de 31/07/2026): incentiva o meio que
+// custa 1,19% de tarifa em vez dos 5,59%+ do cartão. Aplica só sobre os
+// PRODUTOS (frete é cobrado integral) e soma com carrinho+cupom (teto 90%).
+export const PIX_DESCONTO_PERCENT = 3;
 // Valor mínimo de cada parcela. As adquirentes recusam parcelas muito baixas, e a
 // recusa chega ao cliente como um "não autorizado" genérico — então é melhor nem
 // oferecer a opção do que deixar ele tentar e falhar sem entender o motivo.
@@ -141,7 +145,7 @@ export type CalculoPedido = {
 // é a única fonte confiável: o cliente só informa sku + quantidade.
 export function calcularPedidoServidor(
   itensPedido: { sku: string; quantidade: number }[],
-  opts: { cartao: boolean; parcelas: number; cupomPercent?: number; freteReais?: number }
+  opts: { cartao: boolean; parcelas: number; cupomPercent?: number; freteReais?: number; pixPercent?: number }
 ): CalculoPedido {
   const vazio: CalculoPedido = { ok: false, itens: [], subtotal: 0, descPercent: 0, cupomPercent: 0, totalDescPercent: 0, descValor: 0, total: 0, valorCobrar: 0 };
 
@@ -174,7 +178,9 @@ export function calcularPedidoServidor(
   const descPercent = descontoCarrinhoPercent(subtotal);
   // Cupom SOMA com o desconto por valor do carrinho (decisão do dono). Teto de 90%.
   const cupomPercent = Math.max(0, Math.min(90, Number(opts.cupomPercent) || 0));
-  const totalDescPercent = Math.min(90, descPercent + cupomPercent);
+  // Desconto Pix (3%) também soma — aplicado por unidade, igual aos demais.
+  const pixPercent = Math.max(0, Math.min(10, Number(opts.pixPercent) || 0));
+  const totalDescPercent = Math.min(90, descPercent + cupomPercent + pixPercent);
 
   // 3) Preço unitário final (com desconto aplicado por unidade — igual ao checkout)
   const itens: ItemAutoritativo[] = linhas.map((l) => ({

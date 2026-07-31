@@ -1,16 +1,15 @@
 'use client'
 
 // components/BackToSite.tsx
-// Barra de navegação simples para páginas de conta (/cliente, /favoritos, /cliente/perfil)
+// Barra das páginas internas (carrinho, checkout, conta, pedidos…): só a logo
+// Grape Tools no canto esquerdo — clicar nela volta pra home.
 
 export function BackToSite() {
   return (
     <div className="backToSiteBar">
-      <a href="/" className="backToSiteLink">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <polyline points="15 18 9 12 15 6"/>
-        </svg>
-        Voltar ao catálogo
+      <a href="/" className="backToSiteLogo" aria-label="Ir para a página inicial">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/logo-h-branca.png" alt="Grape Tools" />
       </a>
     </div>
   )

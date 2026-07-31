@@ -9,6 +9,7 @@ import {
   PARCELAS_SEM_JUROS,
   PARCELAS_MAX,
   PARCELA_VALOR_MIN,
+  PIX_DESCONTO_PERCENT,
   parcelasMaximas,
 } from '@/lib/pricing'
 
@@ -131,6 +132,16 @@ describe('calcularPedidoServidor — PROTEÇÃO DE PREÇO (anti-adulteração)',
     // Frete negativo/lixo não vira desconto
     const lixo = calcularPedidoServidor([{ sku: v.sku, quantidade: 2 }], { cartao: false, parcelas: 1, freteReais: -50 })
     expect(lixo.valorCobrar).toBeCloseTo(lixo.total, 2)
+  })
+
+  it('desconto Pix (3%) soma com os demais e não afeta pedidos sem Pix', () => {
+    const semPix = calcularPedidoServidor([{ sku: v.sku, quantidade: 2 }], { cartao: false, parcelas: 1 })
+    const comPix = calcularPedidoServidor([{ sku: v.sku, quantidade: 2 }], { cartao: false, parcelas: 1, pixPercent: PIX_DESCONTO_PERCENT })
+    expect(comPix.totalDescPercent).toBe(Math.min(90, semPix.totalDescPercent + PIX_DESCONTO_PERCENT))
+    expect(comPix.total).toBeLessThan(semPix.total)
+    // Frete não ganha desconto de Pix: entra integral no valor cobrado
+    const comFrete = calcularPedidoServidor([{ sku: v.sku, quantidade: 2 }], { cartao: false, parcelas: 1, pixPercent: PIX_DESCONTO_PERCENT, freteReais: 20 })
+    expect(comFrete.valorCobrar).toBeCloseTo(comFrete.total + 20, 2)
   })
 
   it('limita as parcelas pelo valor mínimo por parcela (e ignora o pedido do cliente)', () => {

@@ -272,11 +272,14 @@ export default function ProductPageClient({ slug }: { slug: string }) {
                 <button onClick={() => setQty(q => Math.max(1, q - 1))}>−</button>
                 <input
                   type="number"
-                  min="1"
-                  value={qty}
-                  onChange={(e) => setQty(Math.max(1, Number(e.target.value)))}
+                  min="0"
+                  value={qty === 0 ? '' : qty}
+                  // Deixa apagar/zerar ENQUANTO digita (senão o 1 volta sozinho e
+                  // briga com quem quer escrever "30"); o mínimo é garantido no blur.
+                  onChange={(e) => setQty(Math.max(0, Math.floor(Number(e.target.value)) || 0))}
+                  onBlur={() => { if (qty < 1) setQty(1) }}
                 />
-                <button onClick={() => setQty(q => q + 1)}>+</button>
+                <button onClick={() => setQty(q => Math.max(1, q) + 1)}>+</button>
               </div>
             </div>
 
@@ -295,8 +298,8 @@ export default function ProductPageClient({ slug }: { slug: string }) {
               <span className="stockDot">● Em estoque</span>
             )}
 
-            <button className="detailBtnPrimary" disabled={esgotado} onClick={() => { addToCart(variation.sku, qty); window.location.href = "/checkout"; }}>{esgotado ? "Esgotado" : "Comprar agora"}</button>
-            <button className="detailBtnSecondary" disabled={esgotado} onClick={() => { addToCart(variation.sku, qty); window.location.href = "/cart"; }}>Adicionar ao carrinho</button>
+            <button className="detailBtnPrimary" disabled={esgotado} onClick={() => { addToCart(variation.sku, Math.max(1, qty)); window.location.href = "/checkout"; }}>{esgotado ? "Esgotado" : "Comprar agora"}</button>
+            <button className="detailBtnSecondary" disabled={esgotado} onClick={() => { addToCart(variation.sku, Math.max(1, qty)); window.location.href = "/cart"; }}>Adicionar ao carrinho</button>
 
             <div className="detailTrustRow">
               <span>✓ Nota fiscal emitida</span>

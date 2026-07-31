@@ -38,10 +38,50 @@ function BannerCarousel({ setCategory }: { setCategory: (v: string) => void }) {
   const banners = [
     {
       content: (
-        <a href="#produtos" className="bannerImageLink" aria-label="Ver catálogo">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/banner-home.png" alt="Grape Tools" className="bannerImage" fetchPriority="high" style={{ height: "220px", objectFit: "fill" }} />
-        </a>
+        /* eslint-disable @next/next/no-img-element */
+        <div className="bannerSlide bannerHero">
+          <div className="bannerHeroTexto">
+            <h2 className="bannerHeroTitulo">
+              MAIS DE 800 ITENS<br />
+              <em>PARA SUA LOJA!</em>
+            </h2>
+            <p className="bannerHeroSub">
+              Ferragens, fixação, elétrica, abrasivos e muito mais com a qualidade Grape Tools.
+            </p>
+            <div className="bannerHeroChips">
+              <span>✓ Marca própria</span>
+              <span>✓ Estoque nacional</span>
+              <span>✓ Envio rápido</span>
+            </div>
+            <a href="#produtos" className="bannerHeroBtn">COMPRAR AGORA →</a>
+          </div>
+
+          <div className="bannerHeroProdutos" aria-hidden="true">
+            <span className="bannerHeroPedestal">
+              <img src="/products/CH-DISC-LIX-125-150.jpg" alt="" fetchPriority="high" />
+            </span>
+            <span className="bannerHeroPedestal bannerHeroPedestalAlto">
+              <img src="/products/CH-TRAV-PIS-BR.png" alt="" />
+            </span>
+            <span className="bannerHeroPedestal">
+              <img src="/products/CH-CONEC-DUP-TS.jpg" alt="" />
+            </span>
+          </div>
+
+          <div className="bannerHeroLado">
+            <div className="bannerHeroCard">
+              <span className="bannerHeroEstrelas">★★★★★</span>
+              <strong>MARCA PRÓPRIA</strong>
+              <em>QUALIDADE PREMIUM</em>
+            </div>
+            <div className="bannerHeroCard">
+              <strong>Desconto automático</strong>
+              <em>em compras no atacado</em>
+              <span className="bannerHeroOffPill">quanto mais compra, menos paga</span>
+            </div>
+          </div>
+        </div>
+        /* eslint-enable @next/next/no-img-element */
       ),
     },
     {
@@ -588,7 +628,17 @@ export default function HomePage() {
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/iconeia2.png" alt="" className="profissaoIcone" />
-            <span className="profissaoTxt">{perfilAtivo ? perfilAtivo.emoji + " " + perfilAtivo.label : "Minha profissão"}</span>
+            <span className="profissaoTxt">
+              {perfilAtivo ? (
+                perfilAtivo.emoji + " " + perfilAtivo.label
+              ) : (
+                <>
+                  <span className="profissaoTxtLonga">Encontrar produtos para minha profissão</span>
+                  <span className="profissaoTxtCurta">Produtos para minha profissão</span>
+                  <span className="profissaoTxtMini">Minha profissão</span>
+                </>
+              )}
+            </span>
             {perfilAtivo && (
               <span
                 className="profissaoClear"
@@ -660,16 +710,55 @@ export default function HomePage() {
           <BannerCarousel setCategory={setCategory} />
         )}
 
-        {/* ── TRUST ── */}
+        {/* ── TRUST: faixa de confiança com ícones ── */}
+        {/* eslint-disable @next/next/no-img-element */}
         <div className="trustBar">
           <div className="trustBarInner">
-            <span>✓ Nota fiscal emitida</span>
-            <span>✓ Estoque nacional</span>
-            <span>✓ Entrega para todo o Brasil</span>
-            <span>✓ Compra por CNPJ ou CPF</span>
-            <span>✓ Desconto progressivo automático</span>
+            <span className="trustItem">
+              <img src="/icone-caminhao.png" alt="" aria-hidden="true" />
+              <span className="trustItemTexto">
+                <strong>Frete grátis</strong>
+                <em>acima de R$ 199 para SP</em>
+              </span>
+            </span>
+            <span className="trustItem">
+              <img src="/receber-em-casa.png" alt="" aria-hidden="true" />
+              <span className="trustItemTexto">
+                <strong>Envio em até 24h</strong>
+                <em>para todo o Brasil</em>
+              </span>
+            </span>
+            <span className="trustItem">
+              <img src="/pagamento-pix.png" alt="" aria-hidden="true" />
+              <span className="trustItemTexto">
+                <strong>Pague com Pix</strong>
+                <em>3% de desconto</em>
+              </span>
+            </span>
+            <span className="trustItem">
+              <img src="/pagamento-cartao.png" alt="" aria-hidden="true" />
+              <span className="trustItemTexto">
+                <strong>Parcele em até 12x</strong>
+                <em>no cartão de crédito</em>
+              </span>
+            </span>
+            <span className="trustItem">
+              <img src="/icone-shield.png" alt="" aria-hidden="true" />
+              <span className="trustItemTexto">
+                <strong>Compra segura</strong>
+                <em>seus dados protegidos</em>
+              </span>
+            </span>
+            <span className="trustItem">
+              <img src="/icone-nf.png" alt="" aria-hidden="true" />
+              <span className="trustItemTexto">
+                <strong>Nota fiscal</strong>
+                <em>emitimos para CPF e CNPJ</em>
+              </span>
+            </span>
           </div>
         </div>
+        {/* eslint-enable @next/next/no-img-element */}
 
         {/* ── MODAL PROFISSÃO ── */}
         {profissaoOpen && (
@@ -695,13 +784,13 @@ export default function HomePage() {
                   className={`sidePanelRoot sidePanelMaisVendidos ${maisVendidos ? "active" : ""}`}
                   onClick={() => { setMaisVendidos(true); setKitsMaisVendidos(false); setCategory("Todas"); setSubcategory("Todas"); setSideOpen(false); }}
                 >
-                  🔥 Mais vendidos
+                  Mais vendidos
                 </button>
                 <button
                   className={`sidePanelRoot sidePanelMaisVendidos ${kitsMaisVendidos ? "active" : ""}`}
                   onClick={() => { setKitsMaisVendidos(true); setMaisVendidos(false); setCategory("Todas"); setSubcategory("Todas"); setSideOpen(false); }}
                 >
-                  🧩 KITS mais vendidos
+                  KITS mais vendidos
                 </button>
                 <button
                   className={`sidePanelRoot ${category === "Todas" && !maisVendidos && !kitsMaisVendidos ? "active" : ""}`}

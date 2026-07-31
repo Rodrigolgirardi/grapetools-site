@@ -1,18 +1,40 @@
 'use client'
 
 import "./cart.css"
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { products } from '@/lib/data'
-import { formatCurrency, getTierForQuantity, getCartLines, descontoCarrinhoPercent } from '@/lib/pricing'
+import { formatCurrency, getTierForQuantity, getCartLines, descontoCarrinhoPercent, PIX_DESCONTO_PERCENT } from '@/lib/pricing'
 import { useCart } from '@/hooks/useCart'
 import { productImageSrc, handleProductImageError } from '@/lib/product-image'
 import { BackToSite } from '@/components/BackToSite'
+import { EstoqueAviso, itensSemEstoque } from '@/components/EstoqueAviso'
+import { useEstoque } from '@/hooks/useEstoque'
 import { Minus, Plus, Trash2, ShoppingCart } from 'lucide-react'
 
 const FRETE_GRATIS = 199
 
 export default function CartPage() {
-  const { cart, updateQuantity, clearCart } = useCart()
+  const { cart, updateQuantity, clearCart, addToCart } = useCart()
+  const estoque = useEstoque()
+
+  // Animação do "+ Adicionar" das sugestões: o cartão confirma e se recolhe,
+  // e o item recém-chegado pisca na lista pra mostrar onde foi parar.
+  const [sugestaoSaindo, setSugestaoSaindo] = useState<Set<string>>(new Set())
+  const [recemAdicionado, setRecemAdicionado] = useState<string | null>(null)
+
+  function adicionarSugestao(prefix: string, sku: string) {
+    if (sugestaoSaindo.has(prefix)) return
+    setSugestaoSaindo(prev => new Set(prev).add(prefix))
+    // 1º a confirmação visual no cartão; o item entra quando ele termina de sair
+    setTimeout(() => {
+      addToCart(sku, 1)
+      setRecemAdicionado(sku)
+      // Limpa a marca de "saindo": se o produto voltar às sugestões um dia
+      // (cliente removeu do carrinho), o cartão renderiza visível de novo.
+      setSugestaoSaindo(prev => { const n = new Set(prev); n.delete(prefix); return n })
+      setTimeout(() => setRecemAdicionado(null), 1600)
+    }, 450)
+  }
 
   const lines = getCartLines(cart).map(l => {
     // Economia vs. preço do tier mais caro (menor quantidade)
@@ -30,7 +52,8 @@ export default function CartPage() {
     0
   )
   const descValor = subtotal - totalComDesc
-  const pixSubtotal = totalComDesc // desconto Pix quando implementado
+  // Desconto Pix real (3%): o checkout aplica quando a forma escolhida é Pix
+  const pixSubtotal = Math.round(totalComDesc * (100 - PIX_DESCONTO_PERCENT)) / 100
 
   const freteProgress = Math.min((subtotal / FRETE_GRATIS) * 100, 100)
   const freteGratis = subtotal >= FRETE_GRATIS
@@ -52,6 +75,9 @@ export default function CartPage() {
 
   const nextTier = getNextTierSuggestion()
 
+  // Itens pedindo acima do estoque → banner vermelho + checkout travado
+  const semEstoque = itensSemEstoque(lines, estoque)
+
   // Progresso do próximo tier
   function getTierProgress() {
     if (!nextTier) return 100
@@ -66,14 +92,27 @@ export default function CartPage() {
   const tierProgress = getTierProgress()
 
   // Cross-sell: produtos da mesma categoria dos itens no carrinho
-  const sugestoes = useMemo(() => {
+  // Recalcula quando a COMPOSIÇÃO do carrinho muda (não só o nº de itens): item
+  // adicionado sai das sugestões e outro entra no lugar — a prateleira fica
+  // sempre cheia. As setinhas ‹ › paginam o catálogo inteiro, 5 por vez.
+  const skusNoCarrinho = lines.map(l => l.variation.sku).sort().join('|')
+  const todasSugestoes = useMemo(() => {
     const cartPrefixes = new Set(lines.map(l => l.product.prefix))
     const cartCategories = new Set(lines.map(l => l.product.category))
     // Prioriza mesma categoria, depois qualquer produto
     const sameCategory = products.filter(p => !cartPrefixes.has(p.prefix) && cartCategories.has(p.category))
     const others = products.filter(p => !cartPrefixes.has(p.prefix) && !cartCategories.has(p.category))
-    return [...sameCategory, ...others].slice(0, 5)
-  }, [lines.length])
+    return [...sameCategory, ...others]
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [skusNoCarrinho])
+
+  const SUGESTOES_POR_PAGINA = 5
+  const [sugPagina, setSugPagina] = useState(0)
+  // Direção da última navegação: a página nova desliza vindo do lado certo
+  const [sugDirecao, setSugDirecao] = useState<1 | -1>(1)
+  const totalPaginasSug = Math.max(1, Math.ceil(todasSugestoes.length / SUGESTOES_POR_PAGINA))
+  const paginaAtual = Math.min(sugPagina, totalPaginasSug - 1)
+  const sugestoes = todasSugestoes.slice(paginaAtual * SUGESTOES_POR_PAGINA, paginaAtual * SUGESTOES_POR_PAGINA + SUGESTOES_POR_PAGINA)
 
   return (
     <>
@@ -97,6 +136,8 @@ export default function CartPage() {
               )}
             </div>
 
+            <EstoqueAviso itens={semEstoque} />
+
             {/* ── BARRAS DE PROGRESSO DUPLAS ── */}
             {lines.length > 0 && (
               <div className="cartProgressCards">
@@ -104,7 +145,7 @@ export default function CartPage() {
                 {nextTier ? (
                   <div className="cartProgressCard">
                     <div className="cartProgressCardHead">
-                      <span className="cartProgressIcon">🏷️</span>
+                      <span className="cartProgressIcon">{/* eslint-disable-next-line @next/next/no-img-element */}<img src="/etiqueta-promo-icon.png" alt="" aria-hidden="true" /></span>
                       <div>
                         <strong>Próximo desconto</strong>
                         <span>Adicione <strong>{nextTier.diff} un.</strong> para {formatCurrency(nextTier.nextPrice)}/un.</span>
@@ -127,13 +168,13 @@ export default function CartPage() {
                 {/* Barra 2: Frete grátis */}
                 {freteGratis ? (
                   <div className="cartProgressCard cartProgressCardDone">
-                    <span className="cartProgressIcon">🚚</span>
+                    <span className="cartProgressIcon">{/* eslint-disable-next-line @next/next/no-img-element */}<img src="/icone-caminhao.png" alt="" aria-hidden="true" /></span>
                     <strong>Frete grátis conquistado!</strong>
                   </div>
                 ) : (
                   <div className="cartProgressCard">
                     <div className="cartProgressCardHead">
-                      <span className="cartProgressIcon">🚚</span>
+                      <span className="cartProgressIcon">{/* eslint-disable-next-line @next/next/no-img-element */}<img src="/icone-caminhao.png" alt="" aria-hidden="true" /></span>
                       <div>
                         <strong>Frete grátis</strong>
                         <span>Faltam <strong>{formatCurrency(FRETE_GRATIS - subtotal)}</strong></span>
@@ -171,7 +212,7 @@ export default function CartPage() {
                     : 100
 
                   return (
-                    <div key={variation.sku} className="cartItem">
+                    <div key={variation.sku} className={`cartItem ${variation.sku === recemAdicionado ? 'cartItemFlash' : ''}`}>
                       {/* Imagem */}
                       <a href={`/${product.slug}`} className="cartItemImg">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -260,13 +301,33 @@ export default function CartPage() {
             {/* ── CROSS-SELL ── */}
             {lines.length > 0 && (
               <div className="cartSugestoes">
-                <h2 className="cartSugestoesTitle">Complete seu pedido</h2>
-                <p className="cartSugestoesSubtitle">Clientes que compraram esses produtos também levaram:</p>
-                <div className="cartSugestoesGrid">
+                <div className="cartSugestoesHead">
+                  <div>
+                    <h2 className="cartSugestoesTitle">Complete seu pedido</h2>
+                    <p className="cartSugestoesSubtitle">Clientes que compraram esses produtos também levaram:</p>
+                  </div>
+                  <div className="cartSugestoesNav">
+                    <button
+                      type="button"
+                      aria-label="Sugestões anteriores"
+                      disabled={paginaAtual === 0}
+                      onClick={() => { setSugDirecao(-1); setSugPagina(p => Math.max(0, p - 1)) }}
+                    >‹</button>
+                    <button
+                      type="button"
+                      aria-label="Mais sugestões"
+                      disabled={paginaAtual >= totalPaginasSug - 1}
+                      onClick={() => { setSugDirecao(1); setSugPagina(p => Math.min(totalPaginasSug - 1, p + 1)) }}
+                    >›</button>
+                  </div>
+                </div>
+                {/* key pela página: cada troca remonta o grid e dispara o deslize */}
+                <div key={paginaAtual} className={`cartSugestoesGrid ${sugDirecao === 1 ? 'sugEntraDir' : 'sugEntraEsq'}`}>
                   {sugestoes.map(p => {
                     const lowestPrice = Math.min(...p.variations.flatMap(v => v.tiers.map(t => t.price)))
+                    const saindo = sugestaoSaindo.has(p.prefix)
                     return (
-                      <a key={p.prefix} href={`/${p.slug}`} className="cartSugestaoCard">
+                      <a key={p.prefix} href={`/${p.slug}`} className={`cartSugestaoCard ${saindo ? 'cartSugestaoSaindo' : ''}`}>
                         <div className="cartSugestaoImg">
                           {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img
@@ -282,7 +343,14 @@ export default function CartPage() {
                             a partir de <strong>{formatCurrency(lowestPrice)}</strong>
                           </p>
                         </div>
-                        <span className="cartSugestaoBtn">+ Adicionar</span>
+                        {/* Botão de verdade: adiciona AQUI no carrinho, sem sair da página */}
+                        <button
+                          type="button"
+                          className={`cartSugestaoBtn ${saindo ? 'cartSugestaoBtnOk' : ''}`}
+                          onClick={(e) => { e.preventDefault(); e.stopPropagation(); adicionarSugestao(p.prefix, p.variations[0].sku) }}
+                        >
+                          {saindo ? '✓ Adicionado!' : '+ Adicionar'}
+                        </button>
                       </a>
                     )
                   })}
@@ -300,6 +368,15 @@ export default function CartPage() {
                 <div className="cartSidebarLines">
                   {lines.map(({ product, variation, quantity, total }) => (
                     <div key={variation.sku} className="cartSidebarLine">
+                      <span className="cartSidebarThumb">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={productImageSrc(variation.sku)}
+                          alt=""
+                          loading="lazy"
+                          onError={handleProductImageError(variation.sku)}
+                        />
+                      </span>
                       <span className="cartSidebarLineInfo">
                         <span className="cartSidebarLineNome">
                           {product.name}
@@ -345,29 +422,25 @@ export default function CartPage() {
                   <strong>{formatCurrency(totalComDesc)}</strong>
                 </div>
 
+                {/* Desconto real de 3% pagando com Pix (aplicado no checkout) */}
                 <div className="cartSidebarRow cartSidebarPixRow">
                   <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src="/pagamento-pix.png" alt="" aria-hidden="true" style={{ height: 15, width: 15 }} />
-                    Pagando com Pix
+                    No Pix ({PIX_DESCONTO_PERCENT}% off)
                   </span>
                   <strong className="cartSidebarPixValue">{formatCurrency(pixSubtotal)}</strong>
                 </div>
 
-                {/* Economizou destaque */}
-                {totalEconomia > 0.01 && (
-                  <div className="cartEconomiaDestaque">
-                    <span>🎉</span>
-                    <div>
-                      <strong>Você economizou {formatCurrency(totalEconomia)}</strong>
-                      <span>com desconto por volume</span>
-                    </div>
-                  </div>
+                {semEstoque.length > 0 ? (
+                  <span className="cartSidebarCheckout cartSidebarCheckoutOff" aria-disabled="true">
+                    Ajuste o estoque para continuar
+                  </span>
+                ) : (
+                  <a href="/checkout" className="cartSidebarCheckout">
+                    Finalizar compra →
+                  </a>
                 )}
-
-                <a href="/checkout" className="cartSidebarCheckout">
-                  Finalizar compra →
-                </a>
 
                 {/* Segurança + logos de pagamento */}
                 <div className="cartSecurePay">

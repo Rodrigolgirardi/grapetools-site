@@ -108,7 +108,8 @@
   color: #6b7280;
 }
 
-.cartProgressIcon { font-size: 20px; flex-shrink: 0; }
+.cartProgressIcon { font-size: 20px; flex-shrink: 0; line-height: 0; }
+.cartProgressIcon img { height: 22px; width: 22px; object-fit: contain; display: block; }
 
 .cartProgressBar {
   height: 8px;
@@ -495,6 +496,20 @@
   font-size: 12.5px;
   color: #6b7280;
 }
+/* Miniatura do produto (mesmo padrão do checkout) */
+.cartSidebarThumb {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border: 1px solid #eeeaf6;
+  border-radius: 8px;
+  background: #fff;
+}
+.cartSidebarThumb img { width: 100%; height: 100%; object-fit: contain; }
+
 /* Nome em cima, quantidade em negrito na linha de baixo */
 .cartSidebarLineInfo { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
 .cartSidebarLineNome { color: #1a1a2e; font-weight: 600; line-height: 1.35; }
@@ -511,8 +526,8 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 13.5px;
-  color: #4b5563;
+  font-size: 12.5px;
+  color: #6b7280;
 }
 .cartSidebarRow strong { color: #1a1a2e; font-weight: 700; }
 
@@ -528,7 +543,7 @@
 }
 
 .cartSidebarTotal {
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 800;
   color: #1a1a2e;
   padding-top: 4px;
@@ -542,22 +557,6 @@
   color: #15803d;
 }
 .cartSidebarPixValue { color: #15803d !important; font-size: 15px !important; font-weight: 800 !important; }
-
-/* Economia destaque */
-.cartEconomiaDestaque {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  background: linear-gradient(135deg, #fef9c3, #fef08a);
-  border: 1px solid #fde047;
-  border-radius: 10px;
-  padding: 12px 14px;
-  font-size: 12.5px;
-}
-.cartEconomiaDestaque > span { font-size: 22px; }
-.cartEconomiaDestaque > div { display: flex; flex-direction: column; gap: 1px; }
-.cartEconomiaDestaque strong { color: #854d0e; font-size: 14px; font-weight: 800; }
-.cartEconomiaDestaque span { color: #92400e; }
 
 /* Cupom */
 .cartCupomWrap { display: flex; flex-direction: column; gap: 7px; }
@@ -700,4 +699,72 @@
   .cartProgressCards { grid-template-columns: 1fr; }
   .cartSugestoesGrid { gap: 10px; }
   .cartSugestaoCard { flex: 0 0 150px; }
+}
+
+/* Checkout travado por falta de estoque */
+.cartSidebarCheckoutOff {
+  opacity: 0.55;
+  cursor: not-allowed;
+  text-align: center;
+}
+
+/* ── Animação do "+ Adicionar" das sugestões ── */
+.cartSugestaoBtn { border: none; width: calc(100% - 20px); cursor: pointer; font-family: inherit; }
+.cartSugestaoBtnOk {
+  background: #dcfce7 !important;
+  color: #15803d !important;
+}
+/* Cartão se recolhe suavemente depois da confirmação */
+.cartSugestaoSaindo {
+  animation: sugestaoSai 0.45s ease 0.25s forwards;
+  pointer-events: none;
+}
+@keyframes sugestaoSai {
+  to { opacity: 0; transform: scale(0.88) translateY(8px); }
+}
+/* Item recém-chegado pisca na lista pra mostrar onde entrou */
+.cartItemFlash {
+  animation: itemChega 1.5s ease;
+}
+@keyframes itemChega {
+  0%   { background: #ede9fe; box-shadow: 0 0 0 2px var(--purple-400, #8b5cf6); }
+  60%  { background: #f5f3ff; box-shadow: 0 0 0 2px rgba(139,92,246,0.35); }
+  100% { background: #fff;    box-shadow: 0 2px 8px rgba(91,33,182,0.05); }
+}
+
+/* ── Navegação ‹ › das sugestões ── */
+.cartSugestoesHead {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+.cartSugestoesNav { display: flex; gap: 6px; flex-shrink: 0; }
+.cartSugestoesNav button {
+  width: 34px;
+  height: 34px;
+  border: 1px solid #e5e7eb;
+  border-radius: 50%;
+  background: #fff;
+  color: var(--purple-700, #5b21b6);
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  transition: border-color 0.15s, background 0.15s;
+}
+.cartSugestoesNav button:hover:not(:disabled) { border-color: var(--purple-400, #8b5cf6); background: var(--purple-50, #f5f3ff); }
+.cartSugestoesNav button:disabled { opacity: 0.35; cursor: default; }
+
+/* Deslize suave ao trocar de página nas sugestões (direção acompanha a seta) */
+.sugEntraDir { animation: sugDeslizaDir 0.32s ease; }
+.sugEntraEsq { animation: sugDeslizaEsq 0.32s ease; }
+@keyframes sugDeslizaDir {
+  from { opacity: 0; transform: translateX(34px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes sugDeslizaEsq {
+  from { opacity: 0; transform: translateX(-34px); }
+  to   { opacity: 1; transform: translateX(0); }
 }

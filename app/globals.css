@@ -608,8 +608,13 @@ h1, h2, h3, h4 { font-family: var(--font-syne), sans-serif; margin: 0; }
   gap: 16px;
   align-items: start;
   width: var(--content-w);
-  margin: 16px auto 0;
+  margin: 0 auto;
+  padding: 24px 0 40px;
   box-sizing: border-box;
+  /* bloco cinza de largura total sem wrapper: pinta pros lados e recorta */
+  background: #f8f8fb;
+  box-shadow: 0 0 0 100vmax #f8f8fb;
+  clip-path: inset(0 -100vmax);
 }
 
 /* ════════════════════════════
@@ -1053,29 +1058,32 @@ h1, h2, h3, h4 { font-family: var(--font-syne), sans-serif; margin: 0; }
    TRUST BAR
 ════════════════════════════ */
 .trustBar {
-  background: var(--surface);
+  background: #f8f8fb;
   border-bottom: 1px solid var(--line);
 }
 
 .trustBarInner {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 28px;
+  justify-content: space-between;
+  gap: 18px;
   width: var(--content-w);
   margin: 0 auto;
-  padding: 6px 0;
+  padding: 10px 0;
   flex-wrap: wrap;
 }
 
-.trustBarInner span {
-  font-size: 11px;
-  font-weight: 500;
-  color: var(--muted);
+/* Item da faixa de confiança: ícone + título em negrito + subtítulo */
+.trustItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
   white-space: nowrap;
 }
-
-.trustBarInner span::first-letter { color: var(--green); }
+.trustItem img { height: 24px; width: 24px; object-fit: contain; flex-shrink: 0; }
+.trustItemTexto { display: flex; flex-direction: column; gap: 0; line-height: 1.3; }
+.trustItemTexto strong { font-size: 12.5px; font-weight: 800; color: var(--ink, #1a1a2e); }
+.trustItemTexto em { font-style: normal; font-size: 11px; color: var(--muted); }
 
 .bannerImageLink {
   display: block;
@@ -1766,7 +1774,7 @@ h1, h2, h3, h4 { font-family: var(--font-syne), sans-serif; margin: 0; }
 ════════════════════════════ */
 .simSection {
   width: 100%;
-  background: var(--surface, #f7f6fb);
+  background: #ffffff;
   border-top: 1px solid #e8e4f0;
   padding: 40px 0 48px;
 }
@@ -2477,16 +2485,18 @@ h1, h2, h3, h4 { font-family: var(--font-syne), sans-serif; margin: 0; }
 }
 
 .sidePanelHead {
-  display: flex;
+  /* Grid espelhado: título EXATAMENTE ao centro, X à direita */
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  justify-content: space-between;
   padding: 16px 18px;
   border-bottom: 1px solid var(--line);
   background: var(--purple-700);
   color: white;
 }
 
-.sidePanelHead strong { font-size: 15px; font-weight: 700; }
+.sidePanelHead strong { grid-column: 2; font-size: 19px; font-weight: 800; text-align: center; }
+.sidePanelHead button { grid-column: 3; justify-self: end; }
 
 .sidePanelHead button {
   display: grid; place-items: center;
@@ -2675,10 +2685,10 @@ h1, h2, h3, h4 { font-family: var(--font-syne), sans-serif; margin: 0; }
    MAIS VENDIDOS
 ════════════════════════════ */
 .maisVendidosSection {
-  background: var(--white);
+  background: #ffffff;
   border-top: 1px solid var(--line);
   border-bottom: 1px solid var(--line);
-  margin-top: 12px;
+  margin-top: 0;
 }
 
 .maisVendidosInner {
@@ -3016,8 +3026,9 @@ h1, h2, h3, h4 { font-family: var(--font-syne), sans-serif; margin: 0; }
 
 /* Texto "Minha profissão" com brilho animado (shimmer) — marrom escuro com um
    brilho claro varrendo, combina com o botão dourado. */
+/* Texto branco com brilho lilás deslizando (o shimmer é no clip do texto) */
 .profissaoTxt {
-  background: linear-gradient(110deg, #2a1500 0%, #2a1500 42%, #ffffff 50%, #2a1500 58%, #2a1500 100%);
+  background: linear-gradient(110deg, #ffffff 0%, #ffffff 42%, #d8ccff 50%, #ffffff 58%, #ffffff 100%);
   background-size: 200% auto;
   -webkit-background-clip: text;
   background-clip: text;
@@ -3180,34 +3191,21 @@ h1, h2, h3, h4 { font-family: var(--font-syne), sans-serif; margin: 0; }
   align-items: center !important;
   align-self: stretch !important;
   gap: 7px !important;
-  border: 1px solid rgba(184, 134, 11, 0.55) !important;
+  border: 1px solid transparent !important;
   border-radius: 5px !important;
   padding: 6px 18px !important;
   margin-top: 5px !important;
   margin-bottom: 5px !important;
   opacity: 1 !important;
   font-weight: 700 !important;
-  font-size: 17.5px !important;
+  font-size: 14px !important;
   letter-spacing: 0.02em !important;
   position: relative;
-  color: #2a1500 !important;
-  -webkit-text-fill-color: #2a1500 !important;
-  background: linear-gradient(
-    110deg,
-    #d4a017 0%,
-    #ffd700 20%,
-    #fff3b0 40%,
-    #ffd700 60%,
-    #d4a017 80%,
-    #ffd700 100%
-  ) !important;
-  background-size: 250% 100% !important;
-  -webkit-background-clip: border-box !important;
-  background-clip: border-box !important;
-  animation: profissaoShimmer 3s linear infinite,
-             goldGlow 2.5s ease-in-out infinite !important;
-  box-shadow: 0 0 8px rgba(255, 200, 50, 0.4) !important;
-  transition: transform 0.2s ease !important;
+  color: #fff !important;
+  -webkit-text-fill-color: #fff !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  transition: transform 0.2s ease, background 0.15s !important;
 }
 
 @keyframes profissaoShimmer {
@@ -3222,42 +3220,18 @@ h1, h2, h3, h4 { font-family: var(--font-syne), sans-serif; margin: 0; }
 }
 
 .profissaoBtn:hover {
-  color: #2a1500 !important;
-  -webkit-text-fill-color: #2a1500 !important;
-  background: linear-gradient(
-    110deg,
-    #e6b422 0%,
-    #ffdf40 20%,
-    #fffbe0 40%,
-    #ffdf40 60%,
-    #e6b422 80%,
-    #ffdf40 100%
-  ) !important;
-  background-size: 250% 100% !important;
-  animation: profissaoShimmer 1.2s linear infinite,
-             goldGlow 1.2s ease-in-out infinite !important;
-  transform: scale(1.06) !important;
+  color: #fff !important;
+  -webkit-text-fill-color: #fff !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+  transform: scale(1.03) !important;
 }
 
 /* quando ativo (perfil selecionado): dourado mais intenso + anel */
 .profissaoBtn.active {
-  color: #2a1500 !important;
-  -webkit-text-fill-color: #2a1500 !important;
-  background: linear-gradient(
-    110deg,
-    #b8860b 0%,
-    #ffd700 20%,
-    #fff3b0 40%,
-    #ffd700 60%,
-    #b8860b 80%,
-    #ffd700 100%
-  ) !important;
-  background-size: 250% 100% !important;
-  animation: profissaoShimmer 2s linear infinite,
-             goldGlow 2s ease-in-out infinite !important;
-  border-color: #b8860b !important;
-  outline: 2px solid rgba(255, 215, 0, 0.45) !important;
-  outline-offset: 2px !important;
+  color: #fff !important;
+  -webkit-text-fill-color: #fff !important;
+  background: rgba(124, 58, 237, 0.18) !important;
+  border-color: rgba(167, 139, 250, 0.5) !important;
 }
 
 /* o ícone ✨ acompanha a pílula */
@@ -5256,24 +5230,28 @@ h1, h2, h3, h4 { font-family: var(--font-syne), sans-serif; margin: 0; }
   50% { opacity: 0.8; }
 }
 
+/* Mesmo padrão dos botões Favoritos/Carrinho: altura 50px, borda e raio iguais */
 .headerUserBtn {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 5px 10px 5px 5px;
-  background: rgba(255,255,255,0.1);
-  border: 1px solid rgba(255,255,255,0.15);
-  border-radius: 10px;
+  padding: 0 18px 0 10px;
+  height: 50px;
+  background: transparent;
+  border: 1.5px solid rgba(255,255,255,0.25);
+  border-radius: var(--r-sm);
   cursor: pointer;
-  color: #fff;
-  font-size: 13px;
-  font-weight: 500;
-  transition: background 0.15s;
-  font-family: var(--font-dm-sans), sans-serif;
+  color: rgba(255,255,255,0.85);
+  font-size: 14.5px;
+  font-weight: 600;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+  font-family: inherit;
 }
 
 .headerUserBtn:hover {
-  background: rgba(255,255,255,0.18);
+  border-color: rgba(255,255,255,0.6);
+  color: white;
+  background: rgba(255,255,255,0.08);
 }
 
 .headerUserAvatar {
@@ -5564,32 +5542,23 @@ h1, h2, h3, h4 { font-family: var(--font-syne), sans-serif; margin: 0; }
   width: 100%;
   background: #140b1c;
   padding: 0;
+  display: flex;
+  align-items: center;
 }
 
-.backToSiteLink {
+.backToSiteLogo {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 10px 24px;
-  font-size: 13px;
-  font-weight: 600;
-  color: rgba(255,255,255,0.7);
-  text-decoration: none;
-  transition: color 0.15s, gap 0.15s;
+  padding: 8px 24px;
+  opacity: 0.92;
+  transition: opacity 0.15s;
 }
+.backToSiteLogo:hover { opacity: 1; }
+.backToSiteLogo img { height: 26px; width: auto; display: block; }
 
-.backToSiteLink svg {
-  transition: transform 0.2s ease;
-  flex-shrink: 0;
-}
-
-.backToSiteLink:hover {
-  color: #fff;
-  gap: 10px;
-}
-
-.backToSiteLink:hover svg {
-  transform: translateX(-3px);
+@media (max-width: 540px) {
+  .backToSiteLogo { padding: 8px 14px; }
+  .backToSiteLogo img { height: 22px; }
 }
 
 /* ===== Barra de progresso (frete grátis + maior desconto) ===== */
@@ -5742,4 +5711,152 @@ h1, h2, h3, h4 { font-family: var(--font-syne), sans-serif; margin: 0; }
 .cartDrawerSugestaoBtn:hover {
   background: #5b21b6;
   color: #fff;
+}
+
+/* ═══ Banner de estoque insuficiente (carrinho/checkout) ═══ */
+.estoqueAviso {
+  background: #e2482c;
+  border-radius: 10px;
+  padding: 14px 18px;
+  margin-bottom: 14px;
+  display: grid;
+  gap: 8px;
+}
+.estoqueAviso p {
+  margin: 0;
+  color: #fff;
+  font-size: 13.5px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+.estoqueAviso strong { font-weight: 800; }
+
+/* ═══ Banner hero (slide 1 do carrossel, montado em código) ═══ */
+.bannerHero {
+  display: grid;
+  grid-template-columns: minmax(280px, 1.1fr) 1.2fr minmax(170px, auto);
+  align-items: center;
+  gap: 18px;
+  height: 220px;
+  padding: 0 28px;
+  background:
+    radial-gradient(ellipse at 75% 120%, rgba(167,139,250,0.35), transparent 55%),
+    linear-gradient(115deg, #2e1065 0%, #4c1d95 55%, #5b21b6 100%);
+  overflow: hidden;
+}
+
+.bannerHeroTexto { display: grid; gap: 7px; justify-items: start; }
+.bannerHeroTitulo {
+  margin: 0;
+  font-family: var(--font-syne), sans-serif;
+  font-size: clamp(19px, 2.1vw, 27px);
+  line-height: 1.08;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: 0.01em;
+}
+.bannerHeroTitulo em { font-style: normal; color: #fbbf24; }
+.bannerHeroSub {
+  margin: 0;
+  font-size: 12.5px;
+  line-height: 1.4;
+  color: rgba(255,255,255,0.85);
+  max-width: 340px;
+}
+.bannerHeroChips { display: flex; flex-wrap: wrap; gap: 6px; }
+.bannerHeroChips span {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: #fff;
+  background: rgba(255,255,255,0.14);
+  border: 1px solid rgba(255,255,255,0.22);
+  border-radius: 999px;
+  padding: 3px 10px;
+  white-space: nowrap;
+}
+.bannerHeroBtn {
+  margin-top: 3px;
+  display: inline-block;
+  background: #fff;
+  color: var(--purple-700, #5b21b6);
+  font-size: 12.5px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  border-radius: 999px;
+  padding: 9px 20px;
+  text-decoration: none;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.bannerHeroBtn:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(0,0,0,0.25); }
+
+/* Produtos sobre pedestais (círculos) */
+.bannerHeroProdutos {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 14px;
+  height: 100%;
+  padding-bottom: 16px;
+}
+.bannerHeroPedestal {
+  position: relative;
+  width: 108px;
+  height: 108px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #7c3aed, #4c1d95 70%);
+  box-shadow: 0 14px 22px rgba(0,0,0,0.35), inset 0 -8px 16px rgba(0,0,0,0.25);
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+.bannerHeroPedestalAlto { margin-bottom: 26px; }
+.bannerHeroPedestal img {
+  width: 86%;
+  height: 86%;
+  object-fit: contain;
+  border-radius: 50%;
+  filter: drop-shadow(0 8px 10px rgba(0,0,0,0.35));
+}
+
+/* Cartões da direita */
+.bannerHeroLado { display: grid; gap: 10px; justify-items: stretch; }
+.bannerHeroCard {
+  display: grid;
+  gap: 2px;
+  justify-items: center;
+  text-align: center;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.22);
+  border-radius: 12px;
+  padding: 9px 14px;
+}
+.bannerHeroCard strong { font-size: 12px; font-weight: 800; color: #fff; letter-spacing: 0.04em; }
+.bannerHeroCard em { font-style: normal; font-size: 10.5px; font-weight: 700; color: #fbbf24; }
+.bannerHeroEstrelas { font-size: 11px; color: #fbbf24; letter-spacing: 2px; }
+.bannerHeroOffPill {
+  margin-top: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  color: #fff;
+  border: 1px solid #fbbf24;
+  border-radius: 999px;
+  padding: 2px 10px;
+}
+
+@media (max-width: 1080px) { .bannerHeroLado { display: none; } }
+@media (max-width: 760px) {
+  .bannerHero { grid-template-columns: 1fr; padding: 16px 20px; }
+  .bannerHeroProdutos { display: none; }
+  .bannerHeroSub { max-width: none; }
+}
+
+/* Texto do botão de profissão em 3 degraus: completo / médio / mínimo */
+.profissaoTxtCurta, .profissaoTxtMini { display: none; }
+@media (max-width: 1520px) {
+  .profissaoTxtLonga { display: none; }
+  .profissaoTxtCurta { display: inline; }
+}
+@media (max-width: 900px) {
+  .profissaoTxtCurta { display: none; }
+  .profissaoTxtMini { display: inline; }
 }

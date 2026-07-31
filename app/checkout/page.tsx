@@ -8,10 +8,12 @@ import { useAuth } from '@/hooks/useAuth'
 import { useCart } from '@/hooks/useCart'
 import { productImageSrc, handleProductImageError } from '@/lib/product-image'
 import { documentoValido, formatarDocumento } from '@/lib/documento'
-import { formatCurrency, getCartLines, descontoCarrinhoPercent, parcelasMaximas, PARCELAS_MAX, PARCELAS_SEM_JUROS, PARCELA_VALOR_MIN, JUROS_AO_MES } from '@/lib/pricing'
+import { formatCurrency, getCartLines, descontoCarrinhoPercent, parcelasMaximas, PARCELAS_MAX, PARCELAS_SEM_JUROS, PARCELA_VALOR_MIN, JUROS_AO_MES, PIX_DESCONTO_PERCENT } from '@/lib/pricing'
 import { trackBeginCheckout, trackPurchase, type GaItem } from '@/lib/analytics'
 import { metaBeginCheckout, metaPurchase } from '@/lib/meta-pixel'
 import { BackToSite } from '@/components/BackToSite'
+import { EstoqueAviso, itensSemEstoque } from '@/components/EstoqueAviso'
+import { useEstoque } from '@/hooks/useEstoque'
 
 type FreteOpcao = {
   id: number
@@ -103,10 +105,16 @@ export default function CheckoutPage() {
   const descPercent = descontoCarrinhoPercent(subtotal)
   // Cupom SOMA com o desconto por valor do carrinho (teto 90%) — igual ao servidor.
   const cupomPercent = cupomAplicado?.desconto_percent || 0
-  const descTotalPercent = Math.min(90, descPercent + cupomPercent)
+  // Desconto Pix (3%) entra quando a forma escolhida é Pix — espelha o servidor.
+  const pixPercent = formaPagamento === 'pix' ? PIX_DESCONTO_PERCENT : 0
+  const descTotalPercent = Math.min(90, descPercent + cupomPercent + pixPercent)
   const precoComDesc = (preco: number) => Math.round(preco * (100 - descTotalPercent)) / 100
   const totalComDesc = lines.reduce((s, l) => s + precoComDesc(l.tier.price) * l.quantity, 0)
   const descValor = subtotal - totalComDesc
+  // Base SEM o desconto Pix: a regra do frete grátis (R$199+ Grande SP) não pode
+  // mudar conforme a forma de pagamento — o servidor julga igual.
+  const descSemPixPercent = Math.min(90, descPercent + cupomPercent)
+  const totalSemPix = lines.reduce((s, l) => s + (Math.round(l.tier.price * (100 - descSemPixPercent)) / 100) * l.quantity, 0)
 
   // ——— FRETE (cotação real via Melhor Envio) ———
   const [freteOpcoes, setFreteOpcoes] = useState<FreteOpcao[] | null>(null)
@@ -116,7 +124,7 @@ export default function CheckoutPage() {
 
   const cepDigits = (endereco.cep || '').replace(/\D/g, '')
   // Frete grátis: >= R$199 com destino na Grande SP (CEP 0xxxx-xxx) — regra do topo do site
-  const freteGratis = entregaTipo === 'entrega' && cepDigits.length === 8 && cepDigits.startsWith('0') && totalComDesc >= 199
+  const freteGratis = entregaTipo === 'entrega' && cepDigits.length === 8 && cepDigits.startsWith('0') && totalSemPix >= 199
   const freteEscolhido = freteOpcoes?.find(o => o.id === freteId) || null
   const freteValor = entregaTipo === 'retirada' || freteGratis ? 0 : (freteEscolhido?.preco ?? 0)
   const freteDefinido = entregaTipo === 'retirada' || freteGratis || !!freteEscolhido
@@ -150,6 +158,10 @@ export default function CheckoutPage() {
     return () => { cancelado = true }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cepDigits, entregaTipo, freteGratis, linesKey])
+
+  // Itens acima do estoque → banner + trava o avanço (o servidor revalida no fim)
+  const estoque = useEstoque()
+  const semEstoque = itensSemEstoque(lines, estoque)
 
   // Só oferece parcelas que respeitem o valor mínimo por parcela (ver pricing.ts).
   // Base: produtos + frete — é o valor que o cliente parcela de fato.
@@ -545,6 +557,7 @@ export default function CheckoutPage() {
               <div className="checkoutSection">
                 <h2 className="checkoutSectionTitle">Revise seus itens</h2>
                 <p className="checkoutSectionSub">Veja os produtos que você escolheu e faça ajustes se necessário.</p>
+                <EstoqueAviso itens={semEstoque} />
                 <div className="checkoutItems">
                   {lines.map(({ product, variation, quantity, tier, total }) => (
                     <div key={variation.sku} className="checkoutItem">
@@ -607,8 +620,12 @@ export default function CheckoutPage() {
                   <span className="checkoutContinueBannerLink">Continuar comprando →</span>
                 </a>
 
-                <button className="checkoutBtnPrimary checkoutBtnFull" onClick={() => setStep('entrega')}>
-                  Continuar para entrega →
+                <button
+                  className="checkoutBtnPrimary checkoutBtnFull"
+                  onClick={() => setStep('entrega')}
+                  disabled={semEstoque.length > 0}
+                >
+                  {semEstoque.length > 0 ? 'Ajuste as quantidades para continuar' : 'Continuar para entrega →'}
                 </button>
               </div>
             )}
@@ -805,7 +822,7 @@ export default function CheckoutPage() {
 
                 <div className="checkoutPayOptions">
                   {([
-                    { id: 'pix', label: 'Pix', desc: 'Aprovação imediata', icon: '/pagamento-pix.png' },
+                    { id: 'pix', label: 'Pix', desc: `Aprovação imediata · ${PIX_DESCONTO_PERCENT}% de desconto`, icon: '/pagamento-pix.png' },
                     { id: 'cartao', label: 'Cartão de crédito', desc: 'Em até 12x', icon: '/pagamento-cartao.png' },
                     { id: 'boleto', label: 'Boleto bancário', desc: 'Prazo de 1–3 dias úteis', icon: '/pagamento-boleto.png' },
                   ] as const).map(opt => (
@@ -967,7 +984,7 @@ export default function CheckoutPage() {
               </div>
               {descTotalPercent > 0 && (
                 <div className="checkoutSidebarTotal" style={{ color: '#16a34a', fontWeight: 500 }}>
-                  <span style={{ color: '#16a34a' }}>Desconto ({descTotalPercent}%)</span>
+                  <span style={{ color: '#16a34a' }}>Desconto ({descTotalPercent}%{pixPercent > 0 ? ` · inclui ${pixPercent}% Pix` : ''})</span>
                   <strong style={{ fontSize: '0.875rem', color: '#16a34a' }}>− {formatCurrency(descValor)}</strong>
                 </div>
               )}

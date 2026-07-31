@@ -8,7 +8,7 @@ import { createClient } from '@/lib/supabase-server'
 import { documentoValido } from '@/lib/documento'
 import { getEstoqueMap, confirmarPedidoPago } from '@/lib/estoque'
 import { composicaoDoSku } from '@/lib/data'
-import { calcularPedidoServidor } from '@/lib/pricing'
+import { calcularPedidoServidor, PIX_DESCONTO_PERCENT } from '@/lib/pricing'
 import { buscarCupomAtivo } from '@/lib/cupom'
 import { cotarFrete, freteGratisElegivel } from '@/lib/frete-server'
 
@@ -223,6 +223,9 @@ export async function POST(request: NextRequest) {
       parcelas: parcelas && parcelas > 0 ? parcelas : 1,
       cupomPercent: cupom?.desconto_percent || 0,
       freteReais: freteValor,
+      // Desconto Pix: só quando a forma é pix (o frete-grátis usa o calcSemFrete,
+      // que fica SEM o pix de propósito — a regra dos R$199 não muda com a forma).
+      pixPercent: forma_pagamento === 'pix' ? PIX_DESCONTO_PERCENT : 0,
     })
     if (!calc.ok) {
       return NextResponse.json({ error: calc.erro || 'Itens do pedido inválidos.' }, { status: 400 })
