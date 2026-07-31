@@ -78,6 +78,8 @@ export function productJsonLd(product: Product) {
       priceCurrency: "BRL",
       lowPrice,
       highPrice,
+      // Nº de ofertas agregadas = variações do produto (aviso do Search Console)
+      offerCount: product.variations.length,
       availability: product.stock > 0
         ? "https://schema.org/InStock"
         : "https://schema.org/OutOfStock"

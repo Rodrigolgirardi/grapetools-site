@@ -456,7 +456,11 @@ export default function CheckoutPage() {
             {/* PIX */}
             {pagamentoResult?.tipo === 'pix' && pagamentoResult.qr_code && (
               <div className="checkoutPix">
-                <p className="checkoutPixTitle">⚡ Pague com Pix</p>
+                <p className="checkoutPixTitle">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src="/pagamento-pix.png" alt="" aria-hidden="true" className="checkoutPixTitleIcone" />
+                  Pague com Pix
+                </p>
                 <p className="checkoutPixDesc">Escaneie o QR Code ou copie o código abaixo</p>
                 {pagamentoResult.qr_code_url && (
                   <img src={pagamentoResult.qr_code_url} alt="QR Code Pix" className="checkoutPixQR" />

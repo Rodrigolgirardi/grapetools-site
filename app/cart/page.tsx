@@ -7,7 +7,7 @@ import { formatCurrency, getTierForQuantity, getCartLines, descontoCarrinhoPerce
 import { useCart } from '@/hooks/useCart'
 import { productImageSrc, handleProductImageError } from '@/lib/product-image'
 import { BackToSite } from '@/components/BackToSite'
-import { Minus, Plus, Trash2, ShoppingCart, Shield, FileText, Truck, MessageCircle } from 'lucide-react'
+import { Minus, Plus, Trash2, ShoppingCart } from 'lucide-react'
 
 const FRETE_GRATIS = 199
 
@@ -300,10 +300,12 @@ export default function CartPage() {
                 <div className="cartSidebarLines">
                   {lines.map(({ product, variation, quantity, total }) => (
                     <div key={variation.sku} className="cartSidebarLine">
-                      <span>
-                        {product.name}
-                        {variation.label !== product.name && ` · ${variation.label}`}
-                        <em> ×{quantity}</em>
+                      <span className="cartSidebarLineInfo">
+                        <span className="cartSidebarLineNome">
+                          {product.name}
+                          {variation.label !== product.name && ` · ${variation.label}`}
+                        </span>
+                        <span className="cartSidebarLineQtd">Quantidade: <b>{quantity}</b></span>
                       </span>
                       <strong>{formatCurrency(total)}</strong>
                     </div>
@@ -344,7 +346,11 @@ export default function CartPage() {
                 </div>
 
                 <div className="cartSidebarRow cartSidebarPixRow">
-                  <span>⚡ Pagando com Pix</span>
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src="/pagamento-pix.png" alt="" aria-hidden="true" style={{ height: 15, width: 15 }} />
+                    Pagando com Pix
+                  </span>
                   <strong className="cartSidebarPixValue">{formatCurrency(pixSubtotal)}</strong>
                 </div>
 
@@ -376,29 +382,15 @@ export default function CartPage() {
                     {/* Mastercard */}
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src="https://logospng.org/download/mastercard/logo-mastercard-1024.png" alt="Mastercard" className="cartPayLogoImg" />
-                    {/* Elo — badge estilizado */}
-                    <span className="cartPayLogoElo">elo</span>
+                    {/* Elo */}
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src="/elo-icon.png" alt="Elo" className="cartPayLogoImg" />
                     {/* Pix */}
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src="https://logospng.org/download/pix/logo-pix-icone-512.png" alt="Pix" className="cartPayLogoImg" />
-                    {/* Boleto — SVG com barras reais + label */}
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 44" className="cartPayLogoImg" style={{height:'24px',width:'auto'}}>
-                      <rect x="2"  y="0" width="5" height="34" fill="#1a1a1a"/>
-                      <rect x="9"  y="0" width="2" height="34" fill="#1a1a1a"/>
-                      <rect x="13" y="0" width="4" height="34" fill="#1a1a1a"/>
-                      <rect x="19" y="0" width="2" height="34" fill="#1a1a1a"/>
-                      <rect x="23" y="0" width="6" height="34" fill="#1a1a1a"/>
-                      <rect x="31" y="0" width="2" height="34" fill="#1a1a1a"/>
-                      <rect x="35" y="0" width="5" height="34" fill="#1a1a1a"/>
-                      <rect x="42" y="0" width="2" height="34" fill="#1a1a1a"/>
-                      <rect x="46" y="0" width="4" height="34" fill="#1a1a1a"/>
-                      <rect x="52" y="0" width="6" height="34" fill="#1a1a1a"/>
-                      <rect x="60" y="0" width="2" height="34" fill="#1a1a1a"/>
-                      <rect x="64" y="0" width="5" height="34" fill="#1a1a1a"/>
-                      <rect x="71" y="0" width="2" height="34" fill="#1a1a1a"/>
-                      <rect x="75" y="0" width="3" height="34" fill="#1a1a1a"/>
-                      <text x="40" y="43" textAnchor="middle" fontFamily="Arial" fontWeight="700" fontSize="9" fill="#1a1a1a">BOLETO</text>
-                    </svg>
+                    {/* Boleto (mesmo ícone do checkout) */}
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src="/pagamento-boleto.png" alt="Boleto" className="cartPayLogoImg" />
                   </div>
                 </div>
 
@@ -407,12 +399,14 @@ export default function CartPage() {
                 </a>
 
                 {/* Selos de confiança */}
+                {/* eslint-disable @next/next/no-img-element */}
                 <div className="cartTrust">
-                  <div className="cartTrustItem"><FileText size={13} /><span>Nota Fiscal</span></div>
-                  <div className="cartTrustItem"><Shield size={13} /><span>Compra Segura</span></div>
-                  <div className="cartTrustItem"><Truck size={13} /><span>Entrega Nacional</span></div>
-                  <div className="cartTrustItem"><MessageCircle size={13} /><span>Suporte WhatsApp</span></div>
+                  <div className="cartTrustItem"><img src="/icone-nf.png" alt="" aria-hidden="true" className="cartTrustIco" /><span>Nota Fiscal</span></div>
+                  <div className="cartTrustItem"><img src="/icone-shield.png" alt="" aria-hidden="true" className="cartTrustIco" /><span>Compra Segura</span></div>
+                  <div className="cartTrustItem"><img src="/icone-caminhao.png" alt="" aria-hidden="true" className="cartTrustIco" /><span>Entrega Nacional</span></div>
+                  <div className="cartTrustItem"><img src="/icon-zapzap.png" alt="" aria-hidden="true" className="cartTrustIco cartTrustIcoZap" /><span>Suporte WhatsApp</span></div>
                 </div>
+                {/* eslint-enable @next/next/no-img-element */}
               </div>
             </aside>
           )}

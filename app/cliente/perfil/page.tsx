@@ -74,6 +74,42 @@ export default function PerfilPage() {
   const [error, setError] = useState('')
   const [cepLoading, setCepLoading] = useState(false)
 
+  // Troca de senha: envia o link de redefinição pro e-mail da conta (mesmo fluxo
+  // do "esqueci minha senha"). A senha só muda por quem abrir o e-mail.
+  const [senhaEnviando, setSenhaEnviando] = useState(false)
+  const [senhaMsg, setSenhaMsg] = useState<{ ok: boolean; texto: string } | null>(null)
+  // Conta que só entra pelo Google não tem senha ainda — o mesmo link cria uma.
+  const soGoogle = (() => {
+    const provs = (user?.app_metadata?.providers as string[] | undefined) || []
+    return provs.length > 0 && !provs.includes('email')
+  })()
+
+  async function solicitarTrocaSenha() {
+    if (!user?.email) return
+    setSenhaEnviando(true)
+    setSenhaMsg(null)
+    try {
+      const supabase = createClient()
+      const { error } = await supabase.auth.resetPasswordForEmail(user.email, {
+        redirectTo: `${window.location.origin}/login/redefinir`,
+      })
+      if (error) {
+        // O Supabase limita a 1 pedido por minuto por e-mail
+        if (/second|rate/i.test(error.message)) {
+          setSenhaMsg({ ok: false, texto: 'Aguarde 1 minuto e tente de novo (limite de envios).' })
+        } else {
+          setSenhaMsg({ ok: false, texto: 'Não foi possível enviar o e-mail. Tente novamente.' })
+        }
+        return
+      }
+      setSenhaMsg({ ok: true, texto: '' }) // o texto do sucesso é montado no JSX (link verde + e-mail em negrito)
+    } catch {
+      setSenhaMsg({ ok: false, texto: 'Erro de conexão. Tente novamente.' })
+    } finally {
+      setSenhaEnviando(false)
+    }
+  }
+
   useEffect(() => {
     if (!loading && !user) { router.push('/login?redirect=/cliente/perfil'); return }
     if (user) loadProfile(user.id)
@@ -244,6 +280,33 @@ export default function PerfilPage() {
               </select>
             </div>
           </div>
+        </div>
+
+        {/* ─── SEGURANÇA: troca de senha com confirmação por e-mail ─── */}
+        <div className="perfilSection">
+          <h2 className="perfilSectionTitle">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <rect x="3" y="11" width="18" height="11" rx="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" />
+            </svg>
+            Segurança
+          </h2>
+          <p className="perfilSenhaDesc">
+            {soGoogle
+              ? 'Sua conta entra pelo Google. Se quiser, crie também uma senha para entrar com e-mail e senha.'
+              : 'Por segurança, a troca de senha é confirmada pelo seu e-mail: enviamos um link e você define a senha nova por ele.'}
+          </p>
+          {senhaMsg?.ok ? (
+            <p className="perfilSenhaMsg ok">
+              Enviamos um <strong className="perfilSenhaLink">link</strong> para <strong className="perfilSenhaEmail">{user?.email}</strong> — abra o e-mail e defina a nova senha por lá. Vale por 1 hora.
+            </p>
+          ) : senhaMsg ? (
+            <p className="perfilSenhaMsg erro">{senhaMsg.texto}</p>
+          ) : null}
+          {!senhaMsg?.ok && (
+            <button type="button" className="perfilBtnSecondary" onClick={solicitarTrocaSenha} disabled={senhaEnviando}>
+              {senhaEnviando ? 'Enviando…' : soGoogle ? 'Criar senha por e-mail' : 'Alterar senha por e-mail'}
+            </button>
+          )}
         </div>
 
         <div className="perfilActions">

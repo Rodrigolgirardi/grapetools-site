@@ -179,13 +179,10 @@ export function Header({ cartCount, onSearch, onCartOpen }: HeaderProps) {
               </>
             ) : (
               <a href="/login" className="headerLogin">
-                {/* Ícone de construção (capacete + rostinho) no lugar do bonequinho comum */}
-                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                  <path d="M6 12v-1a6 6 0 0 1 12 0v1" />
-                  <path d="M6 12h12" />
-                  <path d="M9.2 12v1a2.8 2.8 0 0 0 5.6 0v-1" />
-                  <path d="M18 21a6 6 0 0 0-12 0" />
-                </svg>
+                {/* Profissional de capacete (o ícone é preto; o CSS inverte pra
+                    branco quando o fundo do cabeçalho é escuro) */}
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/icone-login.png" alt="" aria-hidden="true" className="headerLoginIco" />
                 <span>Entrar</span>
               </a>
             )}

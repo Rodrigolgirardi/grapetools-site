@@ -701,7 +701,12 @@
   font-weight: 700;
   color: #15803d;
   margin: 0 0 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
+.checkoutPixTitleIcone { height: 20px; width: 20px; }
 
 .checkoutPixDesc {
   font-family: var(--font-dm-sans), sans-serif;

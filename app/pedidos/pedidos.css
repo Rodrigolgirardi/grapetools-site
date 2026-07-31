@@ -235,6 +235,38 @@
 .pedidoCardFooter span { color: #6b7280; }
 .pedidoCardFooter strong { font-size: 1.0625rem; font-weight: 800; color: #1a1a2e; }
 
+/* Ações rápidas: Ver compra / Comprar novamente */
+.pedidoCardAcoes {
+  display: flex;
+  gap: 8px;
+  padding: 0 16px 14px;
+  flex-wrap: wrap;
+}
+.pedidoBtnVer,
+.pedidoBtnRecomprar {
+  height: 36px;
+  padding: 0 16px;
+  border-radius: 8px;
+  font-family: var(--font-dm-sans), sans-serif;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+.pedidoBtnVer {
+  border: 1px solid #e5e7eb;
+  background: #fff;
+  color: var(--purple-700, #5b21b6);
+}
+.pedidoBtnVer:hover { border-color: var(--purple-400, #8b5cf6); background: var(--purple-50, #f5f3ff); }
+.pedidoBtnRecomprar {
+  border: none;
+  background: var(--purple-700, #5b21b6);
+  color: #fff;
+}
+.pedidoBtnRecomprar:hover:not(:disabled) { background: var(--purple-600, #6d28d9); }
+.pedidoBtnRecomprar:disabled { opacity: 0.6; cursor: default; }
+
 @media (max-width: 480px) {
   .pedidoItemRight { flex-direction: column; gap: 2px; align-items: flex-end; }
   .pedidosHeader { flex-direction: column; }

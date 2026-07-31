@@ -5,7 +5,8 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase-client'
 import { useAuth } from '@/hooks/useAuth'
-import { formatCurrency } from '@/lib/pricing'
+import { useCart } from '@/hooks/useCart'
+import { formatCurrency, findVariation } from '@/lib/pricing'
 import { BackToSite } from '@/components/BackToSite'
 
 interface PedidoItem {
@@ -35,10 +36,31 @@ const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string }
   cancelado:    { label: 'Cancelado',              color: '#dc2626', bg: '#fee2e2' },
 }
 
-const PAGAMENTO_LABEL: Record<string, string> = {
-  pix: '⚡ Pix',
-  boleto: '📄 Boleto',
-  transferencia: '🏦 Transferência',
+// Ícone + nome da forma de pagamento (mesmos ícones do checkout)
+const PAG_ICONE: Record<string, string> = {
+  pix: '/pagamento-pix.png',
+  boleto: '/pagamento-boleto.png',
+  cartao: '/pagamento-cartao.png',
+}
+const PAG_NOME: Record<string, string> = {
+  pix: 'Pix',
+  boleto: 'Boleto',
+  cartao: 'Cartão de crédito',
+  transferencia: 'Transferência',
+}
+
+function FormaPagamento({ forma }: { forma: string }) {
+  const nome = PAG_NOME[forma] || forma
+  const icone = PAG_ICONE[forma]
+  return (
+    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+      {icone && (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={icone} alt="" aria-hidden="true" style={{ height: 14, width: 'auto', maxWidth: 22 }} />
+      )}
+      {nome}
+    </span>
+  )
 }
 
 function formatDate(iso: string) {
@@ -49,6 +71,7 @@ function formatDate(iso: string) {
 
 export default function PedidosPage() {
   const { user, loading } = useAuth()
+  const { addToCart } = useCart()
   const router = useRouter()
   const [pedidos, setPedidos] = useState<Pedido[]>([])
   const [pedidosLoading, setPedidosLoading] = useState(true)
@@ -72,8 +95,8 @@ export default function PedidosPage() {
     setPedidosLoading(false)
   }
 
-  async function loadItens(pedidoId: string) {
-    if (itensCache[pedidoId]) return
+  async function loadItens(pedidoId: string): Promise<PedidoItem[]> {
+    if (itensCache[pedidoId]) return itensCache[pedidoId]
     const supabase = createClient()
     const { data } = await supabase
       .from('pedido_itens')
@@ -81,6 +104,34 @@ export default function PedidosPage() {
       .eq('pedido_id', pedidoId)
 
     if (data) setItensCache(c => ({ ...c, [pedidoId]: data }))
+    return data || []
+  }
+
+  // "Comprar novamente": joga os itens do pedido no carrinho e vai pro checkout.
+  // SKU que saiu do catálogo fica de fora (avisando), em vez de quebrar o carrinho.
+  const [recomprando, setRecomprando] = useState<string | null>(null)
+  async function comprarNovamente(pedidoId: string) {
+    setRecomprando(pedidoId)
+    try {
+      const itens = await loadItens(pedidoId)
+      const dentro: PedidoItem[] = []
+      const fora: string[] = []
+      for (const it of itens) {
+        if (it.sku !== 'JUROS' && findVariation(it.sku)) dentro.push(it)
+        else if (it.sku !== 'JUROS') fora.push(it.descricao || it.sku)
+      }
+      if (dentro.length === 0) {
+        alert('Os produtos deste pedido não estão mais disponíveis no catálogo.')
+        return
+      }
+      for (const it of dentro) addToCart(it.sku, it.quantidade)
+      if (fora.length > 0) {
+        alert(`Alguns itens não estão mais no catálogo e ficaram de fora:\n• ${fora.join('\n• ')}`)
+      }
+      router.push('/checkout')
+    } finally {
+      setRecomprando(null)
+    }
   }
 
   function toggleExpand(pedidoId: string) {
@@ -155,7 +206,7 @@ export default function PedidosPage() {
                         <div className="pedidoCardMeta">
                           <span>{formatDate(pedido.created_at)}</span>
                           {pedido.forma_pagamento && (
-                            <span>{PAGAMENTO_LABEL[pedido.forma_pagamento] || pedido.forma_pagamento}</span>
+                            <span><FormaPagamento forma={pedido.forma_pagamento} /></span>
                           )}
                         </div>
                       </div>
@@ -163,6 +214,21 @@ export default function PedidosPage() {
                         <strong className="pedidoTotal">{formatCurrency(pedido.total)}</strong>
                         <span className="pedidoExpandBtn">{isExpanded ? '▲' : '▼'}</span>
                       </div>
+                    </div>
+
+                    {/* Ações rápidas do pedido */}
+                    <div className="pedidoCardAcoes">
+                      <button type="button" className="pedidoBtnVer" onClick={() => toggleExpand(pedido.id)}>
+                        {isExpanded ? 'Ocultar detalhes' : 'Ver compra'}
+                      </button>
+                      <button
+                        type="button"
+                        className="pedidoBtnRecomprar"
+                        disabled={recomprando === pedido.id}
+                        onClick={() => comprarNovamente(pedido.id)}
+                      >
+                        {recomprando === pedido.id ? 'Adicionando…' : 'Comprar novamente'}
+                      </button>
                     </div>
 
                     {/* Itens do pedido (expandido) */}

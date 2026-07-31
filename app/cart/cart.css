@@ -485,18 +485,22 @@
 .cartSidebarLines {
   display: flex;
   flex-direction: column;
-  gap: 7px;
+  gap: 11px;
 }
 .cartSidebarLine {
   display: flex;
   justify-content: space-between;
+  align-items: flex-start;
   gap: 12px;
   font-size: 12.5px;
   color: #6b7280;
 }
-.cartSidebarLine span { flex: 1; line-height: 1.4; }
-.cartSidebarLine em { font-style: normal; color: #9ca3af; }
-.cartSidebarLine strong { color: #1a1a2e; font-weight: 600; white-space: nowrap; }
+/* Nome em cima, quantidade em negrito na linha de baixo */
+.cartSidebarLineInfo { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.cartSidebarLineNome { color: #1a1a2e; font-weight: 600; line-height: 1.35; }
+.cartSidebarLineQtd { font-size: 11.5px; color: #6b7280; }
+.cartSidebarLineQtd b { color: #1a1a2e; font-weight: 800; }
+.cartSidebarLine strong { color: #1a1a2e; font-weight: 700; white-space: nowrap; }
 
 .cartSidebarDivider {
   height: 1px;
@@ -531,15 +535,13 @@
 }
 .cartSidebarTotal strong { font-size: 20px; }
 
+/* Sem caixa verde: só o texto em verde negrito */
 .cartSidebarPixRow {
-  background: #f0fdf4;
-  border: 1px solid #bbf7d0;
-  border-radius: 10px;
-  padding: 10px 12px;
   font-size: 13px;
-  color: #166534;
+  font-weight: 700;
+  color: #15803d;
 }
-.cartSidebarPixValue { color: #15803d !important; font-size: 15px !important; }
+.cartSidebarPixValue { color: #15803d !important; font-size: 15px !important; font-weight: 800 !important; }
 
 /* Economia destaque */
 .cartEconomiaDestaque {
@@ -638,27 +640,11 @@
 }
 
 .cartPayLogoImg {
-  height: 24px;
+  height: 32px;
   width: auto;
   object-fit: contain;
   display: block;
   border-radius: 4px;
-}
-
-.cartPayLogoElo {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  height: 24px;
-  padding: 0 10px;
-  background: #000;
-  border-radius: 5px;
-  font-family: 'Arial Black', Arial, sans-serif;
-  font-weight: 900;
-  font-size: 14px;
-  color: #FFD100;
-  letter-spacing: -0.5px;
-  line-height: 1;
 }
 
 .cartSidebarContinue {
@@ -689,6 +675,11 @@
   font-weight: 600;
 }
 .cartTrustItem svg { color: var(--purple-700, #5b21b6); flex-shrink: 0; }
+/* Todos os arquivos são molduras quadradas 48x48 — caixa fixa = fileira alinhada */
+.cartTrustIco { height: 17px; width: 17px; object-fit: contain; flex-shrink: 0; }
+/* O zapzap tem traço grosso/preenchido; os outros são traço fino — a opacidade
+   equaliza o peso visual pra fileira não ter um ícone "gritando". */
+.cartTrustIcoZap { opacity: 0.62; }
 
 @keyframes shimmerBtn {
   0%   { background-position: 200% center; }
